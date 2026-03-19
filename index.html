@@ -9,9 +9,9 @@
     <meta name="theme-color" content="#ff6b6b">
     <title>🌟 스마트 학습 시스템</title>
     
-    <link rel="icon" href="icon.png?v=14">
-    <link rel="apple-touch-icon" href="icon.png?v=14">
-    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=14","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=14","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="icon" href="icon.png?v=15">
+    <link rel="apple-touch-icon" href="icon.png?v=15">
+    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=15","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=15","sizes":"512x512","type":"image/png"}]}'>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -255,7 +255,7 @@
                 <button class="btn-outline" onclick="selectConfig('difficulty', '최상')">최상</button>
             </div>
 
-            <button class="btn-main btn-primary" onclick="startNewQuiz()" style="margin-top:10px;">✨ 20문제 풀기 출발!</button>
+            <button class="btn-main btn-primary" onclick="startNewQuiz()" style="margin-top:10px;">✨ 문제 풀기 출발!</button>
         </div>
 
         <div style="display: flex; gap: 15px;">
@@ -557,7 +557,7 @@
         db.ref('push_notifications').orderByChild('timestamp').startAt(now).on('child_added', snap => {
             const data = snap.val();
             if (data && data.message) {
-                new Notification("스마트 학습 알림", { body: data.message, icon: "icon.png?v=13", vibrate: [200, 100, 200] });
+                new Notification("스마트 학습 알림", { body: data.message, icon: "icon.png?v=15", vibrate: [200, 100, 200] });
             }
         });
     }
@@ -581,12 +581,12 @@
     const KEY2 = "AIzaSyBred_9lqK4Jx1" + "emrzyHWcUVnmLrqnttUQ";
     const API_KEYS = [KEY1, KEY2];
 
-    // 💡 [핵심 업데이트] 에러를 발생시켰던 가상 모델명 제외 및 공식 API 모델로 전면 교체
     const AI_MODELS = [
-        "gemini-3.1-flash-lite", // 대시보드의 최대 쿼터 모델
-        "gemini-2.5-flash-lite",
+        "gemini-3.1-flash-lite", 
+        "gemini-2.5-flash-lite", 
+        "gemini-3-flash", 
         "gemini-2.5-flash",
-        "gemini-3-flash"
+        "gemini-1.5-flash"
     ];
 
     let currentProfile = null; 
@@ -924,7 +924,6 @@
         else overlay.style.display = 'none';
     }
 
-    // 💡 [통신 에러 해결 로직 적용 완료]
     async function fetchFromGemini(promptText, attempt = 0, isJson = true) {
         const totalAttempts = AI_MODELS.length * API_KEYS.length;
         if (attempt >= totalAttempts) {
@@ -1144,7 +1143,8 @@
             btnElement.style.borderColor = "var(--success)"; btnElement.style.backgroundColor = "#eafaf1";
             fbEl.innerText = '정답입니다!'; fbEl.className = 'correct';
             showFloatingPoint(event, "+5P (적립중)"); 
-            if(!sessionState.isRetryMode) sessionState.initialScore += (100 / sessionState.totalCount);
+            // 💡 [수정 완료] 1문제당 무조건 5점(5포인트)으로 계산식 통일
+            if(!sessionState.isRetryMode) sessionState.initialScore += 5; 
         } else {
             btnElement.style.borderColor = "var(--danger)"; btnElement.style.backgroundColor = "#fff0f0";
             fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요.`; fbEl.className = 'incorrect';
@@ -1183,7 +1183,8 @@
         if(isCorrect) {
             fbEl.innerText = '정답입니다!'; fbEl.className = 'correct';
             showFloatingPoint(event || { clientX: window.innerWidth/2, clientY: window.innerHeight/2 }, "+5P (적립중)"); 
-            if(!sessionState.isRetryMode) sessionState.initialScore += (100 / sessionState.totalCount);
+            // 💡 [수정 완료] 1문제당 무조건 5점(5포인트)으로 계산식 통일
+            if(!sessionState.isRetryMode) sessionState.initialScore += 5;
         } else {
             fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요.`; fbEl.className = 'incorrect';
             let wrongQ = { ...qData, userAns: userAnsRaw };
@@ -1207,8 +1208,11 @@
 
     async function finishQuizCycle() {
         showView('result-view');
-        const finalScore = Math.round(sessionState.initialScore);
-        if (finalScore === 100 && !sessionState.isRetryMode) triggerConfetti();
+        // 💡 [수정 완료] 이제 initialScore 자체가 점수이자 기본 포인트입니다. (20문제면 최대 100점, 10문제면 최대 50점)
+        const finalScore = sessionState.initialScore;
+        
+        const maxScore = sessionState.totalCount * 5; // 만점 기준 (20문제면 100, 10문제면 50)
+        if (finalScore === maxScore && !sessionState.isRetryMode) triggerConfetti();
 
         const titleEl = document.getElementById('result-title');
         const scoreEl = document.getElementById('result-score');
@@ -1221,11 +1225,10 @@
         if (!sessionState.isRetryMode) {
             scoreEl.innerText = `${finalScore}점`;
             
-            const correctCount = Math.round((finalScore / 100) * sessionState.totalCount);
-            const basePoints = correctCount * 5;
+            const basePoints = finalScore;
             let bonusPoints = 0;
-            if (finalScore === 100) bonusPoints = 20;
-            else if (finalScore >= 90) bonusPoints = 10;
+            if (finalScore === maxScore) bonusPoints = 20;
+            else if (finalScore >= (maxScore * 0.9)) bonusPoints = 10; // 90% 이상 맞췄을 때
             const totalEarnedPoints = basePoints + bonusPoints;
             
             if (!sessionState.reportSaved) {
@@ -1322,7 +1325,7 @@
         let reports = await dbGet('reports') || [];
         reports.unshift({
             id: new Date().getTime(), profile: currentProfile, date: getKSTTime(),
-            grade: config.grade, subject: config.subject, difficulty: config.difficulty, score: Math.round(sessionState.initialScore), totalCount: sessionState.totalCount || 20, wrongDetails: sessionState.wrongHistory
+            grade: config.grade, subject: config.subject, difficulty: config.difficulty, score: sessionState.initialScore, totalCount: sessionState.totalCount || 20, wrongDetails: sessionState.wrongHistory
         });
         if(reports.length > 100) reports.pop();
         await dbSet('reports', reports);
@@ -1350,8 +1353,8 @@
             html += `<tr>
                 <td style="font-weight:900; color:var(--text-main);">${r.profile}</td>
                 <td style="color:var(--text-muted); font-size:12px; line-height:1.4;">${r.date}<br>${formatGrade(r.grade)} ${diffText}급</td>
-                <td>${r.subject}<br><b style="color:${r.score===100?'var(--success)':'var(--danger)'};">${r.score}점</b></td>
-                <td><button class="btn-small" onclick="openDetailModal(${r.id})">상세/분석</button></td>
+                <td>${r.subject}<br><b style="color:${r.score===(r.totalCount*5)?'var(--success)':'var(--danger)'};">${r.score}점</b></td>
+                <td><button class="btn-small" onclick="openDetailModal(${r.id})">상세보기</button></td>
             </tr>`;
         });
         tbody.innerHTML = html;
