@@ -196,7 +196,7 @@
     <div id="loading-overlay" class="overlay">
         <div class="spinner"></div>
         <div style="font-size: 18px; font-weight: 900; color: var(--primary); text-align: center; line-height: 1.6;" id="loading-msg">
-            열심히 요청을 처리하고 있어요! 🚀
+            열심히 요청을 처리하고 있어요!
         </div>
     </div>
 
@@ -411,9 +411,6 @@
 </div>
 
 <script>
-    // =========================================================================
-    // 🔥 FIREBASE 연동 설정
-    // =========================================================================
     const firebaseConfig = {
         apiKey: "AIzaSyCJTPXzAVTuofcv902nnzIpJ_CcdK8OOEk",
         authDomain: "smart-edu-app-3d607.firebaseapp.com",
@@ -430,9 +427,6 @@
         db = firebase.database();
     }
 
-    // =========================================================================
-    // 💡 브라우저 푸시 알림 트리거 (앱 팝업 기능)
-    // =========================================================================
     async function triggerPushNotification(msg) {
         if (!db) return;
         const pushRef = db.ref('push_notifications').push();
@@ -478,10 +472,16 @@
     }
 
     // =========================================================================
-    // 🚀 무제한 API 폴백 라우팅 배열 (총 560회 한도)
+    // 무제한 API 폴백 라우팅 배열
     // =========================================================================
     const GEMINI_API_KEY = "AIzaSyCnDfcCJvyRMAcVw6sM2cI2S2VHvqx_TTw";
-    const AI_MODELS = ["gemini-2.5-flash", "gemini-3-flash", "gemini-2.5-flash-lite", "gemini-3.1-flash-lite"];
+    const AI_MODELS = [
+        "gemini-3.1-flash-lite", 
+        "gemini-2.5-flash-lite", 
+        "gemini-3-flash", 
+        "gemini-2.5-flash",
+        "gemini-1.5-flash"
+    ];
 
     let currentProfile = null; 
     let currentReportFilter = '전체';
@@ -491,7 +491,6 @@
     let reportDataCache = [];
     let purchaseDataCache = [];
 
-    // --- 앱 초기화 ---
     window.onload = async () => {
         initSetupUI();
         showView('login-view');
@@ -564,7 +563,6 @@
             switchAdminTab('report'); 
             showView('parent-view');
 
-            // 알림 권한 체크
             if ("Notification" in window) {
                 if (Notification.permission === "default") {
                     document.getElementById('permission-modal').style.display = 'flex';
@@ -767,7 +765,6 @@
         else overlay.style.display = 'none';
     }
 
-    // --- 🚀 [업데이트] 2026년 대한민국 교육과정 반영 AI 출제 ---
     async function fetchFromGemini(promptText, modelIndex = 0, isJson = true) {
         if (modelIndex >= AI_MODELS.length) throw new Error("서버 무료 한도가 모두 소진되었습니다.");
         const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODELS[modelIndex]}:generateContent?key=${GEMINI_API_KEY}`;
@@ -779,16 +776,19 @@
             body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig })
         });
         if (!response.ok) {
-            if (response.status === 429) return fetchFromGemini(promptText, modelIndex + 1, isJson);
+            // 403 (권한 없음), 404 (모델 없음), 429 (요청 한도 초과), 500 이상(서버 에러) 발생 시 다음 모델로 전환
+            if (response.status === 403 || response.status === 404 || response.status === 429 || response.status >= 500) {
+                console.warn(`[${AI_MODELS[modelIndex]}] 모델 통신 실패 (${response.status}). 다음 모델로 자동 전환합니다.`);
+                return fetchFromGemini(promptText, modelIndex + 1, isJson);
+            }
             throw new Error(`통신 에러 (코드: ${response.status})`);
         }
         return response.json();
     }
 
     async function startNewQuiz() {
-        showLoading(true, "AI 선생님이 2026년 교과서에 맞춰<br>문제를 만들고 있어요! 🤖📝");
+        showLoading(true, "AI 선생님이 2026년 교과서에 맞춰<br>문제를 만들고 있어요!");
         
-        // 🚀 2026년 기준 정밀 튜닝 프롬프트
         const prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2022 개정 교육과정' 및 '2026년 AI 디지털 교과서' 기준에 철저히 기반하여 초등학교 ${config.grade}학년 ${config.subject} 과목 문제 20개를 출제하십시오.
         난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
         
@@ -810,7 +810,7 @@
             
             showLoading(false); showView('quiz-view'); renderCurrentQuestion();
             
-            triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 ${config.grade}학년 ${config.subject} (${config.difficulty}) 문제 풀이를 시작했습니다! 🚀`);
+            triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 ${config.grade}학년 ${config.subject} (${config.difficulty}) 문제 풀이를 시작했습니다!`);
         } catch (error) {
             console.error(error); showLoading(false); alert(`오류 발생: ${error.message}`);
         }
@@ -1027,7 +1027,7 @@
         let allWrongs = []; studentReports.forEach(r => { if(r.wrongDetails) allWrongs = allWrongs.concat(r.wrongDetails); });
         if(allWrongs.length === 0) { alert(`해당 학생의 오답 기록이 없습니다. 아주 잘하고 있습니다! 👍`); return; }
 
-        showLoading(true, `오답 패턴을 기반으로<br>맞춤형 취약점 리포트를 작성 중입니다. 🤖`);
+        showLoading(true, `오답 패턴을 기반으로<br>맞춤형 취약점 리포트를 작성 중입니다.`);
         const prompt = `당신은 교육 분석 교사입니다. 학생 '${currentReportFilter}'의 오답 데이터: ${JSON.stringify(allWrongs.slice(0, 30).map(w=>({q:w.q, a:w.a, ans:w.userAns})))}. 2026년 개정 교육과정 기준에 따라 학생의 취약점과 가정 내 지도 방안을 500자 이내 텍스트로 브리핑하십시오.`;
 
         try {
