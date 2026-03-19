@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#ff6b6b">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ff6b6b">
     <title>🌟 스마트 학습 시스템</title>
     
     <link rel="icon" href="icon.png?v=4">
@@ -472,7 +473,7 @@
     }
 
     // =========================================================================
-    // 무제한 API 폴백 라우팅 배열
+    // 무제한 API 폴백 라우팅 배열 지정
     // =========================================================================
     const GEMINI_API_KEY = "AIzaSyCnDfcCJvyRMAcVw6sM2cI2S2VHvqx_TTw";
     const AI_MODELS = [
@@ -765,25 +766,45 @@
         else overlay.style.display = 'none';
     }
 
+    // 디버깅 및 통신 오류 완벽 방어 처리 로직
     async function fetchFromGemini(promptText, modelIndex = 0, isJson = true) {
-        if (modelIndex >= AI_MODELS.length) throw new Error("서버 무료 한도가 모두 소진되었습니다.");
-        const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODELS[modelIndex]}:generateContent?key=${GEMINI_API_KEY}`;
+        if (modelIndex >= AI_MODELS.length) {
+            console.error("[시스템 오류] 배열에 등록된 모든 모델에서 통신이 거절되었습니다. API 키의 상태를 확인해 주십시오.");
+            throw new Error("서버 무료 한도가 모두 소진되었거나 API 키 접근 권한이 없습니다.");
+        }
+
+        const currentModel = AI_MODELS[modelIndex];
+        console.log(`[통신 시도] 모델: ${currentModel} (우선순위: ${modelIndex + 1})`);
+
+        const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${GEMINI_API_KEY}`;
         const generationConfig = { temperature: 0.1 };
         if (isJson) generationConfig.response_mime_type = "application/json";
 
-        const response = await fetch(apiEndpoint, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig })
-        });
-        if (!response.ok) {
-            // 403 (권한 없음), 404 (모델 없음), 429 (요청 한도 초과), 500 이상(서버 에러) 발생 시 다음 모델로 전환
-            if (response.status === 403 || response.status === 404 || response.status === 429 || response.status >= 500) {
-                console.warn(`[${AI_MODELS[modelIndex]}] 모델 통신 실패 (${response.status}). 다음 모델로 자동 전환합니다.`);
-                return fetchFromGemini(promptText, modelIndex + 1, isJson);
+        try {
+            const response = await fetch(apiEndpoint, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.warn(`[통신 거절] 모델: ${currentModel}, 상태코드: ${response.status}, 사유:`, errorData);
+                
+                // 403(권한 없음), 404(모델 없음), 429(한도 초과), 500 이상(서버 에러) 발생 시 자동 폴백
+                if (response.status === 403 || response.status === 404 || response.status === 429 || response.status >= 500) {
+                    console.log(`[자동 전환] 다음 모델로 통신을 재시도합니다.`);
+                    return fetchFromGemini(promptText, modelIndex + 1, isJson);
+                }
+                throw new Error(`통신 에러 (코드: ${response.status})`);
             }
-            throw new Error(`통신 에러 (코드: ${response.status})`);
+            
+            console.log(`[통신 성공] 모델: ${currentModel} 에서 데이터를 정상적으로 수신했습니다.`);
+            return response.json();
+        } catch (error) {
+            console.error(`[네트워크 에러] 모델: ${currentModel}`, error);
+            // 인터넷 연결 불안정 등으로 발생한 예외 상황에서도 다음 모델 시도 보장
+            return fetchFromGemini(promptText, modelIndex + 1, isJson);
         }
-        return response.json();
     }
 
     async function startNewQuiz() {
@@ -876,12 +897,12 @@
 
         if (userAns === correctAns) {
             btnElement.style.borderColor = "var(--success)"; btnElement.style.backgroundColor = "#eafaf1";
-            fbEl.innerText = '정답입니다! 🥳'; fbEl.className = 'correct';
+            fbEl.innerText = '정답입니다!'; fbEl.className = 'correct';
             showFloatingPoint(event, "+5 점"); await addPoints(5);
             if(!sessionState.isRetryMode) sessionState.initialScore += (100 / sessionState.totalCount);
         } else {
             btnElement.style.borderColor = "var(--danger)"; btnElement.style.backgroundColor = "#fff0f0";
-            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요. 😢`; fbEl.className = 'incorrect';
+            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요.`; fbEl.className = 'incorrect';
             btnElement.style.transform = "translateX(-5px)"; setTimeout(() => btnElement.style.transform = "translateX(5px)", 50); setTimeout(() => btnElement.style.transform = "translateX(0)", 100);
             sessionState.wrongQuestions.push(qData);
             if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: selectedText });
@@ -892,7 +913,7 @@
     async function processSubjectiveAnswer(event) {
         const inputEl = document.getElementById('answer-input');
         const userAnsRaw = inputEl.value.trim();
-        if(userAnsRaw === '') { alert('답을 먼저 적어주세요! ✍️'); inputEl.focus(); return; }
+        if(userAnsRaw === '') { alert('답을 먼저 적어주세요!'); inputEl.focus(); return; }
 
         document.getElementById('submit-btn').disabled = true;
         const qData = sessionState.questions[sessionState.currentIndex];
@@ -901,12 +922,12 @@
         const fbEl = document.getElementById('feedback-box');
 
         if(userAns === correctAns) {
-            fbEl.innerText = '정답입니다! 🥳'; fbEl.className = 'correct';
+            fbEl.innerText = '정답입니다!'; fbEl.className = 'correct';
             showFloatingPoint(event || { clientX: window.innerWidth/2, clientY: window.innerHeight/2 }, "+5 점"); 
             await addPoints(5);
             if(!sessionState.isRetryMode) sessionState.initialScore += (100 / sessionState.totalCount);
         } else {
-            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요. 😢`; fbEl.className = 'incorrect';
+            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요.`; fbEl.className = 'incorrect';
             sessionState.wrongQuestions.push(qData);
             if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: userAnsRaw });
         }
@@ -934,22 +955,22 @@
         if (!sessionState.isRetryMode) {
             scoreEl.innerText = `${finalScore}점`;
             if (sessionState.wrongQuestions.length > 0) {
-                titleEl.innerText = "🚩 1차 학습 완료";
+                titleEl.innerText = "1차 학습 완료";
                 msgEl.innerText = `총 20문제 중 ${sessionState.wrongQuestions.length}문제를 틀렸어요.\n틀린 문제를 꼼꼼하게 다시 풀어봐요!`;
-                actionBtn.innerText = "오답 다시 풀기 ✍️";
+                actionBtn.innerText = "오답 다시 풀기";
             } else {
-                titleEl.innerText = "🏆 완벽해요!"; msgEl.innerText = "모든 문제를 다 맞췄어요. 정말 대단해요! 🎉"; actionBtn.innerText = "기분 좋게 끝내기";
+                titleEl.innerText = "완벽해요!"; msgEl.innerText = "모든 문제를 다 맞췄어요. 정말 대단해요!"; actionBtn.innerText = "기분 좋게 끝내기";
                 await saveReport();
             }
-            triggerPushNotification(`[점수 알림] ${currentProfile} 학생이 학습을 마쳤습니다. (1차 점수: ${finalScore}점) 💯`);
+            triggerPushNotification(`[점수 알림] ${currentProfile} 학생이 학습을 마쳤습니다. (1차 점수: ${finalScore}점)`);
         } else {
             scoreEl.style.display = 'none'; 
             if (sessionState.wrongQuestions.length > 0) {
-                titleEl.innerText = "💪 다시 풀기 완료"; msgEl.innerText = `아직 ${sessionState.wrongQuestions.length}문제가 틀렸어요.\n포기하지 말고 100점을 향해 고고!`; actionBtn.innerText = "한번 더 도전!";
+                titleEl.innerText = "다시 풀기 완료"; msgEl.innerText = `아직 ${sessionState.wrongQuestions.length}문제가 틀렸어요.\n포기하지 말고 100점을 향해 고고!`; actionBtn.innerText = "한번 더 도전!";
             } else {
-                titleEl.innerText = "🌟 최종 완료"; msgEl.innerText = "어려운 문제도 모두 해결했어요. 최고! 👍"; actionBtn.innerText = "마무리하기";
+                titleEl.innerText = "최종 완료"; msgEl.innerText = "어려운 문제도 모두 해결했어요. 최고!"; actionBtn.innerText = "마무리하기";
                 await saveReport();
-                triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 오답 수정을 모두 완료했습니다! 💯`);
+                triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 오답 수정을 모두 완료했습니다!`);
             }
         }
     }
@@ -1016,7 +1037,7 @@
         report.wrongDetails.forEach((item, idx) => {
             html += `<div class="wrong-item"><div class="wrong-q">${idx + 1}. ${item.q}</div><div class="wrong-ans">아이의 답: ${item.userAns}</div><div class="correct-ans">올바른 정답: ${item.a}</div></div>`;
         });
-        document.getElementById('modal-title').innerText = "📝 오답 노트 상세";
+        document.getElementById('modal-title').innerText = "오답 노트 상세";
         document.getElementById('modal-body').innerHTML = html;
         document.getElementById('detail-modal').style.display = 'flex';
     }
@@ -1025,15 +1046,15 @@
         if(currentReportFilter === '전체') { alert('학생 탭(김로운 또는 김서아)을 먼저 선택하십시오.'); return; }
         const studentReports = reportDataCache.filter(r => r.profile === currentReportFilter);
         let allWrongs = []; studentReports.forEach(r => { if(r.wrongDetails) allWrongs = allWrongs.concat(r.wrongDetails); });
-        if(allWrongs.length === 0) { alert(`해당 학생의 오답 기록이 없습니다. 아주 잘하고 있습니다! 👍`); return; }
+        if(allWrongs.length === 0) { alert(`해당 학생의 오답 기록이 없습니다. 아주 잘하고 있습니다!`); return; }
 
-        showLoading(true, `오답 패턴을 기반으로<br>맞춤형 취약점 리포트를 작성 중입니다.`);
+        showLoading(true, `오답 패턴을 기반으로 맞춤형 취약점 리포트를 작성 중입니다.`);
         const prompt = `당신은 교육 분석 교사입니다. 학생 '${currentReportFilter}'의 오답 데이터: ${JSON.stringify(allWrongs.slice(0, 30).map(w=>({q:w.q, a:w.a, ans:w.userAns})))}. 2026년 개정 교육과정 기준에 따라 학생의 취약점과 가정 내 지도 방안을 500자 이내 텍스트로 브리핑하십시오.`;
 
         try {
             const data = await fetchFromGemini(prompt, 0, false);
             showLoading(false);
-            document.getElementById('modal-title').innerText = `🤖 AI 취약점 및 지도 리포트`;
+            document.getElementById('modal-title').innerText = `AI 취약점 및 지도 리포트`;
             document.getElementById('modal-body').innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
             document.getElementById('detail-modal').style.display = 'flex';
         } catch(e) { showLoading(false); alert("서버 통신 중 오류가 발생했습니다."); }
