@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ff6b6b">
-    <title>스마트 학습 시스템</title>
+    <title>🌟 스마트 학습 시스템</title>
     
     <link rel="icon" href="icon.png?v=13">
     <link rel="apple-touch-icon" href="icon.png?v=13">
@@ -179,7 +179,7 @@
         .modal-content { background: white; width: 88%; max-height: 80vh; border-radius: 24px; padding: 30px 20px; overflow-y: auto; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
         
         .modal-btns { display: flex; gap: 12px; margin-top: 25px; width: 100%; }
-        .modal-btns button { flex: 1 1 0%; width: 50%; margin: 0; padding: 16px; font-size: 16px; }
+        .modal-btns button { flex: 1; margin: 0; padding: 16px; font-size: 16px; }
         
         .wrong-item { background: #ffffff; border: 2px solid #ffcccc; padding: 20px; border-radius: 16px; margin-bottom: 15px; text-align: left; font-size: 15px; box-shadow: 0 4px 0 #ffe0e0; }
         .wrong-q { font-weight: 900; margin-bottom: 10px; color: var(--text-main); white-space: pre-line; }
@@ -255,7 +255,7 @@
                 <button class="btn-outline" onclick="selectConfig('difficulty', '최상')">최상</button>
             </div>
 
-            <button class="btn-main btn-primary" onclick="startNewQuiz()" style="margin-top:10px;">시작하기!</button>
+            <button class="btn-main btn-primary" onclick="startNewQuiz()" style="margin-top:10px;">✨ 20문제 풀기 출발!</button>
         </div>
 
         <div style="display: flex; gap: 15px;">
@@ -354,7 +354,7 @@
         <div class="glass-card">
             <div class="quiz-status">
                 <span id="current-status" style="background:#eafaf1; padding:4px 10px; border-radius:8px; color:var(--success);"></span>
-                <span id="progress-text" style="color:var(--primary);"></span>
+                <span id="progress-text" style="color:var(--primary);">1 / 20</span>
             </div>
             
             <div class="progress-bar-bg"><div class="progress-bar-fill" id="quiz-progress-bar"></div></div>
@@ -362,11 +362,11 @@
             <div id="question-text" class="question-box">문제를 불러오는 중입니다...</div>
             <button id="tts-btn" class="btn-main btn-accent" style="display: none; margin: 0 auto 25px; padding: 12px; font-size:16px;">🔊 문제 읽어주기</button>
 
-            <div id="options-container" class="options-container" style="display: none;"></div>
-
+            <div id="options-container" class="options-container"></div>
+            
             <input type="text" id="answer-input" class="input-field" placeholder="단어를 정확히 쓰세요!" style="display: none; margin-bottom: 20px;" autocomplete="off">
             <button class="btn-main btn-secondary" id="submit-btn" onclick="processSubjectiveAnswer()" style="display: none;">✅ 정답 확인</button>
-            
+
             <div id="feedback-box"></div>
         </div>
     </div>
@@ -511,6 +511,7 @@
 </div>
 
 <script>
+    // Firebase 세팅 (그대로 유지)
     const firebaseConfig = {
         apiKey: "AIzaSyCJTPXzAVTuofcv902nnzIpJ_CcdK8OOEk",
         authDomain: "smart-edu-app-3d607.firebaseapp.com",
@@ -527,12 +528,16 @@
         db = firebase.database();
     }
 
+    // 💡 [업데이트] 한국 표준시(KST)로 정확하게 저장하는 헬퍼 함수
     function getKSTTime() {
         const d = new Date();
-        const month = d.getMonth() + 1;
-        const day = d.getDate();
-        const hours = d.getHours();
-        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+        const kstTime = new Date(utc + (9 * 3600000));
+        
+        const month = kstTime.getMonth() + 1;
+        const day = kstTime.getDate();
+        const hours = kstTime.getHours();
+        const minutes = String(kstTime.getMinutes()).padStart(2, '0');
         const ampm = hours >= 12 ? '오후' : '오전';
         const h = hours % 12 || 12;
         return `${month}월 ${day}일 ${ampm} ${h}:${minutes}`;
@@ -579,11 +584,10 @@
     const API_KEYS = [KEY1, KEY2];
 
     const AI_MODELS = [
-        "gemini-3.1-flash-lite", 
-        "gemini-2.5-flash-lite", 
-        "gemini-3-flash", 
-        "gemini-2.5-flash",
-        "gemini-1.5-flash"
+        "gemini-2.0-flash", 
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-8b",
+        "gemini-1.5-pro"
     ];
 
     let currentProfile = null; 
@@ -951,6 +955,7 @@
         }
     }
 
+    // 💡 [업데이트] 주관식 출제 조건 완전 삭제 및 100% 객관식 고정 반영
     async function startNewQuiz() {
         alert("💡 [학습 안내]\n정답 1개당 5포인트가 적립됩니다.\n단, 과정을 끝까지 완료해야만 적립된 포인트가 합산되어 최종 지급됩니다.\n중도 포기 시 포인트가 날아가니 끝까지 완료해주세요!");
         showLoading(true, "AI 선생님이 맞춤형 문제를<br>만들고 있어요!");
@@ -967,19 +972,19 @@
             prompt = `당신은 대한민국 교육 전문가입니다. '2026년 AI 디지털 교과서' 기준 ${gradeText} 영어(EFL 기초) 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
             [지침] 1. 원어민 수준이 아닌 '한국 기초 교육과정'의 실생활 소통 및 기초 파닉스 수준으로 출제. 2. 그림, 사진, 표 등 시각 자료가 필요한 문제는 절대 출제 금지. 오직 텍스트만으로 풀 수 있어야 함.
-            [규칙] 1. 무조건 100% 객관식 20개만 출제하십시오. 주관식은 절대 출제하지 마십시오. 2. 문제 지문과 보기는 모두 영어로 작성할 것. 3. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            [규칙] 1. 모든 문제는 예외 없이 100% 객관식 20개로만 출제하십시오. 주관식은 절대 금지합니다. 2. 문제 지문과 보기는 모두 영어로 작성할 것. 3. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
             JSON 응답: [{"type":"objective","q":"영어질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","desc":"이 문제의 핵심 개념과 정답인 이유 설명","tts_q":"영어질문","tts_options":["보기1","보기2","보기3","보기4"]}]`;
         } else if (config.subject === '국어') {
             prompt = `당신은 대한민국 교육 전문가입니다. '2026년 개정 교육과정' 기준 ${gradeText} 국어 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
             [지침] 1. 단순 단어 맞추기를 피하고, 짧은 지문이나 문장을 읽고 문맥 파악 및 문해력 위주로 출제. 2. 그림, 사진, 표 등 시각 자료가 필요한 문제는 절대 출제 금지. 오직 글(텍스트)만으로 풀 수 있어야 함.
-            [규칙] 1. 무조건 100% 객관식 20개만 출제하십시오. 주관식은 절대 출제하지 마십시오. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            [규칙] 1. 모든 문제는 예외 없이 100% 객관식 20개로만 출제하십시오. 주관식은 절대 금지합니다. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
             JSON 응답: [{"type":"objective","q":"질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","desc":"정답을 도출하는 구체적인 풀이 과정과 핵심 개념"}]`;
         } else {
             prompt = `당신은 대한민국 교육 전문가입니다. '2026년 개정 교육과정' 기준 ${gradeText} 수학 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
             [지침] 1. 실생활 상황을 반영한 '문장제 문제' 위주로 출제하되, 해당 연령이 이해하기 쉽게 간결해야 함. 2. 도형 그림, 그래프, 표 등 시각 자료를 보고 푸는 문제는 절대 출제 금지. 오직 텍스트 설명만으로 풀 수 있어야 함.
-            [규칙] 1. 무조건 100% 객관식 20개만 출제하십시오. 주관식은 절대 출제하지 마십시오. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            [규칙] 1. 모든 문제는 예외 없이 100% 객관식 20개로만 출제하십시오. 주관식은 절대 금지합니다. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
             JSON 응답: [{"type":"objective","q":"질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","desc":"정답을 도출하는 구체적인 풀이 과정과 핵심 개념"}]`;
         }
 
@@ -1123,9 +1128,11 @@
             ansInput.value = ''; subBtn.disabled = false; setTimeout(() => ansInput.focus(), 100);
         }
 
+        // 💡 [업데이트] 새로고침 꼼수 방지: 화면 그리기 완료 직후 세션 저장
         saveSession();
     }
 
+    // 💡 [업데이트] 무한 로딩 방지 및 즉각적인 상태 저장 로직 강화
     async function processObjectiveAnswer(selectedText, btnElement, event) {
         document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
         const qData = sessionState.questions[sessionState.currentIndex];
@@ -1150,12 +1157,16 @@
             if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: selectedText, desc: qData.desc });
         }
         
+        // 정답을 채점한 직후 바로 인덱스를 올리고 저장하여 꼼수를 차단합니다.
         sessionState.currentIndex++;
         saveSession(); 
         
         setTimeout(() => {
-            if (sessionState.currentIndex < sessionState.questions.length) renderCurrentQuestion();
-            else finishQuizCycle();
+            if (sessionState.currentIndex < sessionState.questions.length) {
+                renderCurrentQuestion();
+            } else {
+                finishQuizCycle();
+            }
         }, 1500);
     }
 
@@ -1184,12 +1195,16 @@
             if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: userAnsRaw, desc: qData.desc });
         }
         
+        // 정답을 채점한 직후 바로 인덱스를 올리고 저장하여 꼼수를 차단합니다.
         sessionState.currentIndex++;
         saveSession(); 
         
         setTimeout(() => {
-            if (sessionState.currentIndex < sessionState.questions.length) renderCurrentQuestion();
-            else finishQuizCycle();
+            if (sessionState.currentIndex < sessionState.questions.length) {
+                renderCurrentQuestion();
+            } else {
+                finishQuizCycle();
+            }
         }, 1500);
     }
 
