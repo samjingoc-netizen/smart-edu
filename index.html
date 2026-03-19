@@ -7,11 +7,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ff6b6b">
-    <title>스마트 학습 시스템</title>
+    <title>🌟 스마트 학습 시스템</title>
     
-    <link rel="icon" href="icon.png?v=11">
-    <link rel="apple-touch-icon" href="icon.png?v=11">
-    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=11","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=11","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="icon" href="icon.png?v=12">
+    <link rel="apple-touch-icon" href="icon.png?v=12">
+    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=12","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=12","sizes":"512x512","type":"image/png"}]}'>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -538,7 +538,7 @@
         db.ref('push_notifications').orderByChild('timestamp').startAt(now).on('child_added', snap => {
             const data = snap.val();
             if (data && data.message) {
-                new Notification("스마트 학습 알림", { body: data.message, icon: "icon.png?v=11", vibrate: [200, 100, 200] });
+                new Notification("스마트 학습 알림", { body: data.message, icon: "icon.png?v=12", vibrate: [200, 100, 200] });
             }
         });
     }
@@ -842,9 +842,6 @@
         if(!currentProfile || currentProfile === 'admin') return;
         dbSet('sessions/' + currentProfile, { config, sessionState }); 
     }
-
-    // 초기 UI 생성 방식을 제거하고 나이 기반 렌더링으로 대체
-    function initSetupUI() { }
 
     function renderGradeButtons(age) {
         const gradeContainer = document.getElementById('grade-container');
