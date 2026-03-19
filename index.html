@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ff6b6b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>🌟 스마트 학습 시스템</title>
+    
+    <link rel="manifest" href='data:application/manifest+json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","background_color":"#fdfbfb","theme_color":"#ff6b6b"}'>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <style>
+        :root {
+            --primary: #ff6b6b;         
+            --primary-dark: #ee5253;
+            --secondary: #4facfe;       
+            --accent: #feca57;          
+            --bg-color: #fdfbfb;
+            --surface: #ffffff;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --success: #1dd1a1;
+            --danger: #ff4757;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.04);
+            --shadow-md: 0 10px 30px rgba(255, 107, 107, 0.15);
+            --radius: 24px;
+        }
+
+        * { box-sizing: border-box; font-family: 'Apple SD Gothic Neo', 'NanumSquareRound', 'Malgun Gothic', sans-serif; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            color: var(--text-main); margin: 0; padding: 0; display: flex; justify-content: center;
+        }
+
+        .app-container {
+            width: 100%; max-width: 500px; min-height: 100vh; display: flex; flex-direction: column; 
+            position: relative; overflow-x: hidden; background: transparent;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), #ff9f43);
+            color: white; padding: 20px 25px; font-size: 24px; font-weight: 900;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); 
+            border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
+            position: sticky; top: 0; z-index: 50; letter-spacing: -0.5px;
+        }
+        .header-btn {
+            background: rgba(255,255,255,0.25); border: none; color: white;
+            padding: 8px 14px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 800;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .header-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.4); }
+
+        .view-section { display: none; flex: 1; flex-direction: column; padding: 25px 20px; animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .view-section.active { display: flex; }
+        
+        .glass-card {
+            background: var(--surface); border-radius: var(--radius); padding: 30px 20px;
+            box-shadow: var(--shadow-sm); border: 2px solid rgba(255, 107, 107, 0.05); margin-bottom: 25px;
+        }
+
+        .title-text { font-size: 22px; font-weight: 900; margin-bottom: 10px; color: var(--text-main); text-align: center; }
+        .subtitle-text { font-size: 15px; color: var(--text-muted); text-align: center; margin-bottom: 30px; font-weight: 600; }
+
+        .input-group { margin-bottom: 15px; }
+        .input-field {
+            width: 100%; padding: 18px; border: 2px solid #dfe6e9; border-radius: 16px;
+            font-size: 18px; transition: all 0.3s; background-color: #f8fbfa; font-weight: 700; text-align: center;
+        }
+        .input-field:focus { border-color: var(--secondary); background-color: white; box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.15); }
+
+        .btn-main {
+            width: 100%; padding: 18px; font-size: 18px; font-weight: 900; border: none;
+            border-radius: 16px; cursor: pointer; transition: all 0.1s;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            position: relative; top: 0;
+        }
+        .btn-main:active { top: 4px; box-shadow: none !important; }
+        
+        .btn-primary { background-color: var(--primary); color: white; box-shadow: 0 6px 0 var(--primary-dark); }
+        .btn-secondary { background-color: var(--secondary); color: white; box-shadow: 0 6px 0 #2e86de; }
+        .btn-accent { background-color: var(--accent); color: #833471; box-shadow: 0 6px 0 #f39c12; }
+        .btn-dark { background-color: #2d3436; color: white; box-shadow: 0 6px 0 #1e272e; }
+
+        .btn-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; width: 100%; }
+        .btn-outline {
+            flex: 1; min-width: 60px; padding: 14px; border: 2px solid #dfe6e9; border-radius: 14px;
+            background-color: white; color: var(--text-muted); font-size: 15px; font-weight: 800;
+            cursor: pointer; transition: all 0.2s; text-align: center; box-shadow: 0 4px 0 #dfe6e9;
+        }
+        .btn-outline:active { transform: translateY(4px); box-shadow: none; }
+        .btn-outline.active {
+            border-color: var(--primary); background-color: #fff0f0; color: var(--primary);
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .stat-badge {
+            background: linear-gradient(135deg, #feca57, #ff9f43); color: #833471;
+            padding: 10px 20px; border-radius: 20px; font-weight: 900; font-size: 15px;
+            box-shadow: 0 4px 15px rgba(254, 202, 87, 0.4); border: 2px solid #fff;
+        }
+        .streak-badge {
+            background: linear-gradient(135deg, #1dd1a1, #10ac84); color: white;
+            padding: 10px 20px; border-radius: 20px; font-weight: 900; font-size: 15px;
+            box-shadow: 0 4px 15px rgba(29, 209, 161, 0.4); border: 2px solid #fff;
+        }
+
+        .quiz-status { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 800; color: var(--text-muted); font-size: 14px; }
+        .progress-bar-bg { width: 100%; height: 12px; background-color: #dfe6e9; border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--secondary), #00d2d3); border-radius: 10px; transition: width 0.4s ease-out; width: 0%; }
+        
+        .question-box {
+            font-size: 22px; font-weight: 900; line-height: 1.5; color: var(--text-main);
+            margin-bottom: 25px; white-space: pre-line; word-break: keep-all; text-align: center;
+        }
+        .options-container { display: flex; flex-direction: column; gap: 15px; }
+        .option-row { display: flex; gap: 10px; width: 100%; }
+        .option-btn {
+            flex: 1; padding: 18px; background: white; border: 2px solid #dfe6e9;
+            border-radius: 16px; font-size: 17px; font-weight: 800; text-align: left;
+            cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 0 #dfe6e9;
+        }
+        .option-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: none; }
+        .option-btn:hover:not(:disabled) { border-color: var(--secondary); background: #f0f8ff; }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.9; }
+        
+        .tts-opt-btn {
+            width: 65px; background: #ffeaa7; border: none; border-radius: 14px; box-shadow: 0 4px 0 #f3ca20;
+            color: #d35400; font-weight: 900; cursor: pointer; transition: all 0.1s; font-size: 20px;
+        }
+        .tts-opt-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        #feedback-box { margin-top: 25px; font-size: 22px; font-weight: 900; text-align: center; min-height: 33px; animation: popIn 0.3s; }
+        .correct { color: var(--success); }
+        .incorrect { color: var(--danger); }
+
+        .report-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 15px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .report-table th, .report-table td { border-bottom: 1px solid #f1f2f6; padding: 15px 10px; text-align: center; }
+        .report-table th { background-color: #f8fbfa; color: var(--text-muted); font-weight: 800; }
+        .btn-small { background: var(--text-main); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; cursor: pointer; }
+        .btn-small.used { background: #b2bec3; cursor: default; }
+
+        .admin-info-box { background: #fff0f0; border: 2px solid #ffcccc; border-radius: 16px; padding: 20px; margin-bottom: 25px; }
+        .admin-info-title { font-weight: 900; color: var(--danger); margin-bottom: 10px; font-size: 16px; }
+
+        .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 20px; border: 2px solid #dfe6e9; border-radius: 16px; margin-bottom: 15px; background: white; box-shadow: 0 4px 0 #dfe6e9; }
+        .item-name { font-weight: 900; font-size: 18px; margin-bottom: 6px; color: var(--text-main); }
+        .item-cost { color: var(--primary); font-weight: 900; font-size: 15px; }
+
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.95) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); } 100% { opacity: 0; transform: translateY(-80px) scale(1.8) rotate(10deg); } }
+        
+        .floating-point {
+            position: fixed; color: var(--primary); font-size: 28px; font-weight: 900;
+            text-shadow: 0 4px 0 var(--primary-dark), 0 2px 10px rgba(0,0,0,0.3); pointer-events: none; z-index: 9999;
+            animation: floatUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .confetti { position: fixed; width: 10px; height: 10px; background-color: #f00; z-index: 8000; pointer-events: none; animation: fall linear forwards; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .spinner { width: 50px; height: 50px; border: 5px solid #ffeaa7; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal-content { background: white; width: 88%; max-height: 80vh; border-radius: 24px; padding: 30px 20px; overflow-y: auto; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        .modal-btns { display: flex; gap: 12px; margin-top: 25px; width: 100%; }
+        .modal-btns button { flex: 1; margin: 0; padding: 16px; font-size: 16px; }
+        
+        .wrong-item { background: #fff0f0; border: 2px solid #ffcccc; padding: 20px; border-radius: 16px; margin-bottom: 15px; text-align: left; font-size: 15px; }
+        .wrong-q { font-weight: 900; margin-bottom: 10px; color: var(--text-main); white-space: pre-line; }
+        .wrong-ans { color: var(--danger); margin-bottom: 5px; font-weight: 700; }
+        .correct-ans { color: var(--success); font-weight: 900; }
+    </style>
+</head>
+<body>
+
+<div class="app-container" id="app">
+    <div class="header">
+        <span id="header-title">🌟 스마트 학습</span>
+        <button id="logout-btn" class="header-btn" style="display:none;" onclick="logout()">나가기</button>
+    </div>
+
+    <div id="loading-overlay" class="overlay">
+        <div class="spinner"></div>
+        <div style="font-size: 18px; font-weight: 900; color: var(--primary); text-align: center; line-height: 1.6;" id="loading-msg">
+            열심히 요청을 처리하고 있어요! 🚀
+        </div>
+    </div>
+
+    <div id="login-view" class="view-section active">
+        <div class="glass-card" style="margin-top: 20px;">
+            <div class="title-text">👨‍👩‍👧‍👦 로그인 구분</div>
+            <div class="subtitle-text">누가 사용하나요? 버튼을 눌러주세요.</div>
+            
+            <button class="btn-main btn-primary" style="margin-bottom: 20px;" onclick="showView('profile-select-view')">🎒 학생용으로 시작하기</button>
+            <button class="btn-main btn-dark" onclick="loginAsParent()">📊 관리자(부모님) 로그인</button>
+        </div>
+    </div>
+
+    <div id="profile-select-view" class="view-section">
+        <div class="glass-card" style="margin-top: 20px;">
+            <div class="title-text">🙋 학생 선택</div>
+            <div class="subtitle-text">내 이름을 선택하고 비밀번호를 입력해요.</div>
+            
+            <button class="btn-main btn-secondary" style="margin-bottom: 20px;" onclick="selectProfile('김로운')">👦 김로운</button>
+            <button class="btn-main btn-secondary" onclick="selectProfile('김서아')">👧 김서아</button>
+        </div>
+        <button class="btn-main btn-outline" style="flex: none;" onclick="showView('login-view')">뒤로 가기</button>
+    </div>
+
+    <div id="child-dashboard-view" class="view-section">
+        <div class="dashboard-header">
+            <div class="streak-badge" id="streak-display">🔥 연속 0일</div>
+            <div class="stat-badge" id="point-display">💰 0P</div>
+        </div>
+
+        <div class="glass-card">
+            <div class="title-text">🚀 오늘의 학습 시작</div>
+            
+            <div class="subtitle-text" style="text-align: left; margin-bottom:10px; font-weight:800; color:var(--text-main);">1. 학년 선택</div>
+            <div class="btn-group" id="grade-container"></div>
+
+            <div class="subtitle-text" style="text-align: left; margin-bottom:10px; font-weight:800; color:var(--text-main);">2. 과목 선택</div>
+            <div class="btn-group" id="subject-container">
+                <button class="btn-outline active" onclick="selectConfig('subject', '국어')">📖 국어</button>
+                <button class="btn-outline" onclick="selectConfig('subject', '영어')">🔤 영어</button>
+                <button class="btn-outline" onclick="selectConfig('subject', '수학')">🔢 수학</button>
+            </div>
+
+            <div class="subtitle-text" style="text-align: left; margin-bottom:10px; font-weight:800; color:var(--text-main);">3. 난이도 선택</div>
+            <div class="btn-group" id="difficulty-container">
+                <button class="btn-outline" onclick="selectConfig('difficulty', '최저')">최저</button>
+                <button class="btn-outline" onclick="selectConfig('difficulty', '하')">하</button>
+                <button class="btn-outline active" onclick="selectConfig('difficulty', '중')">중</button>
+                <button class="btn-outline" onclick="selectConfig('difficulty', '상')">상</button>
+                <button class="btn-outline" onclick="selectConfig('difficulty', '최상')">최상</button>
+            </div>
+
+            <button class="btn-main btn-primary" onclick="startNewQuiz()" style="margin-top:10px;">✨ 20문제 풀기 출발!</button>
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+            <button class="btn-main btn-accent" style="flex: 2;" onclick="showView('shop-view')">🏪 포인트 상점</button>
+            <button class="btn-main btn-outline" style="flex: 1; padding: 10px; font-size: 15px;" onclick="changePassword()">🔑 비번변경</button>
+        </div>
+    </div>
+
+    <div id="shop-view" class="view-section">
+        <div class="glass-card">
+            <div class="title-text">🎁 내 포인트 상점</div>
+            <div class="subtitle-text" id="shop-point-display" style="color:var(--primary); font-size:18px;">현재 보유: 0P</div>
+            
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">💵 1,000원 용돈 교환권</div>
+                    <div class="item-cost">1,000 P</div>
+                </div>
+                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('1,000원 용돈 교환권', 1000)">구매</button>
+            </div>
+
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">📱 휴대폰 1시간 쿠폰</div>
+                    <div class="item-cost">1,000 P</div>
+                </div>
+                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('휴대폰 1시간 쿠폰', 1000)">구매</button>
+            </div>
+
+            <button class="btn-main btn-outline" style="flex: none; margin-top:25px;" onclick="showView('child-dashboard-view')">메인으로 가기</button>
+        </div>
+    </div>
+
+    <div id="quiz-view" class="view-section">
+        <div class="glass-card">
+            <div class="quiz-status">
+                <span id="current-status" style="background:#eafaf1; padding:4px 10px; border-radius:8px; color:var(--success);">1학년 국어 (중)</span>
+                <span id="progress-text" style="color:var(--primary);">1 / 20</span>
+            </div>
+            
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="quiz-progress-bar"></div></div>
+            
+            <div id="question-text" class="question-box">문제를 불러오는 중입니다...</div>
+            <button id="tts-btn" class="btn-main btn-accent" onclick="playTTS(currentEnglishText)" style="display: none; margin: 0 auto 25px; padding: 12px; font-size:16px;">🔊 문제 읽어주기</button>
+
+            <div id="options-container" class="options-container" style="display: none;"></div>
+
+            <input type="text" id="answer-input" class="input-field" placeholder="정답을 쓰고 확인을 눌러요!" style="display: none; margin-bottom: 20px;" autocomplete="off">
+            <button class="btn-main btn-secondary" id="submit-btn" onclick="processSubjectiveAnswer()" style="display: none;">✅ 정답 확인</button>
+            
+            <div id="feedback-box"></div>
+        </div>
+    </div>
+
+    <div id="result-view" class="view-section">
+        <div class="glass-card" style="text-align: center;">
+            <div class="title-text" id="result-title">🎉 학습 완료!</div>
+            <div style="font-size: 60px; font-weight: 900; color: var(--primary); margin: 20px 0; text-shadow: 2px 2px 0px #ffeaa7;" id="result-score">100점</div>
+            <div style="font-size: 20px; color: var(--secondary); font-weight: 900; margin-bottom: 25px;" id="earned-points" style="display:none;">🎁 보너스 100P 획득!</div>
+            <div id="result-message" class="subtitle-text" style="font-size: 17px; line-height:1.5;">참 잘했어요!</div>
+            <button id="result-action-btn" class="btn-main btn-primary" onclick="handleResultAction()">확인</button>
+        </div>
+    </div>
+
+    <div id="parent-view" class="view-section">
+        <div class="glass-card">
+            <div class="title-text">👨‍🏫 부모님 관리 대시보드</div>
+            
+            <div class="admin-info-box">
+                <div class="admin-info-title">🔑 학생 비밀번호 상태</div>
+                <div id="admin-pw-display" style="font-size: 16px; font-weight: bold; color: var(--text-main);">
+                    정보를 불러오는 중입니다...
+                </div>
+            </div>
+            
+            <div class="btn-group" style="margin-bottom: 25px;">
+                <button class="btn-outline active" id="tab-report-btn" onclick="switchAdminTab('report')">📝 학습 리포트</button>
+                <button class="btn-outline" id="tab-reward-btn" onclick="switchAdminTab('reward')">🎁 보상/쿠폰 관리</button>
+            </div>
+
+            <div id="admin-report-section">
+                <div class="btn-group" style="margin-bottom: 20px;">
+                    <button class="btn-outline active" id="filter-all" onclick="filterReport('전체')">전체</button>
+                    <button class="btn-outline" id="filter-rw" onclick="filterReport('김로운')">김로운</button>
+                    <button class="btn-outline" id="filter-sa" onclick="filterReport('김서아')">김서아</button>
+                </div>
+
+                <button class="btn-main btn-secondary" style="margin-bottom: 20px; padding:14px; font-size:16px;" onclick="analyzeWeakness()">🤖 선택 학생 AI 취약점 분석</button>
+
+                <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 0 0 1px #dfe6e9;">
+                    <table class="report-table" style="margin-top:0;">
+                        <thead>
+                            <tr>
+                                <th>이름</th>
+                                <th>일시</th>
+                                <th>결과</th>
+                                <th>오답</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="admin-reward-section" style="display: none;">
+                <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 0 0 1px #dfe6e9;">
+                    <table class="report-table" style="margin-top:0;">
+                        <thead>
+                            <tr>
+                                <th>아이</th>
+                                <th>구매내역</th>
+                                <th>P</th>
+                                <th>처리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reward-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resume-modal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <div class="title-text" id="resume-title">🚨 풀다 만 학습이 있어요!</div>
+            <div class="subtitle-text">이전에 풀던 문제부터 이어서 진행할까요?</div>
+            <div class="modal-btns">
+                <button class="btn-main btn-outline" style="flex: none; width: 45%; margin: 0 auto;" onclick="cancelResume()">처음부터</button>
+                <button class="btn-main btn-primary" style="flex: none; width: 45%; margin: 0 auto;" onclick="confirmResume()">이어하기</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="permission-modal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <div class="title-text">🔔 알림 권한 허용 안내</div>
+            <div class="subtitle-text" style="color:var(--text-main); font-size:16px; line-height:1.5;">
+                아이의 학습 시작, 점수 결과 등을 실시간으로 받으시려면 <b>[권한 허용]</b>을 누르신 후 브라우저 팝업에서도 <b>허용</b>을 눌러주세요.<br><br>
+                <span style="color:var(--danger); font-size:14px;">※ 모바일 환경에서는 브라우저 탭을 백그라운드에 켜두셔야 정상적으로 알림이 수신됩니다.</span>
+            </div>
+            <div class="modal-btns">
+                <button class="btn-main btn-outline" style="flex: none; width: 40%; margin: 0 auto;" onclick="closePermissionModal()">다음에</button>
+                <button class="btn-main btn-primary" style="flex: none; width: 50%; margin: 0 auto;" onclick="requestPushPermission()">권한 허용</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="title-text" id="modal-title">🔍 상세 정보</div>
+            <div id="modal-body" style="line-height: 1.6; color: var(--text-main); font-size: 16px; margin-bottom: 25px; white-space: pre-line;"></div>
+            <button class="btn-main btn-dark" onclick="document.getElementById('detail-modal').style.display='none'">닫기</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // =========================================================================
+    // 🔥 FIREBASE 연동 설정 (제공해주신 설정값 적용)
+    // =========================================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyCJTPXzAVTuofcv902nnzIpJ_CcdK8OOEk",
+        authDomain: "smart-edu-app-3d607.firebaseapp.com",
+        databaseURL: "https://smart-edu-app-3d607-default-rtdb.firebaseio.com",
+        projectId: "smart-edu-app-3d607",
+        storageBucket: "smart-edu-app-3d607.firebasestorage.app",
+        messagingSenderId: "184288653031",
+        appId: "1:184288653031:web:12d62e0a2df72a49297c42"
+    };
+
+    let db = null;
+    if (firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+    }
+
+    // =========================================================================
+    // 💡 브라우저 푸시 알림 트리거 (앱 팝업 기능)
+    // =========================================================================
+    async function triggerPushNotification(msg) {
+        if (!db) return;
+        const pushRef = db.ref('push_notifications').push();
+        await pushRef.set({
+            message: msg,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+    }
+
+    function setupAdminPushListener() {
+        if (!db || Notification.permission !== "granted") return;
+        
+        const now = Date.now();
+        db.ref('push_notifications').orderByChild('timestamp').startAt(now).on('child_added', snap => {
+            const data = snap.val();
+            if (data && data.message) {
+                new Notification("스마트 학습 알림 🔔", {
+                    body: data.message,
+                    icon: "https://cdn-icons-png.flaticon.com/512/3135/3135810.png",
+                    vibrate: [200, 100, 200]
+                });
+            }
+        });
+    }
+
+    async function requestPushPermission() {
+        document.getElementById('permission-modal').style.display = 'none';
+        if ("Notification" in window) {
+            const permission = await Notification.requestPermission();
+            if (permission === "granted") {
+                alert("알림 권한이 허용되었습니다. 이제 백그라운드에 앱을 켜두시면 아이의 소식을 받을 수 있습니다.");
+                setupAdminPushListener();
+            } else {
+                alert("알림이 차단되었습니다. 기기 설정에서 허용으로 변경해 주세요.");
+            }
+        } else {
+            alert("현재 브라우저는 알림 기능을 지원하지 않습니다.");
+        }
+    }
+
+    function closePermissionModal() {
+        document.getElementById('permission-modal').style.display = 'none';
+    }
+
+    // =========================================================================
+    // 🚀 무제한 API 폴백 라우팅 배열 (총 560회 한도)
+    // =========================================================================
+    const GEMINI_API_KEY = "AIzaSyCnDfcCJvyRMAcVw6sM2cI2S2VHvqx_TTw";
+    const AI_MODELS = ["gemini-2.5-flash", "gemini-3-flash", "gemini-2.5-flash-lite", "gemini-3.1-flash-lite"];
+
+    let currentProfile = null; 
+    let currentReportFilter = '전체';
+    let config = { grade: 1, subject: '국어', difficulty: '중' };
+    let sessionState = { questions: [], currentIndex: 0, wrongQuestions: [], wrongHistory: [], initialScore: 0, isRetryMode: false, totalCount: 20 };
+    let currentEnglishText = ''; 
+    let reportDataCache = [];
+    let purchaseDataCache = [];
+
+    // --- 앱 초기화 ---
+    window.onload = async () => {
+        initSetupUI();
+        showView('login-view');
+
+        if (db) {
+            db.ref('reports').on('value', snap => {
+                reportDataCache = snap.val() || [];
+                if (currentProfile === 'admin') renderReportsList();
+            });
+            db.ref('purchases').on('value', snap => {
+                purchaseDataCache = snap.val() || [];
+                if (currentProfile === 'admin') renderRewardList();
+            });
+            db.ref('users').on('value', snap => {
+                if (currentProfile === 'admin') renderAdminPasswords(snap.val());
+            });
+        }
+    };
+
+    async function dbGet(path) {
+        if(db) { const snap = await db.ref(path).once('value'); return snap.val(); }
+        return JSON.parse(localStorage.getItem('edu_' + path.replace(/\//g, '_')));
+    }
+    async function dbSet(path, data) {
+        if(db) { return db.ref(path).set(data); }
+        localStorage.setItem('edu_' + path.replace(/\//g, '_'), JSON.stringify(data));
+    }
+
+    function triggerConfetti() {
+        const colors = ['#ff6b6b', '#4facfe', '#feca57', '#1dd1a1', '#a29bfe'];
+        for(let i=0; i<70; i++) {
+            let confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            confetti.style.opacity = Math.random();
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 4000);
+        }
+    }
+
+    function showView(viewId) {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+        
+        const logoutBtn = document.getElementById('logout-btn');
+        const headerTitle = document.getElementById('header-title');
+        
+        if (viewId === 'login-view') {
+            logoutBtn.style.display = 'none'; headerTitle.innerText = '🌟 스마트 학습';
+        } else {
+            logoutBtn.style.display = 'block';
+            if(viewId === 'parent-view') headerTitle.innerText = '📊 관리자 센터';
+            else if(viewId === 'shop-view') headerTitle.innerText = '🎁 포인트 상점';
+            else if(viewId === 'profile-select-view') headerTitle.innerText = '🙋 사용자 선택';
+            else headerTitle.innerText = `${currentProfile}의 학습장 ✨`;
+        }
+    }
+
+    async function loginAsParent() {
+        const pw = prompt("관리자 비밀번호를 입력하십시오.");
+        if (pw === "1010") {
+            currentProfile = 'admin';
+            reportDataCache = await dbGet('reports') || [];
+            purchaseDataCache = await dbGet('purchases') || [];
+            const usersData = await dbGet('users') || {};
+            
+            renderAdminPasswords(usersData);
+            switchAdminTab('report'); 
+            showView('parent-view');
+
+            // 알림 권한 체크 및 팝업 띄우기
+            if ("Notification" in window) {
+                if (Notification.permission === "default") {
+                    document.getElementById('permission-modal').style.display = 'flex';
+                } else if (Notification.permission === "granted") {
+                    setupAdminPushListener();
+                }
+            }
+        } else if (pw !== null) alert("비밀번호가 일치하지 않습니다.");
+    }
+
+    function renderAdminPasswords(usersData) {
+        if (!usersData) return;
+        const rwPw = (usersData['김로운'] && usersData['김로운'].pw) ? usersData['김로운'].pw : '미설정';
+        const saPw = (usersData['김서아'] && usersData['김서아'].pw) ? usersData['김서아'].pw : '미설정';
+        
+        document.getElementById('admin-pw-display').innerHTML = `
+            <div style="margin-bottom: 5px;">👦 김로운 : <span style="color:var(--primary);">${rwPw}</span></div>
+            <div>👧 김서아 : <span style="color:var(--primary);">${saPw}</span></div>
+        `;
+    }
+
+    async function selectProfile(profileName) {
+        showLoading(true, "사용자 정보를 불러오는 중입니다...");
+        let user = await dbGet('users/' + profileName);
+        if(!user) {
+            user = { pw: '', points: 0, streak: [] };
+            await dbSet('users/' + profileName, user);
+        }
+        showLoading(false);
+        
+        if (user.pw === '') {
+            let newPw = prompt(`[${profileName}] 처음 오셨네요! 사용할 비밀번호를 만들어주세요.`);
+            if (!newPw || newPw.trim() === '') return;
+            user.pw = newPw.trim();
+            await dbSet('users/' + profileName + '/pw', user.pw);
+            alert('비밀번호가 안전하게 만들어졌어요! 🎉');
+            triggerPushNotification(`[계정 알림] ${profileName} 학생이 최초 비밀번호를 설정했습니다.`);
+        } else {
+            let inputPw = prompt(`[${profileName}] 비밀번호를 입력해주세요.`);
+            if (inputPw === null) return;
+            if (inputPw.trim() !== user.pw) { alert('비밀번호가 틀렸어요. 다시 시도해봐요!'); return; }
+        }
+        
+        currentProfile = profileName;
+        await updateDashboardStats();
+        await recordTodayStreak(); 
+        await checkSavedSession();
+    }
+
+    async function changePassword() {
+        let user = await dbGet('users/' + currentProfile);
+        let oldPw = prompt("현재 비밀번호를 입력해주세요.");
+        if (oldPw === null) return;
+        if (oldPw.trim() !== user.pw) { alert("현재 비밀번호가 일치하지 않습니다."); return; }
+        
+        let newPw = prompt("새롭게 사용할 비밀번호를 입력해주세요.");
+        if (!newPw || newPw.trim() === '') { alert("유효한 비밀번호를 입력해주세요."); return; }
+        
+        await dbSet('users/' + currentProfile + '/pw', newPw.trim());
+        alert("비밀번호가 성공적으로 변경되었어요! 🔑");
+        triggerPushNotification(`[계정 알림] ${currentProfile} 학생이 비밀번호를 변경했습니다.`);
+    }
+
+    function logout() { currentProfile = null; showView('login-view'); }
+
+    async function updateDashboardStats() {
+        let user = await dbGet('users/' + currentProfile) || { points: 0, streak: [] };
+        let points = user.points || 0;
+        document.getElementById('point-display').innerText = `💰 ${points}P`;
+        document.getElementById('shop-point-display').innerText = `현재 보유: ${points}P`;
+        document.getElementById('streak-display').innerText = `🔥 연속 ${calculateStreak(user.streak || [])}일`;
+    }
+
+    function calculateStreak(dates) {
+        if (!dates || dates.length === 0) return 0;
+        let streak = 1;
+        const today = new Date(); today.setHours(0,0,0,0);
+        let lastDate = new Date(dates[dates.length - 1]); lastDate.setHours(0,0,0,0);
+        
+        const diffDays = Math.ceil(Math.abs(today - lastDate) / (1000 * 60 * 60 * 24));
+        if (diffDays > 1) return 0;
+
+        for (let i = dates.length - 1; i > 0; i--) {
+            let d1 = new Date(dates[i]); d1.setHours(0,0,0,0);
+            let d2 = new Date(dates[i-1]); d2.setHours(0,0,0,0);
+            const diff = Math.ceil(Math.abs(d1 - d2) / (1000 * 60 * 60 * 24));
+            if (diff === 1) streak++; else if (diff === 0) continue; else break;
+        }
+        return streak;
+    }
+
+    async function recordTodayStreak() {
+        let user = await dbGet('users/' + currentProfile);
+        let dates = user.streak || [];
+        const todayStr = new Date().toDateString();
+        
+        if (dates.length === 0 || dates[dates.length - 1] !== todayStr) {
+            dates.push(todayStr);
+            await dbSet('users/' + currentProfile + '/streak', dates);
+            let currentStreak = calculateStreak(dates);
+            await addPoints(currentStreak);
+            alert(`출석 완료! 🎉 연속 ${currentStreak}일 보상으로 ${currentStreak}포인트를 받았어요!`);
+        }
+        document.getElementById('streak-display').innerText = `🔥 연속 ${calculateStreak(dates)}일`;
+    }
+
+    async function addPoints(amount) {
+        let pts = await dbGet('users/' + currentProfile + '/points') || 0;
+        await dbSet('users/' + currentProfile + '/points', pts + amount);
+        document.getElementById('point-display').innerText = `💰 ${pts + amount}P`;
+        document.getElementById('shop-point-display').innerText = `현재 보유: ${pts + amount}P`;
+    }
+
+    async function buyItem(itemName, cost) {
+        let points = await dbGet('users/' + currentProfile + '/points') || 0;
+        if (points >= cost) {
+            if(confirm(`'${itemName}'을(를) ${cost}P에 살까요?`)) {
+                await dbSet('users/' + currentProfile + '/points', points - cost);
+                await updateDashboardStats();
+                
+                let purchases = await dbGet('purchases') || [];
+                purchases.unshift({
+                    id: new Date().getTime(), profile: currentProfile, itemName: itemName, cost: cost,
+                    date: new Date().toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }),
+                    status: 'pending' 
+                });
+                await dbSet('purchases', purchases);
+                alert(`짠! 🎁 성공적으로 샀어요. 부모님께 보여주세요!`);
+                triggerPushNotification(`[상점 알림] ${currentProfile} 학생이 '${itemName}'을(를) 구매했습니다.`);
+            }
+        } else {
+            alert(`앗, 포인트가 부족해요. 😭 (현재: ${points}P, 필요: ${cost}P)`);
+        }
+    }
+
+    function showFloatingPoint(e, text) {
+        const floater = document.createElement('div');
+        floater.className = 'floating-point'; floater.innerText = text;
+        let x = e.clientX || (e.touches && e.touches[0].clientX) || window.innerWidth / 2;
+        let y = e.clientY || (e.touches && e.touches[0].clientY) || window.innerHeight / 2;
+        floater.style.left = `${x - 40}px`; floater.style.top = `${y - 40}px`;
+        document.body.appendChild(floater);
+        setTimeout(() => floater.remove(), 1000);
+    }
+
+    async function checkSavedSession() {
+        const saved = await dbGet('sessions/' + currentProfile);
+        if (saved && saved.sessionState && saved.sessionState.questions) {
+            document.getElementById('resume-title').innerText = `🚨 풀다 만 학습이 있어요!`;
+            document.getElementById('resume-modal').style.display = 'flex';
+        } else {
+            showView('child-dashboard-view');
+        }
+    }
+
+    async function confirmResume() {
+        const saved = await dbGet('sessions/' + currentProfile);
+        config = saved.config; sessionState = saved.sessionState;
+        if(!sessionState.wrongHistory) sessionState.wrongHistory = []; 
+        if(!sessionState.totalCount) sessionState.totalCount = 20;
+        document.getElementById('resume-modal').style.display = 'none';
+        updateSetupUI(); showView('quiz-view'); renderCurrentQuestion();
+    }
+
+    async function cancelResume() {
+        await dbSet('sessions/' + currentProfile, null);
+        document.getElementById('resume-modal').style.display = 'none';
+        showView('child-dashboard-view');
+    }
+
+    function saveSession() {
+        if(!currentProfile || currentProfile === 'admin') return;
+        dbSet('sessions/' + currentProfile, { config, sessionState }); 
+    }
+
+    function initSetupUI() {
+        const gradeContainer = document.getElementById('grade-container');
+        gradeContainer.innerHTML = '';
+        for(let i = 1; i <= 6; i++) {
+            const btn = document.createElement('button');
+            btn.className = `btn-outline ${i === config.grade ? 'active' : ''}`;
+            btn.innerText = `${i}학년`;
+            btn.onclick = () => selectConfig('grade', i);
+            btn.dataset.val = i;
+            gradeContainer.appendChild(btn);
+        }
+    }
+
+    function selectConfig(type, val) { config[type] = val; updateSetupUI(); }
+
+    function updateSetupUI() {
+        document.querySelectorAll('#grade-container .btn-outline').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.val) === config.grade));
+        document.querySelectorAll('#subject-container .btn-outline').forEach(btn => btn.classList.toggle('active', btn.innerText.includes(config.subject)));
+        document.querySelectorAll('#difficulty-container .btn-outline').forEach(btn => btn.classList.toggle('active', btn.innerText === config.difficulty));
+    }
+
+    function showLoading(show, message = "요청을 처리 중입니다.") {
+        const overlay = document.getElementById('loading-overlay');
+        if (show) { document.getElementById('loading-msg').innerHTML = message; overlay.style.display = 'flex'; } 
+        else overlay.style.display = 'none';
+    }
+
+    async function fetchFromGemini(promptText, modelIndex = 0, isJson = true) {
+        if (modelIndex >= AI_MODELS.length) throw new Error("서버 무료 한도가 모두 소진되었습니다.");
+        const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODELS[modelIndex]}:generateContent?key=${GEMINI_API_KEY}`;
+        const generationConfig = { temperature: 0.1 };
+        if (isJson) generationConfig.response_mime_type = "application/json";
+
+        const response = await fetch(apiEndpoint, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig })
+        });
+        if (!response.ok) {
+            if (response.status === 429) return fetchFromGemini(promptText, modelIndex + 1, isJson);
+            throw new Error(`통신 에러 (코드: ${response.status})`);
+        }
+        return response.json();
+    }
+
+    async function startNewQuiz() {
+        showLoading(true, "AI 선생님이 나만의 문제를<br>만들고 있어요! 🤖📝<br>(약 5~10초 소요)");
+        const prompt = `당신은 대한민국 초등학교 교사입니다. 초등학교 ${config.grade}학년 ${config.subject} 과목 문제 20개를 출제하십시오.
+        난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
+        [규칙] 1. 객관식 15개("type":"objective"), 주관식 5개("type":"subjective"). 2. 주관적 질문 배제. 3. 영어 과목은 모두 영어 구성 및 발음("en_q", "en_options") 필수.
+        JSON 배열 응답: [{"type":"objective","q":"질문","options":["A","B","C","D"],"a":"정답","en_q":"발음","en_options":["발음1","발음2","발음3","발음4"]}, {"type":"subjective","q":"질문","a":"정답","en_q":"발음"}]`;
+
+        try {
+            const data = await fetchFromGemini(prompt, 0, true);
+            let jsonText = data.candidates[0].content.parts[0].text;
+            const questionsArray = JSON.parse(jsonText.replace(/```json/gi, '').replace(/```/g, '').trim());
+
+            if (!Array.isArray(questionsArray)) throw new Error("데이터 구조 오류");
+            sessionState = { questions: questionsArray.slice(0, 20), currentIndex: 0, wrongQuestions: [], wrongHistory: [], initialScore: 0, isRetryMode: false, totalCount: 20 };
+            
+            showLoading(false); showView('quiz-view'); renderCurrentQuestion();
+            
+            triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 ${config.grade}학년 ${config.subject} 문제 풀이를 시작했습니다! 🚀`);
+        } catch (error) {
+            console.error(error); showLoading(false); alert(`오류 발생: ${error.message}`);
+        }
+    }
+
+    function renderCurrentQuestion() {
+        saveSession(); 
+        const qData = sessionState.questions[sessionState.currentIndex];
+        const typeLabel = qData.type === 'objective' ? '🔢 [객관식]' : '✍️ [주관식]';
+        
+        document.getElementById('current-status').innerText = `${config.grade}학년 ${config.subject} (${config.difficulty})`;
+        document.getElementById('quiz-progress-bar').style.width = `${((sessionState.currentIndex) / sessionState.questions.length) * 100}%`;
+        document.getElementById('progress-text').innerText = sessionState.isRetryMode 
+            ? `오답 풀이 : ${sessionState.currentIndex + 1} / ${sessionState.questions.length}` 
+            : `${sessionState.currentIndex + 1} / ${sessionState.questions.length} ${typeLabel}`;
+        
+        document.getElementById('question-text').innerText = qData.q;
+        document.getElementById('feedback-box').innerText = '';
+
+        currentEnglishText = qData.en_q || '';
+        document.getElementById('tts-btn').style.display = (currentEnglishText) ? 'block' : 'none';
+
+        const optContainer = document.getElementById('options-container');
+        const ansInput = document.getElementById('answer-input');
+        const subBtn = document.getElementById('submit-btn');
+
+        if (qData.type === 'objective') {
+            ansInput.style.display = 'none'; subBtn.style.display = 'none';
+            optContainer.style.display = 'flex'; optContainer.innerHTML = '';
+            qData.options.forEach((optText, index) => {
+                const row = document.createElement('div'); row.className = 'option-row';
+                const btn = document.createElement('button');
+                btn.className = 'option-btn'; btn.innerText = optText;
+                btn.onclick = (e) => processObjectiveAnswer(optText, btn, e);
+                row.appendChild(btn);
+
+                if (qData.en_options && qData.en_options[index]) {
+                    const ttsBtn = document.createElement('button');
+                    ttsBtn.className = 'tts-opt-btn'; ttsBtn.innerText = '🔊';
+                    ttsBtn.onclick = (e) => { e.stopPropagation(); playTTS(qData.en_options[index]); };
+                    row.appendChild(ttsBtn);
+                }
+                optContainer.appendChild(row);
+            });
+        } else {
+            optContainer.style.display = 'none'; ansInput.style.display = 'block'; subBtn.style.display = 'flex';
+            ansInput.value = ''; subBtn.disabled = false; setTimeout(() => ansInput.focus(), 100);
+        }
+    }
+
+    function playTTS(text) {
+        if(!text) return;
+        const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.9;
+        window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+    }
+
+    async function processObjectiveAnswer(selectedText, btnElement, event) {
+        document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+        const qData = sessionState.questions[sessionState.currentIndex];
+        const correctAns = String(qData.a).toLowerCase().trim();
+        const userAns = selectedText.toLowerCase().trim();
+        const fbEl = document.getElementById('feedback-box');
+
+        if (userAns === correctAns) {
+            btnElement.style.borderColor = "var(--success)"; btnElement.style.backgroundColor = "#eafaf1";
+            fbEl.innerText = '정답입니다! 🥳'; fbEl.className = 'correct';
+            showFloatingPoint(event, "+5 점"); await addPoints(5);
+            if(!sessionState.isRetryMode) sessionState.initialScore += (100 / sessionState.totalCount);
+        } else {
+            btnElement.style.borderColor = "var(--danger)"; btnElement.style.backgroundColor = "#fff0f0";
+            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요. 😢`; fbEl.className = 'incorrect';
+            btnElement.style.transform = "translateX(-5px)"; setTimeout(() => btnElement.style.transform = "translateX(5px)", 50); setTimeout(() => btnElement.style.transform = "translateX(0)", 100);
+            sessionState.wrongQuestions.push(qData);
+            if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: selectedText });
+        }
+        setTimeout(moveToNextQuestion, 1500);
+    }
+
+    async function processSubjectiveAnswer(event) {
+        const inputEl = document.getElementById('answer-input');
+        const userAnsRaw = inputEl.value.trim();
+        if(userAnsRaw === '') { alert('답을 먼저 적어주세요! ✍️'); inputEl.focus(); return; }
+
+        document.getElementById('submit-btn').disabled = true;
+        const qData = sessionState.questions[sessionState.currentIndex];
+        const correctAns = String(qData.a).replace(/\s+/g, '').toLowerCase();
+        const userAns = userAnsRaw.replace(/\s+/g, '').toLowerCase();
+        const fbEl = document.getElementById('feedback-box');
+
+        if(userAns === correctAns) {
+            fbEl.innerText = '정답입니다! 🥳'; fbEl.className = 'correct';
+            showFloatingPoint(event || { clientX: window.innerWidth/2, clientY: window.innerHeight/2 }, "+5 점"); 
+            await addPoints(5);
+            if(!sessionState.isRetryMode) sessionState.initialScore += (100 / sessionState.totalCount);
+        } else {
+            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요. 😢`; fbEl.className = 'incorrect';
+            sessionState.wrongQuestions.push(qData);
+            if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: userAnsRaw });
+        }
+        setTimeout(moveToNextQuestion, 1500);
+    }
+
+    document.getElementById('answer-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') processSubjectiveAnswer(); });
+
+    function moveToNextQuestion() {
+        sessionState.currentIndex++;
+        if (sessionState.currentIndex < sessionState.questions.length) renderCurrentQuestion();
+        else finishQuizCycle();
+    }
+
+    async function finishQuizCycle() {
+        showView('result-view');
+        const finalScore = Math.round(sessionState.initialScore);
+        if (finalScore === 100 && !sessionState.isRetryMode) triggerConfetti();
+
+        const titleEl = document.getElementById('result-title');
+        const scoreEl = document.getElementById('result-score');
+        const msgEl = document.getElementById('result-message');
+        const actionBtn = document.getElementById('result-action-btn');
+
+        if (!sessionState.isRetryMode) {
+            scoreEl.innerText = `${finalScore}점`;
+            if (sessionState.wrongQuestions.length > 0) {
+                titleEl.innerText = "🚩 1차 학습 완료";
+                msgEl.innerText = `총 20문제 중 ${sessionState.wrongQuestions.length}문제를 틀렸어요.\n틀린 문제를 꼼꼼하게 다시 풀어봐요!`;
+                actionBtn.innerText = "오답 다시 풀기 ✍️";
+            } else {
+                titleEl.innerText = "🏆 완벽해요!"; msgEl.innerText = "모든 문제를 다 맞췄어요. 정말 대단해요! 🎉"; actionBtn.innerText = "기분 좋게 끝내기";
+                await saveReport();
+            }
+            triggerPushNotification(`[점수 알림] ${currentProfile} 학생이 학습을 마쳤습니다. (1차 점수: ${finalScore}점) 💯`);
+        } else {
+            scoreEl.style.display = 'none'; 
+            if (sessionState.wrongQuestions.length > 0) {
+                titleEl.innerText = "💪 다시 풀기 완료"; msgEl.innerText = `아직 ${sessionState.wrongQuestions.length}문제가 틀렸어요.\n포기하지 말고 100점을 향해 고고!`; actionBtn.innerText = "한번 더 도전!";
+            } else {
+                titleEl.innerText = "🌟 최종 완료"; msgEl.innerText = "어려운 문제도 모두 해결했어요. 최고! 👍"; actionBtn.innerText = "마무리하기";
+                await saveReport();
+                triggerPushNotification(`[점수 알림] ${currentProfile} 학생이 오답 수정을 모두 완료했습니다! 💯`);
+            }
+        }
+    }
+
+    async function handleResultAction() {
+        if (sessionState.wrongQuestions.length > 0) {
+            sessionState.questions = [...sessionState.wrongQuestions]; 
+            sessionState.wrongQuestions = []; sessionState.currentIndex = 0; sessionState.isRetryMode = true;
+            showView('quiz-view'); document.getElementById('result-score').style.display = 'block'; renderCurrentQuestion();
+        } else {
+            await dbSet('sessions/' + currentProfile, null); 
+            document.getElementById('result-score').style.display = 'block'; showView('child-dashboard-view');
+        }
+    }
+
+    function switchAdminTab(tabName) {
+        document.getElementById('tab-report-btn').classList.remove('active'); document.getElementById('tab-reward-btn').classList.remove('active');
+        document.getElementById('admin-report-section').style.display = 'none'; document.getElementById('admin-reward-section').style.display = 'none';
+        if (tabName === 'report') { document.getElementById('tab-report-btn').classList.add('active'); document.getElementById('admin-report-section').style.display = 'block'; filterReport('전체'); } 
+        else if (tabName === 'reward') { document.getElementById('tab-reward-btn').classList.add('active'); document.getElementById('admin-reward-section').style.display = 'block'; renderRewardList(); }
+    }
+
+    async function saveReport() {
+        let reports = await dbGet('reports') || [];
+        reports.unshift({
+            id: new Date().getTime(), profile: currentProfile, date: new Date().toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }),
+            grade: config.grade, subject: config.subject, score: Math.round(sessionState.initialScore), wrongDetails: sessionState.wrongHistory
+        });
+        if(reports.length > 100) reports.pop();
+        await dbSet('reports', reports);
+    }
+
+    function filterReport(profile) {
+        currentReportFilter = profile;
+        ['filter-all', 'filter-rw', 'filter-sa'].forEach(id => document.getElementById(id).classList.remove('active'));
+        if(profile === '전체') document.getElementById('filter-all').classList.add('active');
+        if(profile === '김로운') document.getElementById('filter-rw').classList.add('active');
+        if(profile === '김서아') document.getElementById('filter-sa').classList.add('active');
+        renderReportsList();
+    }
+
+    function renderReportsList() {
+        const tbody = document.getElementById('report-tbody');
+        let filtered = currentReportFilter !== '전체' ? reportDataCache.filter(r => r.profile === currentReportFilter) : reportDataCache;
+        if (!filtered || filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="empty-report">학습 기록이 없습니다.</td></tr>'; return; }
+
+        let html = '';
+        filtered.forEach(r => {
+            const hasWrong = r.wrongDetails && r.wrongDetails.length > 0;
+            html += `<tr>
+                <td style="font-weight:900; color:var(--text-main);">${r.profile}</td>
+                <td style="color:var(--text-muted);">${r.date.split(' ')[1]} ${r.date.split(' ')[2]}</td>
+                <td>${r.grade}학년 ${r.subject}<br><b style="color:${r.score===100?'var(--success)':'var(--danger)'};">${r.score}점</b></td>
+                <td>${hasWrong ? `<button class="btn-small" onclick="openDetailModal(${r.id})">보기</button>` : `<span style="color:#aaa;font-size:12px;">완벽함</span>`}</td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function openDetailModal(reportId) {
+        const report = reportDataCache.find(r => r.id === reportId);
+        if(!report || !report.wrongDetails) return;
+        let html = '';
+        report.wrongDetails.forEach((item, idx) => {
+            html += `<div class="wrong-item"><div class="wrong-q">${idx + 1}. ${item.q}</div><div class="wrong-ans">아이의 답: ${item.userAns}</div><div class="correct-ans">올바른 정답: ${item.a}</div></div>`;
+        });
+        document.getElementById('modal-title').innerText = "📝 오답 노트 상세";
+        document.getElementById('modal-body').innerHTML = html;
+        document.getElementById('detail-modal').style.display = 'flex';
+    }
+
+    async function analyzeWeakness() {
+        if(currentReportFilter === '전체') { alert('학생 탭(김로운 또는 김서아)을 먼저 선택하십시오.'); return; }
+        const studentReports = reportDataCache.filter(r => r.profile === currentReportFilter);
+        let allWrongs = []; studentReports.forEach(r => { if(r.wrongDetails) allWrongs = allWrongs.concat(r.wrongDetails); });
+        if(allWrongs.length === 0) { alert(`해당 학생의 오답 기록이 없습니다. 아주 잘하고 있습니다! 👍`); return; }
+
+        showLoading(true, `오답 패턴을 기반으로<br>맞춤형 취약점 리포트를 작성 중입니다. 🤖`);
+        const prompt = `당신은 교육 분석 교사입니다. 학생 '${currentReportFilter}'의 오답 데이터: ${JSON.stringify(allWrongs.slice(0, 30).map(w=>({q:w.q, a:w.a, ans:w.userAns})))}. 학생의 취약점과 가정 내 지도 방안을 500자 이내 텍스트로 브리핑하십시오.`;
+
+        try {
+            const data = await fetchFromGemini(prompt, 0, false);
+            showLoading(false);
+            document.getElementById('modal-title').innerText = `🤖 AI 취약점 및 지도 리포트`;
+            document.getElementById('modal-body').innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+            document.getElementById('detail-modal').style.display = 'flex';
+        } catch(e) { showLoading(false); alert("서버 통신 중 오류가 발생했습니다."); }
+    }
+
+    function renderRewardList() {
+        const tbody = document.getElementById('reward-tbody');
+        if (!purchaseDataCache || purchaseDataCache.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="empty-report">쿠폰 구매 내역이 없습니다.</td></tr>'; return; }
+
+        let html = '';
+        purchaseDataCache.forEach(p => {
+            let actionBtn = p.status === 'pending' ? `<button class="btn-small" style="background-color: var(--primary);" onclick="markRewardAsUsed(${p.id})">사용 승인</button>` : `<button class="btn-small used" disabled>사용 완료</button>`;
+            html += `<tr>
+                <td style="font-weight:900; color:var(--text-main);">${p.profile}</td>
+                <td><div style="font-weight:800;">${p.itemName}</div><div style="font-size:11px; color:var(--text-muted);">${p.date.split(' ')[1]} ${p.date.split(' ')[2]} ${p.date.split(' ')[3]}</div></td>
+                <td style="color:var(--secondary); font-weight:900;">${p.cost}P</td>
+                <td>${actionBtn}</td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+
+    async function markRewardAsUsed(purchaseId) {
+        if(confirm("아이에게 해당 쿠폰 보상을 제공하셨습니까?\n확인 시 '사용 완료' 처리됩니다.")) {
+            let purchases = await dbGet('purchases') || [];
+            let itemIndex = purchases.findIndex(p => p.id === purchaseId);
+            if(itemIndex !== -1) {
+                purchases[itemIndex].status = 'used';
+                await dbSet('purchases', purchases);
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
