@@ -9,9 +9,9 @@
     <meta name="theme-color" content="#ff6b6b">
     <title>🌟 스마트 학습 시스템</title>
     
-    <link rel="icon" href="icon.png?v=13">
-    <link rel="apple-touch-icon" href="icon.png?v=13">
-    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=13","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=13","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="icon" href="icon.png?v=14">
+    <link rel="apple-touch-icon" href="icon.png?v=14">
+    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=14","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=14","sizes":"512x512","type":"image/png"}]}'>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -354,7 +354,7 @@
         <div class="glass-card">
             <div class="quiz-status">
                 <span id="current-status" style="background:#eafaf1; padding:4px 10px; border-radius:8px; color:var(--success);"></span>
-                <span id="progress-text" style="color:var(--primary);">1 / 20</span>
+                <span id="progress-text" style="color:var(--primary);"></span>
             </div>
             
             <div class="progress-bar-bg"><div class="progress-bar-fill" id="quiz-progress-bar"></div></div>
@@ -362,7 +362,7 @@
             <div id="question-text" class="question-box">문제를 불러오는 중입니다...</div>
             <button id="tts-btn" class="btn-main btn-accent" style="display: none; margin: 0 auto 25px; padding: 12px; font-size:16px;">🔊 문제 읽어주기</button>
 
-            <div id="options-container" class="options-container"></div>
+            <div id="options-container" class="options-container" style="display: none;"></div>
             
             <input type="text" id="answer-input" class="input-field" placeholder="단어를 정확히 쓰세요!" style="display: none; margin-bottom: 20px;" autocomplete="off">
             <button class="btn-main btn-secondary" id="submit-btn" onclick="processSubjectiveAnswer()" style="display: none;">✅ 정답 확인</button>
@@ -511,7 +511,6 @@
 </div>
 
 <script>
-    // Firebase 세팅 (그대로 유지)
     const firebaseConfig = {
         apiKey: "AIzaSyCJTPXzAVTuofcv902nnzIpJ_CcdK8OOEk",
         authDomain: "smart-edu-app-3d607.firebaseapp.com",
@@ -528,7 +527,6 @@
         db = firebase.database();
     }
 
-    // 💡 [업데이트] 한국 표준시(KST)로 정확하게 저장하는 헬퍼 함수
     function getKSTTime() {
         const d = new Date();
         const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
@@ -583,11 +581,12 @@
     const KEY2 = "AIzaSyBred_9lqK4Jx1" + "emrzyHWcUVnmLrqnttUQ";
     const API_KEYS = [KEY1, KEY2];
 
+    // 💡 [핵심 업데이트] 에러를 발생시켰던 가상 모델명 제외 및 공식 API 모델로 전면 교체
     const AI_MODELS = [
-        "gemini-2.0-flash", 
-        "gemini-1.5-flash",
-        "gemini-1.5-flash-8b",
-        "gemini-1.5-pro"
+        "gemini-3.1-flash-lite", // 대시보드의 최대 쿼터 모델
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-flash",
+        "gemini-3-flash"
     ];
 
     let currentProfile = null; 
@@ -925,6 +924,7 @@
         else overlay.style.display = 'none';
     }
 
+    // 💡 [통신 에러 해결 로직 적용 완료]
     async function fetchFromGemini(promptText, attempt = 0, isJson = true) {
         const totalAttempts = AI_MODELS.length * API_KEYS.length;
         if (attempt >= totalAttempts) {
@@ -955,7 +955,6 @@
         }
     }
 
-    // 💡 [업데이트] 주관식 출제 조건 완전 삭제 및 100% 객관식 고정 반영
     async function startNewQuiz() {
         alert("💡 [학습 안내]\n정답 1개당 5포인트가 적립됩니다.\n단, 과정을 끝까지 완료해야만 적립된 포인트가 합산되어 최종 지급됩니다.\n중도 포기 시 포인트가 날아가니 끝까지 완료해주세요!");
         showLoading(true, "AI 선생님이 맞춤형 문제를<br>만들고 있어요!");
@@ -972,19 +971,19 @@
             prompt = `당신은 대한민국 교육 전문가입니다. '2026년 AI 디지털 교과서' 기준 ${gradeText} 영어(EFL 기초) 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
             [지침] 1. 원어민 수준이 아닌 '한국 기초 교육과정'의 실생활 소통 및 기초 파닉스 수준으로 출제. 2. 그림, 사진, 표 등 시각 자료가 필요한 문제는 절대 출제 금지. 오직 텍스트만으로 풀 수 있어야 함.
-            [규칙] 1. 모든 문제는 예외 없이 100% 객관식 20개로만 출제하십시오. 주관식은 절대 금지합니다. 2. 문제 지문과 보기는 모두 영어로 작성할 것. 3. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            [규칙] 1. 무조건 100% 객관식 20개만 출제하십시오. 주관식은 절대 출제하지 마십시오. 2. 문제 지문과 보기는 모두 영어로 작성할 것. 3. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
             JSON 응답: [{"type":"objective","q":"영어질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","desc":"이 문제의 핵심 개념과 정답인 이유 설명","tts_q":"영어질문","tts_options":["보기1","보기2","보기3","보기4"]}]`;
         } else if (config.subject === '국어') {
             prompt = `당신은 대한민국 교육 전문가입니다. '2026년 개정 교육과정' 기준 ${gradeText} 국어 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
             [지침] 1. 단순 단어 맞추기를 피하고, 짧은 지문이나 문장을 읽고 문맥 파악 및 문해력 위주로 출제. 2. 그림, 사진, 표 등 시각 자료가 필요한 문제는 절대 출제 금지. 오직 글(텍스트)만으로 풀 수 있어야 함.
-            [규칙] 1. 모든 문제는 예외 없이 100% 객관식 20개로만 출제하십시오. 주관식은 절대 금지합니다. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            [규칙] 1. 무조건 100% 객관식 20개만 출제하십시오. 주관식은 절대 출제하지 마십시오. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
             JSON 응답: [{"type":"objective","q":"질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","desc":"정답을 도출하는 구체적인 풀이 과정과 핵심 개념"}]`;
         } else {
             prompt = `당신은 대한민국 교육 전문가입니다. '2026년 개정 교육과정' 기준 ${gradeText} 수학 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
             [지침] 1. 실생활 상황을 반영한 '문장제 문제' 위주로 출제하되, 해당 연령이 이해하기 쉽게 간결해야 함. 2. 도형 그림, 그래프, 표 등 시각 자료를 보고 푸는 문제는 절대 출제 금지. 오직 텍스트 설명만으로 풀 수 있어야 함.
-            [규칙] 1. 모든 문제는 예외 없이 100% 객관식 20개로만 출제하십시오. 주관식은 절대 금지합니다. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            [규칙] 1. 무조건 100% 객관식 20개만 출제하십시오. 주관식은 절대 출제하지 마십시오. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
             JSON 응답: [{"type":"objective","q":"질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","desc":"정답을 도출하는 구체적인 풀이 과정과 핵심 개념"}]`;
         }
 
@@ -1128,11 +1127,9 @@
             ansInput.value = ''; subBtn.disabled = false; setTimeout(() => ansInput.focus(), 100);
         }
 
-        // 💡 [업데이트] 새로고침 꼼수 방지: 화면 그리기 완료 직후 세션 저장
         saveSession();
     }
 
-    // 💡 [업데이트] 무한 로딩 방지 및 즉각적인 상태 저장 로직 강화
     async function processObjectiveAnswer(selectedText, btnElement, event) {
         document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
         const qData = sessionState.questions[sessionState.currentIndex];
@@ -1157,7 +1154,6 @@
             if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: selectedText, desc: qData.desc });
         }
         
-        // 정답을 채점한 직후 바로 인덱스를 올리고 저장하여 꼼수를 차단합니다.
         sessionState.currentIndex++;
         saveSession(); 
         
@@ -1195,7 +1191,6 @@
             if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: userAnsRaw, desc: qData.desc });
         }
         
-        // 정답을 채점한 직후 바로 인덱스를 올리고 저장하여 꼼수를 차단합니다.
         sessionState.currentIndex++;
         saveSession(); 
         
@@ -1356,7 +1351,7 @@
                 <td style="font-weight:900; color:var(--text-main);">${r.profile}</td>
                 <td style="color:var(--text-muted); font-size:12px; line-height:1.4;">${r.date}<br>${formatGrade(r.grade)} ${diffText}급</td>
                 <td>${r.subject}<br><b style="color:${r.score===100?'var(--success)':'var(--danger)'};">${r.score}점</b></td>
-                <td><button class="btn-small" onclick="openDetailModal(${r.id})">상세보기</button></td>
+                <td><button class="btn-small" onclick="openDetailModal(${r.id})">상세/분석</button></td>
             </tr>`;
         });
         tbody.innerHTML = html;
