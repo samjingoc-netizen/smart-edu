@@ -214,8 +214,8 @@
 
     <div id="profile-select-view" class="view-section">
         <div class="glass-card" style="margin-top: 20px;">
-            <div class="title-text">🙋 학생 선택</div>
-            <div class="subtitle-text">내 이름을 선택하고 비밀번호를 입력해요.</div>
+            <div class="title-text">🙋 사용자 선택</div>
+            <div class="subtitle-text">이름을 선택하고 비밀번호를 입력해요.</div>
             
             <button class="btn-main btn-secondary" style="margin-bottom: 20px;" onclick="selectProfile('김로운')">👦 김로운</button>
             <button class="btn-main btn-secondary" style="margin-bottom: 20px;" onclick="selectProfile('김서아')">👧 김서아</button>
@@ -333,10 +333,7 @@
             <div id="question-text" class="question-box">문제를 불러오는 중입니다...</div>
             <button id="tts-btn" class="btn-main btn-accent" style="display: none; margin: 0 auto 25px; padding: 12px; font-size:16px;">🔊 문제 읽어주기</button>
 
-            <div id="options-container" class="options-container" style="display: none;"></div>
-
-            <input type="text" id="answer-input" class="input-field" placeholder="정답을 쓰고 확인을 눌러요!" style="display: none; margin-bottom: 20px;" autocomplete="off">
-            <button class="btn-main btn-secondary" id="submit-btn" onclick="processSubjectiveAnswer()" style="display: none;">✅ 정답 확인</button>
+            <div id="options-container" class="options-container"></div>
             
             <div id="feedback-box"></div>
         </div>
@@ -398,7 +395,7 @@
                     <button class="btn-outline" id="filter-jj" onclick="filterReport('정지영')">정지영</button>
                 </div>
 
-                <button class="btn-main btn-secondary" style="margin-bottom: 20px; padding:14px; font-size:16px;" onclick="analyzeWeakness()">🤖 선택 사용자 AI 취약점 심층 분석</button>
+                <button class="btn-main btn-secondary" style="margin-bottom: 20px; padding:14px; font-size:16px;" onclick="analyzeComprehensiveWeakness()">🤖 선택 사용자 AI 종합 성장 리포트</button>
 
                 <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 0 0 1px #dfe6e9;">
                     <table class="report-table" style="margin-top:0;">
@@ -407,7 +404,7 @@
                                 <th>이름</th>
                                 <th>일시/정보</th>
                                 <th>과목/점수</th>
-                                <th>오답</th>
+                                <th>상세/분석</th>
                             </tr>
                         </thead>
                         <tbody id="report-tbody"></tbody>
@@ -828,6 +825,7 @@
         }
     }
 
+    // [핵심 변경 사항: 모든 과목 100% 객관식으로 고정 및 주관식 로직 완전 삭제]
     async function startNewQuiz() {
         alert("💡 [학습 안내]\n정답 1개당 5포인트가 적립됩니다.\n단, 20문제를 모두 완료해야만 적립된 포인트가 합산되어 최종 지급됩니다.\n중도 포기 시 포인트가 날아가니 끝까지 완료해주세요!");
         showLoading(true, "AI 선생님이 교과서에 맞춰<br>문제를 만들고 있어요!");
@@ -838,19 +836,19 @@
             prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2026년 AI 디지털 교과서' 기준 초등 ${config.grade}학년 영어(EFL 기초) 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
             [지침] 1. 원어민 수준이 아닌 '한국 초교 교육과정'의 실생활 소통 및 기초 파닉스 수준으로 출제. 2. 그림, 사진, 표 등 시각 자료가 필요한 문제는 절대 출제 금지. 오직 텍스트만으로 풀 수 있어야 함.
-            [규칙] 1. 객관식 20개. 주관식은 절대 출제하지 마십시오. 2. 문제 지문과 보기는 모두 영어로 작성할 것. 3. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            [규칙] 1. 무조건 100% 객관식 20개만 출제하십시오. 주관식은 절대 출제하지 마십시오. 2. 문제 지문과 보기는 모두 영어로 작성할 것. 3. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
             JSON 응답: [{"type":"objective","q":"영어질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","desc":"이 문제의 핵심 개념과 정답인 이유 설명","tts_q":"영어질문","tts_options":["보기1","보기2","보기3","보기4"]}]`;
         } else if (config.subject === '국어') {
             prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2026년 개정 교육과정' 기준 초등 ${config.grade}학년 국어 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
             [지침] 1. 단순 단어 맞추기를 피하고, 짧은 지문이나 문장을 읽고 문맥 파악 및 문해력 위주로 출제. 2. 그림, 사진, 표 등 시각 자료가 필요한 문제는 절대 출제 금지. 오직 글(텍스트)만으로 풀 수 있어야 함.
-            [규칙] 1. 객관식 20개. 주관식은 절대 출제하지 마십시오. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            [규칙] 1. 무조건 100% 객관식 20개만 출제하십시오. 주관식은 절대 출제하지 마십시오. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
             JSON 응답: [{"type":"objective","q":"질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","desc":"정답을 도출하는 구체적인 풀이 과정과 핵심 개념"}]`;
         } else {
             prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2026년 개정 교육과정' 기준 초등 ${config.grade}학년 수학 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
             [지침] 1. 실생활 상황을 반영한 '문장제 문제' 위주로 출제하되, 초등학생이 이해하기 쉽게 간결해야 함. 2. 도형 그림, 그래프, 표 등 시각 자료를 보고 푸는 문제는 절대 출제 금지. 오직 텍스트 설명만으로 풀 수 있어야 함.
-            [규칙] 1. 객관식 20개. 주관식은 절대 출제하지 마십시오. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            [규칙] 1. 무조건 100% 객관식 20개만 출제하십시오. 주관식은 절대 출제하지 마십시오. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
             JSON 응답: [{"type":"objective","q":"질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","desc":"정답을 도출하는 구체적인 풀이 과정과 핵심 개념"}]`;
         }
 
@@ -873,13 +871,12 @@
     function renderCurrentQuestion() {
         saveSession(); 
         const qData = sessionState.questions[sessionState.currentIndex];
-        const typeLabel = qData.type === 'objective' ? '🔢 [객관식]' : '✍️ [주관식]';
         
         document.getElementById('current-status').innerText = `${config.grade}학년 ${config.subject} (${config.difficulty})`;
         document.getElementById('quiz-progress-bar').style.width = `${((sessionState.currentIndex) / sessionState.questions.length) * 100}%`;
         document.getElementById('progress-text').innerText = sessionState.isRetryMode 
             ? `오답 풀이 : ${sessionState.currentIndex + 1} / ${sessionState.questions.length}` 
-            : `${sessionState.currentIndex + 1} / ${sessionState.questions.length} ${typeLabel}`;
+            : `${sessionState.currentIndex + 1} / ${sessionState.questions.length} 🔢 [객관식]`;
         
         document.getElementById('question-text').innerText = qData.q;
         document.getElementById('feedback-box').innerText = '';
@@ -892,31 +889,23 @@
         ttsBtn.onclick = () => playTTS(ttsText, ttsLang);
 
         const optContainer = document.getElementById('options-container');
-        const ansInput = document.getElementById('answer-input');
-        const subBtn = document.getElementById('submit-btn');
+        optContainer.style.display = 'flex'; optContainer.innerHTML = '';
+        
+        qData.options.forEach((optText, index) => {
+            const row = document.createElement('div'); row.className = 'option-row';
+            const btn = document.createElement('button');
+            btn.className = 'option-btn'; btn.innerText = optText;
+            btn.onclick = (e) => processObjectiveAnswer(optText, btn, e);
+            row.appendChild(btn);
 
-        if (qData.type === 'objective') {
-            ansInput.style.display = 'none'; subBtn.style.display = 'none';
-            optContainer.style.display = 'flex'; optContainer.innerHTML = '';
-            qData.options.forEach((optText, index) => {
-                const row = document.createElement('div'); row.className = 'option-row';
-                const btn = document.createElement('button');
-                btn.className = 'option-btn'; btn.innerText = optText;
-                btn.onclick = (e) => processObjectiveAnswer(optText, btn, e);
-                row.appendChild(btn);
-
-                const optTtsBtn = document.createElement('button');
-                optTtsBtn.className = 'tts-opt-btn'; optTtsBtn.innerText = '🔊';
-                const optTtsText = config.subject === '영어' ? (qData.tts_options ? qData.tts_options[index] : optText) : optText;
-                optTtsBtn.onclick = (e) => { e.stopPropagation(); playTTS(optTtsText, ttsLang); };
-                row.appendChild(optTtsBtn);
-                
-                optContainer.appendChild(row);
-            });
-        } else {
-            optContainer.style.display = 'none'; ansInput.style.display = 'block'; subBtn.style.display = 'flex';
-            ansInput.value = ''; subBtn.disabled = false; setTimeout(() => ansInput.focus(), 100);
-        }
+            const optTtsBtn = document.createElement('button');
+            optTtsBtn.className = 'tts-opt-btn'; optTtsBtn.innerText = '🔊';
+            const optTtsText = config.subject === '영어' ? (qData.tts_options ? qData.tts_options[index] : optText) : optText;
+            optTtsBtn.onclick = (e) => { e.stopPropagation(); playTTS(optTtsText, ttsLang); };
+            row.appendChild(optTtsBtn);
+            
+            optContainer.appendChild(row);
+        });
     }
 
     function playTTS(text, lang = 'ko-KR') {
@@ -953,35 +942,6 @@
         }
         setTimeout(moveToNextQuestion, 1500);
     }
-
-    async function processSubjectiveAnswer(event) {
-        const inputEl = document.getElementById('answer-input');
-        const userAnsRaw = inputEl.value.trim();
-        if(userAnsRaw === '') { alert('답을 먼저 적어주세요!'); inputEl.focus(); return; }
-
-        document.getElementById('submit-btn').disabled = true;
-        const qData = sessionState.questions[sessionState.currentIndex];
-        
-        const correctAnsStr = String(qData.a).replace(/\s+/g, '').toLowerCase();
-        const userAnsStr = userAnsRaw.replace(/\s+/g, '').toLowerCase();
-        const isCorrect = (userAnsStr === correctAnsStr) || userAnsStr.includes(correctAnsStr) || correctAnsStr.includes(userAnsStr);
-
-        const fbEl = document.getElementById('feedback-box');
-
-        if(isCorrect) {
-            fbEl.innerText = '정답입니다!'; fbEl.className = 'correct';
-            showFloatingPoint(event || { clientX: window.innerWidth/2, clientY: window.innerHeight/2 }, "+5점 (적립중)"); 
-            if(!sessionState.isRetryMode) sessionState.initialScore += (100 / sessionState.totalCount);
-        } else {
-            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요.`; fbEl.className = 'incorrect';
-            let wrongQ = { ...qData, userAns: userAnsRaw };
-            sessionState.wrongQuestions.push(wrongQ);
-            if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: userAnsRaw, desc: qData.desc });
-        }
-        setTimeout(moveToNextQuestion, 1500);
-    }
-
-    document.getElementById('answer-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') processSubjectiveAnswer(); });
 
     function moveToNextQuestion() {
         sessionState.currentIndex++;
@@ -1115,51 +1075,108 @@
                 <td style="font-weight:900; color:var(--text-main);">${r.profile}</td>
                 <td style="color:var(--text-muted); font-size:12px;">${r.date.split(' ')[1]} ${r.date.split(' ')[2]}<br>${r.grade}학년 ${diffText}급</td>
                 <td>${r.subject}<br><b style="color:${r.score===100?'var(--success)':'var(--danger)'};">${r.score}점</b></td>
-                <td>${hasWrong ? `<button class="btn-small" onclick="openDetailModal(${r.id})">보기</button>` : `<span style="color:#aaa;font-size:12px;">완벽함</span>`}</td>
+                <td><button class="btn-small" onclick="openDetailModal(${r.id})">상세/분석</button></td>
             </tr>`;
         });
         tbody.innerHTML = html;
     }
 
+    // [업데이트] 단일 회차 심층 분석 기능 추가
     function openDetailModal(reportId) {
         const report = reportDataCache.find(r => r.id === reportId);
-        if(!report || !report.wrongDetails) return;
-        let html = '';
-        report.wrongDetails.forEach((item, idx) => {
-            html += `<div class="wrong-item"><div class="wrong-q">${idx + 1}. ${item.q}</div><div class="wrong-ans">사용자 답: ${item.userAns}</div><div class="correct-ans">올바른 정답: ${item.a}</div></div>`;
-        });
+        if(!report) return;
+        
+        let html = `<div style="text-align:center; margin-bottom:20px;">
+                        <button class="btn-main btn-secondary" style="padding:12px; font-size:15px;" onclick="analyzeSingleReport(${report.id})">🤖 이 회차만 집중 AI 분석하기</button>
+                    </div>`;
+
+        if(!report.wrongDetails || report.wrongDetails.length === 0) {
+            html += `<div style="text-align:center; font-weight:bold; color:var(--success); font-size:18px; margin-top:20px;">오답이 없습니다! 완벽해요! 🎉</div>`;
+        } else {
+            report.wrongDetails.forEach((item, idx) => {
+                html += `<div class="wrong-item">
+                    <div class="wrong-q">${idx + 1}. ${item.q}</div>
+                    <div class="wrong-ans">사용자 답: ${item.userAns}</div>
+                    <div class="correct-ans">올바른 정답: ${item.a}</div>
+                    <div style="margin-top:10px; font-size:13px; color:#555; background:#fff; padding:10px; border-radius:8px; border:1px dashed #ccc;">💡 해설: ${item.desc || '제공되지 않음'}</div>
+                </div>`;
+            });
+        }
+        
         document.getElementById('modal-title').innerText = "오답 노트 상세";
         document.getElementById('modal-body').innerHTML = html;
         document.getElementById('detail-modal').style.display = 'flex';
     }
 
-    async function analyzeWeakness() {
-        if(currentReportFilter === '전체') { alert('사용자 탭(김로운, 김서아 또는 정지영)을 먼저 선택하십시오.'); return; }
-        const studentReports = reportDataCache.filter(r => r.profile === currentReportFilter);
-        if(studentReports.length === 0) { alert(`해당 사용자의 오답 기록이 없습니다. 아주 잘하고 있습니다!`); return; }
-
-        showLoading(true, `점수, 맞춘 문제, 틀린 문제를 분석하여<br>취약점 리포트를 작성 중입니다.`);
+    async function analyzeSingleReport(reportId) {
+        const report = reportDataCache.find(r => r.id === reportId);
+        if(!report) return;
         
-        const summaryData = studentReports.slice(0, 5).map(r => ({
-            grade: r.grade, subject: r.subject, difficulty: r.difficulty || '중', score: r.score, total_questions: r.totalCount || 20,
-            correct_count: Math.round((r.score / 100) * (r.totalCount || 20)),
-            wrong_count: r.wrongDetails ? r.wrongDetails.length : 0,
-            wrongs: r.wrongDetails ? r.wrongDetails.map(w => ({q: w.q, ans: w.userAns, correct: w.a})) : []
-        }));
-
-        const prompt = `당신은 대한민국 교육 분석 전문가입니다. 학생 '${currentReportFilter}'의 최근 5회 학습 데이터입니다: ${JSON.stringify(summaryData)}.
+        showLoading(true, "선택하신 회차의 학습 결과를<br>AI가 분석 중입니다... 🤖");
         
-        [분석 지시사항]
-        1. 첫 줄에 학생이 수행한 "학년과 난이도(급)"를 반드시 노출하세요. (예: 초등학교 1학년, 난이도 중급)
-        2. [점수], [맞춘 문제 수], [틀린 문제 수]를 기반으로 전반적인 성취도를 브리핑하세요.
-        3. "👍 잘한 것(강점)"과 "⚠️ 못한 것(취약점 및 오답 분석)"을 명확히 구분하여 목차를 나누어 작성하세요.
-        4. 2026년 개정 교육과정 기준에 맞춘 구체적이고 전문적인 보완 방안을 제안하세요.
-        5. 전체 내용을 600자 이내로 읽기 편하게 작성하십시오.`;
+        const summary = {
+            profile: report.profile, grade: report.grade, subject: report.subject, difficulty: report.difficulty || '중', 
+            score: report.score, total: report.totalCount || 20,
+            wrongs: report.wrongDetails ? report.wrongDetails.map(w => ({q: w.q, ans: w.userAns, correct: w.a})) : []
+        };
+
+        const prompt = `당신은 교육 분석가입니다. 학생 '${report.profile}'의 단일 회차(20문제) 학습 데이터입니다: ${JSON.stringify(summary)}.
+        1. [점수 및 오답 개수]를 기반으로 해당 회차 성취도를 평가하세요.
+        2. 틀린 문제(wrongs)를 분석하여 어떤 개념에서 실수했는지 구체적으로 짚어주세요.
+        3. 이 회차에 대한 칭찬과 개선점, 부모님 지도 팁을 500자 이내로 친절하게 작성하세요.`;
 
         try {
             const data = await fetchFromGemini(prompt, 0, false);
             showLoading(false);
-            document.getElementById('modal-title').innerText = `AI 취약점 정밀 분석 리포트`;
+            document.getElementById('modal-title').innerText = `📊 단일 회차 집중 AI 분석`;
+            document.getElementById('modal-body').innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+        } catch(e) { showLoading(false); alert("분석 실패"); }
+    }
+
+    // [업데이트] 종합 성장 리포트 고도화 (초기 기록 vs 최근 기록 비교)
+    async function analyzeComprehensiveWeakness() {
+        if(currentReportFilter === '전체') { alert('사용자 탭(김로운, 김서아 또는 정지영)을 먼저 선택하십시오.'); return; }
+        
+        const studentReports = reportDataCache.filter(r => r.profile === currentReportFilter);
+        if(studentReports.length < 2) { 
+            alert(`종합 성장 분석을 위해 최소 2회 이상의 학습 기록이 필요합니다. (현재 ${studentReports.length}회)`); 
+            return; 
+        }
+
+        showLoading(true, `가장 처음 성적과 최근 성적을 비교하여<br>종합 성장 리포트를 작성 중입니다. 🤖`);
+        
+        const oldestReport = studentReports[studentReports.length - 1];
+        const newestReport = studentReports[0];
+        const recentAverage = studentReports.slice(0, 3).reduce((sum, r) => sum + r.score, 0) / Math.min(3, studentReports.length);
+
+        const comparisonData = {
+            profile: currentReportFilter,
+            total_sessions: studentReports.length,
+            initial_state: {
+                date: oldestReport.date, subject: oldestReport.subject, score: oldestReport.score, 
+                wrong_concepts: oldestReport.wrongDetails ? oldestReport.wrongDetails.slice(0,3).map(w=>w.q) : []
+            },
+            current_state: {
+                date: newestReport.date, subject: newestReport.subject, score: newestReport.score, 
+                recent_avg_score: recentAverage,
+                wrong_concepts: newestReport.wrongDetails ? newestReport.wrongDetails.slice(0,3).map(w=>w.q) : []
+            }
+        };
+
+        const prompt = `당신은 대한민국 교육 분석 전문가입니다. 학생 '${currentReportFilter}'의 전체 누적 학습 데이터를 비교 분석하십시오.
+        데이터: ${JSON.stringify(comparisonData)}
+        
+        [분석 지시사항]
+        1. [초기 성적]과 [최근 성적/평균]을 비교하여 긍정적인 발전(개선된 부분)을 구체적으로 명시하세요.
+        2. 과거에 비해 오히려 성취도가 떨어졌거나 정체된 부분(과목, 유형 등)이 있다면 날카롭게 지적하세요.
+        3. 오답 유형의 변화를 바탕으로 현재 시점에서 가장 시급하게 보완해야 할 '최종 취약점'을 도출하세요.
+        4. 2026년 개정 교육과정 기준에 맞춘 구체적인 가정 내 종합 지도 방향을 제안하세요.
+        5. 전체 내용을 600자 이내로 가독성 있게 (목차/기호 사용) 친절하게 작성하십시오.`;
+
+        try {
+            const data = await fetchFromGemini(prompt, 0, false);
+            showLoading(false);
+            document.getElementById('modal-title').innerText = `📈 AI 종합 성장 리포트 (초기 vs 현재)`;
             document.getElementById('modal-body').innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
             document.getElementById('detail-modal').style.display = 'flex';
         } catch(e) { showLoading(false); alert("서버 통신 중 오류가 발생했습니다."); }
