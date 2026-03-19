@@ -329,6 +329,18 @@
                     정보를 불러오는 중입니다...
                 </div>
             </div>
+
+            <div class="admin-info-box" style="border-color: var(--secondary); background-color: #f0f8ff;">
+                <div class="admin-info-title" style="color: var(--secondary);">🎁 특별 보너스 포인트 지급</div>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <select id="bonus-student-select" class="input-field" style="padding: 10px; font-size: 15px;">
+                        <option value="김로운">👦 김로운</option>
+                        <option value="김서아">👧 김서아</option>
+                    </select>
+                    <input type="number" id="bonus-point-input" class="input-field" placeholder="지급할 포인트 수량 입력" style="padding: 10px; font-size: 15px;">
+                </div>
+                <button class="btn-main btn-secondary" style="padding: 12px; font-size: 15px;" onclick="giveBonusPoint()">포인트 지급하기</button>
+            </div>
             
             <div class="btn-group" style="margin-bottom: 25px;">
                 <button class="btn-outline active" id="tab-report-btn" onclick="switchAdminTab('report')">📝 학습 리포트</button>
@@ -413,9 +425,6 @@
 </div>
 
 <script>
-    // =========================================================================
-    // 🔥 FIREBASE 연동 설정
-    // =========================================================================
     const firebaseConfig = {
         apiKey: "AIzaSyCJTPXzAVTuofcv902nnzIpJ_CcdK8OOEk",
         authDomain: "smart-edu-app-3d607.firebaseapp.com",
@@ -448,7 +457,7 @@
         db.ref('push_notifications').orderByChild('timestamp').startAt(now).on('child_added', snap => {
             const data = snap.val();
             if (data && data.message) {
-                new Notification("스마트 학습 알림 🔔", {
+                new Notification("스마트 학습 알림", {
                     body: data.message,
                     icon: "icon.png?v=9",
                     vibrate: [200, 100, 200]
@@ -476,9 +485,6 @@
         document.getElementById('permission-modal').style.display = 'none';
     }
 
-    // =========================================================================
-    // API 키 깃허브 보안 스캔 우회
-    // =========================================================================
     const KEY1 = "AIzaSyA1H3rfJarOuDx" + "A1NflRN96_ugCsaehU0M";
     const KEY2 = "AIzaSyBred_9lqK4Jx1" + "emrzyHWcUVnmLrqnttUQ";
     const API_KEYS = [KEY1, KEY2];
@@ -487,7 +493,8 @@
         "gemini-3.1-flash-lite", 
         "gemini-2.5-flash-lite", 
         "gemini-3-flash", 
-        "gemini-2.5-flash"
+        "gemini-2.5-flash",
+        "gemini-1.5-flash"
     ];
 
     let currentProfile = null; 
@@ -604,7 +611,7 @@
             if (!newPw || newPw.trim() === '') return;
             user.pw = newPw.trim();
             await dbSet('users/' + profileName + '/pw', user.pw);
-            alert('비밀번호가 안전하게 만들어졌어요! 🎉');
+            alert('비밀번호가 안전하게 만들어졌어요!');
             triggerPushNotification(`[계정 알림] ${profileName} 학생이 최초 비밀번호를 설정했습니다.`);
         } else {
             let inputPw = prompt(`[${profileName}] 비밀번호를 입력해주세요.`);
@@ -628,7 +635,7 @@
         if (!newPw || newPw.trim() === '') { alert("유효한 비밀번호를 입력해주세요."); return; }
         
         await dbSet('users/' + currentProfile + '/pw', newPw.trim());
-        alert("비밀번호가 성공적으로 변경되었어요! 🔑");
+        alert("비밀번호가 성공적으로 변경되었어요!");
         triggerPushNotification(`[계정 알림] ${currentProfile} 학생이 비밀번호를 변경했습니다.`);
     }
 
@@ -670,7 +677,7 @@
             await dbSet('users/' + currentProfile + '/streak', dates);
             let currentStreak = calculateStreak(dates);
             await addPoints(currentStreak);
-            alert(`출석 완료! 🎉 연속 ${currentStreak}일 보상으로 ${currentStreak}포인트를 받았어요!`);
+            alert(`출석 완료! 연속 ${currentStreak}일 보상으로 ${currentStreak}포인트를 받았어요!`);
         }
         document.getElementById('streak-display').innerText = `🔥 연속 ${calculateStreak(dates)}일`;
     }
@@ -680,6 +687,31 @@
         await dbSet('users/' + currentProfile + '/points', pts + amount);
         document.getElementById('point-display').innerText = `💰 ${pts + amount}P`;
         document.getElementById('shop-point-display').innerText = `현재 보유: ${pts + amount}P`;
+    }
+
+    async function giveBonusPoint() {
+        const student = document.getElementById('bonus-student-select').value;
+        const pointInput = document.getElementById('bonus-point-input').value;
+        const pointsToGive = parseInt(pointInput);
+
+        if (isNaN(pointsToGive) || pointsToGive <= 0) {
+            alert("올바른 포인트 수량을 입력해주세요.");
+            return;
+        }
+
+        let user = await dbGet('users/' + student);
+        if (!user) {
+            alert("해당 학생의 계정 정보가 없습니다. 먼저 1회 로그인이 필요합니다.");
+            return;
+        }
+
+        let currentPoints = user.points || 0;
+        await dbSet('users/' + student + '/points', currentPoints + pointsToGive);
+        
+        alert(`${student} 학생에게 특별 보너스 ${pointsToGive}P가 지급되었습니다.`);
+        document.getElementById('bonus-point-input').value = '';
+        
+        triggerPushNotification(`[보너스 알림] 부모님이 ${student} 학생에게 특별 보너스 ${pointsToGive}P를 선물했습니다!`);
     }
 
     async function buyItem(itemName, cost) {
@@ -696,11 +728,11 @@
                     status: 'pending' 
                 });
                 await dbSet('purchases', purchases);
-                alert(`짠! 🎁 성공적으로 샀어요. 부모님께 보여주세요!`);
+                alert(`성공적으로 샀어요. 부모님께 보여주세요!`);
                 triggerPushNotification(`[상점 알림] ${currentProfile} 학생이 '${itemName}'을(를) 구매했습니다.`);
             }
         } else {
-            alert(`앗, 포인트가 부족해요. 😭 (현재: ${points}P, 필요: ${cost}P)`);
+            alert(`앗, 포인트가 부족해요. (현재: ${points}P, 필요: ${cost}P)`);
         }
     }
 
@@ -771,9 +803,6 @@
         else overlay.style.display = 'none';
     }
 
-    // =========================================================================
-    // 🚀 [문제 해결] 과목별 프롬프트 분리 및 오류 방어 통신 로직
-    // =========================================================================
     async function fetchFromGemini(promptText, attempt = 0, isJson = true) {
         const totalAttempts = AI_MODELS.length * API_KEYS.length;
         if (attempt >= totalAttempts) {
@@ -805,29 +834,42 @@
     }
 
     async function startNewQuiz() {
-        showLoading(true, "AI 선생님이 2026년 교과서에 맞춰<br>문제를 만들고 있어요! 🤖📝");
+        showLoading(true, "AI 선생님이 교과서에 맞춰<br>문제를 만들고 있어요!");
         
         let prompt = '';
         
-        // 과목별로 AI 지시사항(프롬프트)을 완벽하게 분리하여 품질 저하 및 TTS 언어 꼬임 방지
+        // 시각 자료 출제 금지 및 정답 일치 조건 강화
         if (config.subject === '영어') {
             prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2026년 AI 디지털 교과서' 기준 초등 ${config.grade}학년 영어(EFL 기초) 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
-            [지침] 원어민 수준이 아닌 '한국 초교 교육과정'의 실생활 소통 및 기초 파닉스 수준.
-            [규칙] 1. 객관식 15개, 주관식 5개. 2. 문제 지문과 보기는 모두 영어로 작성할 것.
-            JSON 응답: [{"type":"objective","q":"영어질문","options":["A","B","C","D"],"a":"정답","tts_q":"영어질문","tts_options":["A","B","C","D"]}, {"type":"subjective","q":"영어질문","a":"정답","tts_q":"영어질문"}]`;
+            [지침] 
+            1. 원어민 수준이 아닌 '한국 초교 교육과정'의 실생활 소통 및 기초 파닉스 수준으로 출제.
+            2. 그림, 사진, 표 등 시각 자료가 필요한 문제는 절대 출제 금지. 오직 텍스트만으로 풀 수 있어야 함.
+            [규칙] 
+            1. 객관식 15개, 주관식 5개. 
+            2. 문제 지문과 보기는 모두 영어로 작성할 것. 
+            3. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            JSON 응답: [{"type":"objective","q":"영어질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","tts_q":"영어질문","tts_options":["보기1","보기2","보기3","보기4"]}, {"type":"subjective","q":"영어질문","a":"정답","tts_q":"영어질문"}]`;
         } else if (config.subject === '국어') {
             prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2026년 개정 교육과정' 기준 초등 ${config.grade}학년 국어 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
-            [지침] 단순 단어 맞추기나 의미 없는 짧은 문제를 절대 내지 마십시오. 학생이 짧은 지문이나 문장을 읽고 문맥과 의미를 스스로 파악해야 하는 '진짜 문해력' 위주로 출제하십시오.
-            [규칙] 1. 객관식 15개, 주관식 5개.
-            JSON 응답: [{"type":"objective","q":"질문","options":["A","B","C","D"],"a":"정답"}, {"type":"subjective","q":"질문","a":"정답"}]`;
+            [지침] 
+            1. 단순 단어 맞추기를 피하고, 짧은 지문이나 문장을 읽고 문맥을 파악하는 문해력 위주로 출제.
+            2. 그림, 사진, 표 등 시각 자료가 필요한 문제는 절대 출제 금지. 오직 글(텍스트)만으로 풀 수 있어야 함.
+            [규칙] 
+            1. 객관식 15개, 주관식 5개. 
+            2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            JSON 응답: [{"type":"objective","q":"질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트"}, {"type":"subjective","q":"질문","a":"정답"}]`;
         } else {
             prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2026년 개정 교육과정' 기준 초등 ${config.grade}학년 수학 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
-            [지침] 숫자만 있는 단순 연산을 피하고, 실생활 상황을 반영한 '문장제 문제' 위주로 출제하십시오. 단, 문장은 초등학생이 이해하기 쉽게 간결해야 합니다.
-            [규칙] 1. 객관식 15개, 주관식 5개.
-            JSON 응답: [{"type":"objective","q":"질문","options":["A","B","C","D"],"a":"정답"}, {"type":"subjective","q":"질문","a":"정답"}]`;
+            [지침] 
+            1. 실생활 상황을 반영한 '문장제 문제' 위주로 출제하되, 초등학생이 이해하기 쉽게 간결해야 함.
+            2. 도형 그림, 그래프, 표 등 시각 자료를 보고 푸는 문제는 절대 출제 금지. 오직 텍스트 설명만으로 풀 수 있어야 함.
+            [규칙] 
+            1. 객관식 15개, 주관식 5개. 
+            2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            JSON 응답: [{"type":"objective","q":"질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트"}, {"type":"subjective","q":"질문","a":"정답"}]`;
         }
 
         try {
@@ -840,7 +882,7 @@
             
             showLoading(false); showView('quiz-view'); renderCurrentQuestion();
             
-            triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 ${config.grade}학년 ${config.subject} (${config.difficulty}) 문제 풀이를 시작했습니다! 🚀`);
+            triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 ${config.grade}학년 ${config.subject} (${config.difficulty}) 문제 풀이를 시작했습니다!`);
         } catch (error) {
             console.error(error); showLoading(false); alert(`오류 발생: AI가 문제 생성에 실패했습니다. 다시 시도해주세요.`);
         }
@@ -860,7 +902,6 @@
         document.getElementById('question-text').innerText = qData.q;
         document.getElementById('feedback-box').innerText = '';
 
-        // 지능형 언어 전환: 영어 과목은 영어로, 국어/수학은 한국어로 자연스럽게 읽어줌
         const ttsLang = config.subject === '영어' ? 'en-US' : 'ko-KR';
         const ttsText = config.subject === '영어' ? (qData.tts_q || qData.q) : qData.q;
         
@@ -896,7 +937,6 @@
         }
     }
 
-    // TTS 언어 동적 할당 지원
     function playTTS(text, lang = 'ko-KR') {
         if(!text || !("speechSynthesis" in window)) return;
         const u = new SpeechSynthesisUtterance(text); 
@@ -909,18 +949,22 @@
     async function processObjectiveAnswer(selectedText, btnElement, event) {
         document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
         const qData = sessionState.questions[sessionState.currentIndex];
-        const correctAns = String(qData.a).toLowerCase().trim();
-        const userAns = selectedText.toLowerCase().trim();
+        
+        // 정답 검증 로직 강화 (공백 제거 후 양방향 포함 여부 확인)
+        const correctAnsStr = String(qData.a).replace(/\s+/g, '').toLowerCase();
+        const userAnsStr = selectedText.replace(/\s+/g, '').toLowerCase();
+        const isCorrect = (userAnsStr === correctAnsStr) || userAnsStr.includes(correctAnsStr) || correctAnsStr.includes(userAnsStr);
+
         const fbEl = document.getElementById('feedback-box');
 
-        if (userAns === correctAns) {
+        if (isCorrect) {
             btnElement.style.borderColor = "var(--success)"; btnElement.style.backgroundColor = "#eafaf1";
-            fbEl.innerText = '정답입니다! 🥳'; fbEl.className = 'correct';
+            fbEl.innerText = '정답입니다!'; fbEl.className = 'correct';
             showFloatingPoint(event, "+5 점"); await addPoints(5);
             if(!sessionState.isRetryMode) sessionState.initialScore += (100 / sessionState.totalCount);
         } else {
             btnElement.style.borderColor = "var(--danger)"; btnElement.style.backgroundColor = "#fff0f0";
-            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요. 😢`; fbEl.className = 'incorrect';
+            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요.`; fbEl.className = 'incorrect';
             btnElement.style.transform = "translateX(-5px)"; setTimeout(() => btnElement.style.transform = "translateX(5px)", 50); setTimeout(() => btnElement.style.transform = "translateX(0)", 100);
             sessionState.wrongQuestions.push(qData);
             if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: selectedText });
@@ -931,21 +975,24 @@
     async function processSubjectiveAnswer(event) {
         const inputEl = document.getElementById('answer-input');
         const userAnsRaw = inputEl.value.trim();
-        if(userAnsRaw === '') { alert('답을 먼저 적어주세요! ✍️'); inputEl.focus(); return; }
+        if(userAnsRaw === '') { alert('답을 먼저 적어주세요!'); inputEl.focus(); return; }
 
         document.getElementById('submit-btn').disabled = true;
         const qData = sessionState.questions[sessionState.currentIndex];
-        const correctAns = String(qData.a).replace(/\s+/g, '').toLowerCase();
-        const userAns = userAnsRaw.replace(/\s+/g, '').toLowerCase();
+        
+        const correctAnsStr = String(qData.a).replace(/\s+/g, '').toLowerCase();
+        const userAnsStr = userAnsRaw.replace(/\s+/g, '').toLowerCase();
+        const isCorrect = (userAnsStr === correctAnsStr) || userAnsStr.includes(correctAnsStr) || correctAnsStr.includes(userAnsStr);
+
         const fbEl = document.getElementById('feedback-box');
 
-        if(userAns === correctAns) {
-            fbEl.innerText = '정답입니다! 🥳'; fbEl.className = 'correct';
+        if(isCorrect) {
+            fbEl.innerText = '정답입니다!'; fbEl.className = 'correct';
             showFloatingPoint(event || { clientX: window.innerWidth/2, clientY: window.innerHeight/2 }, "+5 점"); 
             await addPoints(5);
             if(!sessionState.isRetryMode) sessionState.initialScore += (100 / sessionState.totalCount);
         } else {
-            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요. 😢`; fbEl.className = 'incorrect';
+            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요.`; fbEl.className = 'incorrect';
             sessionState.wrongQuestions.push(qData);
             if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: userAnsRaw });
         }
@@ -969,26 +1016,45 @@
         const scoreEl = document.getElementById('result-score');
         const msgEl = document.getElementById('result-message');
         const actionBtn = document.getElementById('result-action-btn');
+        const earnedPointsEl = document.getElementById('earned-points');
+
+        earnedPointsEl.style.display = 'none';
 
         if (!sessionState.isRetryMode) {
             scoreEl.innerText = `${finalScore}점`;
-            if (sessionState.wrongQuestions.length > 0) {
-                titleEl.innerText = "🚩 1차 학습 완료";
-                msgEl.innerText = `총 20문제 중 ${sessionState.wrongQuestions.length}문제를 틀렸어요.\n틀린 문제를 꼼꼼하게 다시 풀어봐요!`;
-                actionBtn.innerText = "오답 다시 풀기 ✍️";
-            } else {
-                titleEl.innerText = "🏆 완벽해요!"; msgEl.innerText = "모든 문제를 다 맞췄어요. 정말 대단해요! 🎉"; actionBtn.innerText = "기분 좋게 끝내기";
-                await saveReport();
+            
+            let bonusPoints = 0;
+            if (finalScore === 100) {
+                bonusPoints = 20;
+            } else if (finalScore >= 90) {
+                bonusPoints = 10;
             }
-            triggerPushNotification(`[점수 알림] ${currentProfile} 학생이 학습을 마쳤습니다. (1차 점수: ${finalScore}점) 💯`);
+
+            if (bonusPoints > 0) {
+                earnedPointsEl.innerText = `🎁 성적 우수 보너스 ${bonusPoints}P 획득!`;
+                earnedPointsEl.style.display = 'block';
+                await addPoints(bonusPoints);
+            }
+
+            if (sessionState.wrongQuestions.length > 0) {
+                titleEl.innerText = "1차 학습 완료";
+                msgEl.innerText = `총 20문제 중 ${sessionState.wrongQuestions.length}문제를 틀렸어요.\n틀린 문제를 꼼꼼하게 다시 풀어봐요!`;
+                actionBtn.innerText = "오답 다시 풀기";
+            } else {
+                titleEl.innerText = "완벽해요!"; 
+                msgEl.innerText = "모든 문제를 다 맞췄어요. 정말 대단해요!"; 
+                actionBtn.innerText = "기분 좋게 끝내기";
+            }
+            await saveReport();
+            triggerPushNotification(`[점수 알림] ${currentProfile} 학생이 학습을 마쳤습니다. (1차 점수: ${finalScore}점)`);
         } else {
             scoreEl.style.display = 'none'; 
             if (sessionState.wrongQuestions.length > 0) {
-                titleEl.innerText = "💪 다시 풀기 완료"; msgEl.innerText = `아직 ${sessionState.wrongQuestions.length}문제가 틀렸어요.\n포기하지 말고 100점을 향해 고고!`; actionBtn.innerText = "한번 더 도전!";
+                titleEl.innerText = "다시 풀기 완료"; msgEl.innerText = `아직 ${sessionState.wrongQuestions.length}문제가 틀렸어요.\n포기하지 말고 100점을 향해 고고!`; actionBtn.innerText = "한번 더 도전!";
             } else {
-                titleEl.innerText = "🌟 최종 완료"; msgEl.innerText = "어려운 문제도 모두 해결했어요. 최고! 👍"; actionBtn.innerText = "마무리하기";
+                titleEl.innerText = "최종 완료"; msgEl.innerText = "어려운 문제도 모두 해결했어요. 최고!"; actionBtn.innerText = "마무리하기";
                 await saveReport();
-                triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 오답 수정을 모두 완료했습니다! 💯`);
+                triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 오답 수정을 모두 완료했습니다!`);
             }
         }
     }
@@ -1055,7 +1121,7 @@
         report.wrongDetails.forEach((item, idx) => {
             html += `<div class="wrong-item"><div class="wrong-q">${idx + 1}. ${item.q}</div><div class="wrong-ans">아이의 답: ${item.userAns}</div><div class="correct-ans">올바른 정답: ${item.a}</div></div>`;
         });
-        document.getElementById('modal-title').innerText = "📝 오답 노트 상세";
+        document.getElementById('modal-title').innerText = "오답 노트 상세";
         document.getElementById('modal-body').innerHTML = html;
         document.getElementById('detail-modal').style.display = 'flex';
     }
@@ -1064,15 +1130,15 @@
         if(currentReportFilter === '전체') { alert('학생 탭(김로운 또는 김서아)을 먼저 선택하십시오.'); return; }
         const studentReports = reportDataCache.filter(r => r.profile === currentReportFilter);
         let allWrongs = []; studentReports.forEach(r => { if(r.wrongDetails) allWrongs = allWrongs.concat(r.wrongDetails); });
-        if(allWrongs.length === 0) { alert(`해당 학생의 오답 기록이 없습니다. 아주 잘하고 있습니다! 👍`); return; }
+        if(allWrongs.length === 0) { alert(`해당 학생의 오답 기록이 없습니다. 아주 잘하고 있습니다!`); return; }
 
-        showLoading(true, `오답 패턴을 기반으로<br>맞춤형 취약점 리포트를 작성 중입니다. 🤖`);
+        showLoading(true, `오답 패턴을 기반으로 맞춤형 취약점 리포트를 작성 중입니다.`);
         const prompt = `당신은 교육 분석 교사입니다. 학생 '${currentReportFilter}'의 오답 데이터: ${JSON.stringify(allWrongs.slice(0, 30).map(w=>({q:w.q, a:w.a, ans:w.userAns})))}. 2026년 개정 교육과정 기준에 따라 학생의 취약점과 가정 내 지도 방안을 500자 이내 텍스트로 브리핑하십시오.`;
 
         try {
             const data = await fetchFromGemini(prompt, 0, false);
             showLoading(false);
-            document.getElementById('modal-title').innerText = `🤖 AI 취약점 및 지도 리포트`;
+            document.getElementById('modal-title').innerText = `AI 취약점 및 지도 리포트`;
             document.getElementById('modal-body').innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
             document.getElementById('detail-modal').style.display = 'flex';
         } catch(e) { showLoading(false); alert("서버 통신 중 오류가 발생했습니다."); }
