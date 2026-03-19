@@ -121,7 +121,8 @@
         
         .question-box {
             font-size: 22px; font-weight: 900; line-height: 1.5; color: var(--text-main);
-            margin-bottom: 25px; white-space: pre-line; word-break: keep-all; text-align: center;
+            margin-bottom: 25px; white-space: pre-line; word-break: keep-all; text-align: left;
+            background: #f8fbfa; padding: 20px; border-radius: 16px; border: 1px solid #dfe6e9;
         }
         .options-container { display: flex; flex-direction: column; gap: 15px; }
         .option-row { display: flex; gap: 10px; width: 100%; }
@@ -297,7 +298,7 @@
             <div class="progress-bar-bg"><div class="progress-bar-fill" id="quiz-progress-bar"></div></div>
             
             <div id="question-text" class="question-box">문제를 불러오는 중입니다...</div>
-            <button id="tts-btn" class="btn-main btn-accent" onclick="playTTS(currentEnglishText)" style="display: none; margin: 0 auto 25px; padding: 12px; font-size:16px;">🔊 문제 읽어주기</button>
+            <button id="tts-btn" class="btn-main btn-accent" style="display: none; margin: 0 auto 25px; padding: 12px; font-size:16px;">🔊 문제 읽어주기</button>
 
             <div id="options-container" class="options-container" style="display: none;"></div>
 
@@ -381,8 +382,8 @@
             <div class="title-text" id="resume-title">🚨 풀다 만 학습이 있어요!</div>
             <div class="subtitle-text">이전에 풀던 문제부터 이어서 진행할까요?</div>
             <div class="modal-btns">
-                <button class="btn-main btn-outline" onclick="cancelResume()">처음부터</button>
-                <button class="btn-main btn-primary" onclick="confirmResume()">이어하기</button>
+                <button class="btn-main btn-outline" style="flex: none; width: 45%; margin: 0 auto;" onclick="cancelResume()">처음부터</button>
+                <button class="btn-main btn-primary" style="flex: none; width: 45%; margin: 0 auto;" onclick="confirmResume()">이어하기</button>
             </div>
         </div>
     </div>
@@ -412,6 +413,9 @@
 </div>
 
 <script>
+    // =========================================================================
+    // 🔥 FIREBASE 연동 설정
+    // =========================================================================
     const firebaseConfig = {
         apiKey: "AIzaSyCJTPXzAVTuofcv902nnzIpJ_CcdK8OOEk",
         authDomain: "smart-edu-app-3d607.firebaseapp.com",
@@ -446,7 +450,7 @@
             if (data && data.message) {
                 new Notification("스마트 학습 알림 🔔", {
                     body: data.message,
-                    icon: "icon.png?v=4",
+                    icon: "icon.png?v=9",
                     vibrate: [200, 100, 200]
                 });
             }
@@ -472,7 +476,9 @@
         document.getElementById('permission-modal').style.display = 'none';
     }
 
-    // API 키 깃허브 보안 스캔 우회를 위한 문자열 분리 할당 및 다중 키 배열 적용
+    // =========================================================================
+    // API 키 깃허브 보안 스캔 우회
+    // =========================================================================
     const KEY1 = "AIzaSyA1H3rfJarOuDx" + "A1NflRN96_ugCsaehU0M";
     const KEY2 = "AIzaSyBred_9lqK4Jx1" + "emrzyHWcUVnmLrqnttUQ";
     const API_KEYS = [KEY1, KEY2];
@@ -481,15 +487,13 @@
         "gemini-3.1-flash-lite", 
         "gemini-2.5-flash-lite", 
         "gemini-3-flash", 
-        "gemini-2.5-flash",
-        "gemini-1.5-flash"
+        "gemini-2.5-flash"
     ];
 
     let currentProfile = null; 
     let currentReportFilter = '전체';
     let config = { grade: 1, subject: '국어', difficulty: '중' };
     let sessionState = { questions: [], currentIndex: 0, wrongQuestions: [], wrongHistory: [], initialScore: 0, isRetryMode: false, totalCount: 20 };
-    let currentEnglishText = ''; 
     let reportDataCache = [];
     let purchaseDataCache = [];
 
@@ -767,11 +771,14 @@
         else overlay.style.display = 'none';
     }
 
+    // =========================================================================
+    // 🚀 [문제 해결] 과목별 프롬프트 분리 및 오류 방어 통신 로직
+    // =========================================================================
     async function fetchFromGemini(promptText, attempt = 0, isJson = true) {
         const totalAttempts = AI_MODELS.length * API_KEYS.length;
         if (attempt >= totalAttempts) {
-            console.error("[시스템 오류] 모든 API 키와 모델 조합에서 통신이 거절되었습니다.");
-            alert("1분당 문제 출제 횟수 제한에 도달했거나 통신 상태가 불안정합니다.\n약 1분 정도 기다리셨다가 다시 시도해주세요.");
+            console.error("[시스템 오류] 통신 실패");
+            alert("통신 상태가 불안정하거나 한도에 도달했습니다.\n잠시 후 다시 시도해주세요.");
             throw new Error("통신 제한 도달");
         }
 
@@ -779,8 +786,6 @@
         const keyIndex = Math.floor(attempt / AI_MODELS.length);
         const currentModel = AI_MODELS[modelIndex];
         const currentKey = API_KEYS[keyIndex];
-
-        console.log(`[통신 시도] Key: ${keyIndex + 1}, Model: ${currentModel}`);
 
         const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${currentKey}`;
         const generationConfig = { temperature: 0.1 };
@@ -792,14 +797,9 @@
                 body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig })
             });
 
-            if (!response.ok) {
-                console.warn(`[통신 거절] Key: ${keyIndex + 1}, Model: ${currentModel}, 상태코드: ${response.status}`);
-                return fetchFromGemini(promptText, attempt + 1, isJson);
-            }
-            
+            if (!response.ok) return fetchFromGemini(promptText, attempt + 1, isJson);
             return response.json();
         } catch (error) {
-            console.error(`[네트워크 에러] Key: ${keyIndex + 1}, Model: ${currentModel}`, error);
             return fetchFromGemini(promptText, attempt + 1, isJson);
         }
     }
@@ -807,16 +807,28 @@
     async function startNewQuiz() {
         showLoading(true, "AI 선생님이 2026년 교과서에 맞춰<br>문제를 만들고 있어요! 🤖📝");
         
-        const prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2022 개정 교육과정' 및 '2026년 AI 디지털 교과서' 기준에 철저히 기반하여 초등학교 ${config.grade}학년 ${config.subject} 과목 문제 20개를 출제하십시오.
-        난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
+        let prompt = '';
         
-        [2026년 교과별 출제 지침]
-        1. 국어: '기초 문해력' 강화를 위해 어휘의 정확한 쓰임과 맥락 파악 문제 위주로 출제.
-        2. 영어: 원어민 수준이 아닌 '한국 초교 교육과정(EFL)'의 실생활 소통 및 기초 파닉스 수준으로 난이도를 하향 평준화할 것.
-        3. 수학: 단순 연산보다 '실생활 문제 해결' 능력을 묻는 문장제 문제를 포함하되, 문장은 초등학생 수준에 맞춰 간결하게 작성할 것.
-        
-        [규칙] 1. 객관식 15개("type":"objective"), 주관식 5개("type":"subjective"). 2. 주관적 답변이 가능한 열린 질문 배제. 3. 영어 과목은 지문과 보기를 모두 영어로 구성.
-        JSON 배열 응답: [{"type":"objective","q":"질문","options":["A","B","C","D"],"a":"정답","en_q":"발음","en_options":["발음1","발음2","발음3","발음4"]}, {"type":"subjective","q":"질문","a":"정답","en_q":"발음"}]`;
+        // 과목별로 AI 지시사항(프롬프트)을 완벽하게 분리하여 품질 저하 및 TTS 언어 꼬임 방지
+        if (config.subject === '영어') {
+            prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2026년 AI 디지털 교과서' 기준 초등 ${config.grade}학년 영어(EFL 기초) 과목 문제 20개를 출제하십시오.
+            난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
+            [지침] 원어민 수준이 아닌 '한국 초교 교육과정'의 실생활 소통 및 기초 파닉스 수준.
+            [규칙] 1. 객관식 15개, 주관식 5개. 2. 문제 지문과 보기는 모두 영어로 작성할 것.
+            JSON 응답: [{"type":"objective","q":"영어질문","options":["A","B","C","D"],"a":"정답","tts_q":"영어질문","tts_options":["A","B","C","D"]}, {"type":"subjective","q":"영어질문","a":"정답","tts_q":"영어질문"}]`;
+        } else if (config.subject === '국어') {
+            prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2026년 개정 교육과정' 기준 초등 ${config.grade}학년 국어 과목 문제 20개를 출제하십시오.
+            난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
+            [지침] 단순 단어 맞추기나 의미 없는 짧은 문제를 절대 내지 마십시오. 학생이 짧은 지문이나 문장을 읽고 문맥과 의미를 스스로 파악해야 하는 '진짜 문해력' 위주로 출제하십시오.
+            [규칙] 1. 객관식 15개, 주관식 5개.
+            JSON 응답: [{"type":"objective","q":"질문","options":["A","B","C","D"],"a":"정답"}, {"type":"subjective","q":"질문","a":"정답"}]`;
+        } else {
+            prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2026년 개정 교육과정' 기준 초등 ${config.grade}학년 수학 과목 문제 20개를 출제하십시오.
+            난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
+            [지침] 숫자만 있는 단순 연산을 피하고, 실생활 상황을 반영한 '문장제 문제' 위주로 출제하십시오. 단, 문장은 초등학생이 이해하기 쉽게 간결해야 합니다.
+            [규칙] 1. 객관식 15개, 주관식 5개.
+            JSON 응답: [{"type":"objective","q":"질문","options":["A","B","C","D"],"a":"정답"}, {"type":"subjective","q":"질문","a":"정답"}]`;
+        }
 
         try {
             const data = await fetchFromGemini(prompt, 0, true);
@@ -830,7 +842,7 @@
             
             triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 ${config.grade}학년 ${config.subject} (${config.difficulty}) 문제 풀이를 시작했습니다! 🚀`);
         } catch (error) {
-            console.error(error); showLoading(false); alert(`오류 발생: ${error.message}`);
+            console.error(error); showLoading(false); alert(`오류 발생: AI가 문제 생성에 실패했습니다. 다시 시도해주세요.`);
         }
     }
 
@@ -848,8 +860,13 @@
         document.getElementById('question-text').innerText = qData.q;
         document.getElementById('feedback-box').innerText = '';
 
-        currentEnglishText = qData.en_q || '';
-        document.getElementById('tts-btn').style.display = (currentEnglishText) ? 'block' : 'none';
+        // 지능형 언어 전환: 영어 과목은 영어로, 국어/수학은 한국어로 자연스럽게 읽어줌
+        const ttsLang = config.subject === '영어' ? 'en-US' : 'ko-KR';
+        const ttsText = config.subject === '영어' ? (qData.tts_q || qData.q) : qData.q;
+        
+        const ttsBtn = document.getElementById('tts-btn');
+        ttsBtn.style.display = 'block';
+        ttsBtn.onclick = () => playTTS(ttsText, ttsLang);
 
         const optContainer = document.getElementById('options-container');
         const ansInput = document.getElementById('answer-input');
@@ -865,12 +882,12 @@
                 btn.onclick = (e) => processObjectiveAnswer(optText, btn, e);
                 row.appendChild(btn);
 
-                if (qData.en_options && qData.en_options[index]) {
-                    const ttsBtn = document.createElement('button');
-                    ttsBtn.className = 'tts-opt-btn'; ttsBtn.innerText = '🔊';
-                    ttsBtn.onclick = (e) => { e.stopPropagation(); playTTS(qData.en_options[index]); };
-                    row.appendChild(ttsBtn);
-                }
+                const optTtsBtn = document.createElement('button');
+                optTtsBtn.className = 'tts-opt-btn'; optTtsBtn.innerText = '🔊';
+                const optTtsText = config.subject === '영어' ? (qData.tts_options ? qData.tts_options[index] : optText) : optText;
+                optTtsBtn.onclick = (e) => { e.stopPropagation(); playTTS(optTtsText, ttsLang); };
+                row.appendChild(optTtsBtn);
+                
                 optContainer.appendChild(row);
             });
         } else {
@@ -879,10 +896,14 @@
         }
     }
 
-    function playTTS(text) {
-        if(!text) return;
-        const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.9;
-        window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+    // TTS 언어 동적 할당 지원
+    function playTTS(text, lang = 'ko-KR') {
+        if(!text || !("speechSynthesis" in window)) return;
+        const u = new SpeechSynthesisUtterance(text); 
+        u.lang = lang; 
+        u.rate = 0.9;
+        window.speechSynthesis.cancel(); 
+        window.speechSynthesis.speak(u);
     }
 
     async function processObjectiveAnswer(selectedText, btnElement, event) {
