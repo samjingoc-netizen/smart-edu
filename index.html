@@ -8,9 +8,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>🌟 스마트 학습 시스템</title>
     
-    <link rel="icon" href="icon.png?v=2">
-    <link rel="apple-touch-icon" href="icon.png?v=2">
-    <link rel="manifest" href='data:application/manifest+json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=2","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=2","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="icon" href="icon.png?v=4">
+    <link rel="apple-touch-icon" href="icon.png?v=4">
+    <link rel="manifest" href='data:application/manifest+json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=4","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=4","sizes":"512x512","type":"image/png"}]}'>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -177,7 +177,7 @@
         .modal-content { background: white; width: 88%; max-height: 80vh; border-radius: 24px; padding: 30px 20px; overflow-y: auto; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
         
         .modal-btns { display: flex; gap: 12px; margin-top: 25px; width: 100%; }
-        .modal-btns button { flex: 1; margin: 0; padding: 16px; font-size: 16px; }
+        .modal-btns button { flex: 1 1 0%; width: 50%; margin: 0; padding: 16px; font-size: 16px; }
         
         .wrong-item { background: #fff0f0; border: 2px solid #ffcccc; padding: 20px; border-radius: 16px; margin-bottom: 15px; text-align: left; font-size: 15px; }
         .wrong-q { font-weight: 900; margin-bottom: 10px; color: var(--text-main); white-space: pre-line; }
@@ -218,7 +218,9 @@
             <button class="btn-main btn-secondary" style="margin-bottom: 20px;" onclick="selectProfile('김로운')">👦 김로운</button>
             <button class="btn-main btn-secondary" onclick="selectProfile('김서아')">👧 김서아</button>
         </div>
-        <button class="btn-main btn-outline" style="flex: none;" onclick="showView('login-view')">뒤로 가기</button>
+        <div style="margin-top: auto; padding-top: 20px;">
+            <button class="btn-main btn-outline" onclick="showView('login-view')">뒤로 가기</button>
+        </div>
     </div>
 
     <div id="child-dashboard-view" class="view-section">
@@ -278,8 +280,9 @@
                 </div>
                 <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('휴대폰 1시간 쿠폰', 1000)">구매</button>
             </div>
-
-            <button class="btn-main btn-outline" style="flex: none; margin-top:25px;" onclick="showView('child-dashboard-view')">메인으로 가기</button>
+        </div>
+        <div style="margin-top: auto; padding-top: 20px;">
+            <button class="btn-main btn-outline" onclick="showView('child-dashboard-view')">메인으로 가기</button>
         </div>
     </div>
 
@@ -377,8 +380,8 @@
             <div class="title-text" id="resume-title">🚨 풀다 만 학습이 있어요!</div>
             <div class="subtitle-text">이전에 풀던 문제부터 이어서 진행할까요?</div>
             <div class="modal-btns">
-                <button class="btn-main btn-outline" style="flex: none; width: 45%; margin: 0 auto;" onclick="cancelResume()">처음부터</button>
-                <button class="btn-main btn-primary" style="flex: none; width: 45%; margin: 0 auto;" onclick="confirmResume()">이어하기</button>
+                <button class="btn-main btn-outline" onclick="cancelResume()">처음부터</button>
+                <button class="btn-main btn-primary" onclick="confirmResume()">이어하기</button>
             </div>
         </div>
     </div>
@@ -409,7 +412,7 @@
 
 <script>
     // =========================================================================
-    // 🔥 FIREBASE 연동 설정 (제공해주신 설정값 적용)
+    // 🔥 FIREBASE 연동 설정
     // =========================================================================
     const firebaseConfig = {
         apiKey: "AIzaSyCJTPXzAVTuofcv902nnzIpJ_CcdK8OOEk",
@@ -448,7 +451,7 @@
             if (data && data.message) {
                 new Notification("스마트 학습 알림 🔔", {
                     body: data.message,
-                    icon: "https://cdn-icons-png.flaticon.com/512/3135/3135810.png",
+                    icon: "icon.png?v=4",
                     vibrate: [200, 100, 200]
                 });
             }
@@ -561,7 +564,7 @@
             switchAdminTab('report'); 
             showView('parent-view');
 
-            // 알림 권한 체크 및 팝업 띄우기
+            // 알림 권한 체크
             if ("Notification" in window) {
                 if (Notification.permission === "default") {
                     document.getElementById('permission-modal').style.display = 'flex';
@@ -764,6 +767,7 @@
         else overlay.style.display = 'none';
     }
 
+    // --- 🚀 [업데이트] 2026년 대한민국 교육과정 반영 AI 출제 ---
     async function fetchFromGemini(promptText, modelIndex = 0, isJson = true) {
         if (modelIndex >= AI_MODELS.length) throw new Error("서버 무료 한도가 모두 소진되었습니다.");
         const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODELS[modelIndex]}:generateContent?key=${GEMINI_API_KEY}`;
@@ -782,10 +786,18 @@
     }
 
     async function startNewQuiz() {
-        showLoading(true, "AI 선생님이 나만의 문제를<br>만들고 있어요! 🤖📝<br>(약 5~10초 소요)");
-        const prompt = `당신은 대한민국 초등학교 교사입니다. 초등학교 ${config.grade}학년 ${config.subject} 과목 문제 20개를 출제하십시오.
+        showLoading(true, "AI 선생님이 2026년 교과서에 맞춰<br>문제를 만들고 있어요! 🤖📝");
+        
+        // 🚀 2026년 기준 정밀 튜닝 프롬프트
+        const prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2022 개정 교육과정' 및 '2026년 AI 디지털 교과서' 기준에 철저히 기반하여 초등학교 ${config.grade}학년 ${config.subject} 과목 문제 20개를 출제하십시오.
         난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
-        [규칙] 1. 객관식 15개("type":"objective"), 주관식 5개("type":"subjective"). 2. 주관적 질문 배제. 3. 영어 과목은 모두 영어 구성 및 발음("en_q", "en_options") 필수.
+        
+        [2026년 교과별 출제 지침]
+        1. 국어: '기초 문해력' 강화를 위해 어휘의 정확한 쓰임과 맥락 파악 문제 위주로 출제.
+        2. 영어: 원어민 수준이 아닌 '한국 초교 교육과정(EFL)'의 실생활 소통 및 기초 파닉스 수준으로 난이도를 하향 평준화할 것.
+        3. 수학: 단순 연산보다 '실생활 문제 해결' 능력을 묻는 문장제 문제를 포함하되, 문장은 초등학생 수준에 맞춰 간결하게 작성할 것.
+        
+        [규칙] 1. 객관식 15개("type":"objective"), 주관식 5개("type":"subjective"). 2. 주관적 답변이 가능한 열린 질문 배제. 3. 영어 과목은 지문과 보기를 모두 영어로 구성.
         JSON 배열 응답: [{"type":"objective","q":"질문","options":["A","B","C","D"],"a":"정답","en_q":"발음","en_options":["발음1","발음2","발음3","발음4"]}, {"type":"subjective","q":"질문","a":"정답","en_q":"발음"}]`;
 
         try {
@@ -798,7 +810,7 @@
             
             showLoading(false); showView('quiz-view'); renderCurrentQuestion();
             
-            triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 ${config.grade}학년 ${config.subject} 문제 풀이를 시작했습니다! 🚀`);
+            triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 ${config.grade}학년 ${config.subject} (${config.difficulty}) 문제 풀이를 시작했습니다! 🚀`);
         } catch (error) {
             console.error(error); showLoading(false); alert(`오류 발생: ${error.message}`);
         }
@@ -937,7 +949,7 @@
             } else {
                 titleEl.innerText = "🌟 최종 완료"; msgEl.innerText = "어려운 문제도 모두 해결했어요. 최고! 👍"; actionBtn.innerText = "마무리하기";
                 await saveReport();
-                triggerPushNotification(`[점수 알림] ${currentProfile} 학생이 오답 수정을 모두 완료했습니다! 💯`);
+                triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 오답 수정을 모두 완료했습니다! 💯`);
             }
         }
     }
@@ -1016,7 +1028,7 @@
         if(allWrongs.length === 0) { alert(`해당 학생의 오답 기록이 없습니다. 아주 잘하고 있습니다! 👍`); return; }
 
         showLoading(true, `오답 패턴을 기반으로<br>맞춤형 취약점 리포트를 작성 중입니다. 🤖`);
-        const prompt = `당신은 교육 분석 교사입니다. 학생 '${currentReportFilter}'의 오답 데이터: ${JSON.stringify(allWrongs.slice(0, 30).map(w=>({q:w.q, a:w.a, ans:w.userAns})))}. 학생의 취약점과 가정 내 지도 방안을 500자 이내 텍스트로 브리핑하십시오.`;
+        const prompt = `당신은 교육 분석 교사입니다. 학생 '${currentReportFilter}'의 오답 데이터: ${JSON.stringify(allWrongs.slice(0, 30).map(w=>({q:w.q, a:w.a, ans:w.userAns})))}. 2026년 개정 교육과정 기준에 따라 학생의 취약점과 가정 내 지도 방안을 500자 이내 텍스트로 브리핑하십시오.`;
 
         try {
             const data = await fetchFromGemini(prompt, 0, false);
