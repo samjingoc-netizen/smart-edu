@@ -181,7 +181,7 @@
         .modal-btns { display: flex; gap: 12px; margin-top: 25px; width: 100%; }
         .modal-btns button { flex: 1 1 0%; width: 50%; margin: 0; padding: 16px; font-size: 16px; }
         
-        .wrong-item { background: #fff0f0; border: 2px solid #ffcccc; padding: 20px; border-radius: 16px; margin-bottom: 15px; text-align: left; font-size: 15px; }
+        .wrong-item { background: #ffffff; border: 2px solid #ffcccc; padding: 20px; border-radius: 16px; margin-bottom: 15px; text-align: left; font-size: 15px; box-shadow: 0 4px 0 #ffe0e0; }
         .wrong-q { font-weight: 900; margin-bottom: 10px; color: var(--text-main); white-space: pre-line; }
         .wrong-ans { color: var(--danger); margin-bottom: 5px; font-weight: 700; }
         .correct-ans { color: var(--success); font-weight: 900; }
@@ -218,7 +218,8 @@
             <div class="subtitle-text">내 이름을 선택하고 비밀번호를 입력해요.</div>
             
             <button class="btn-main btn-secondary" style="margin-bottom: 20px;" onclick="selectProfile('김로운')">👦 김로운</button>
-            <button class="btn-main btn-secondary" onclick="selectProfile('김서아')">👧 김서아</button>
+            <button class="btn-main btn-secondary" style="margin-bottom: 20px;" onclick="selectProfile('김서아')">👧 김서아</button>
+            <button class="btn-main btn-secondary" onclick="selectProfile('정지영')">👩 정지영</button>
         </div>
         <div style="margin-top: auto; padding-top: 20px;">
             <button class="btn-main btn-outline" onclick="showView('login-view')">뒤로 가기</button>
@@ -269,6 +270,38 @@
             
             <div class="shop-item">
                 <div>
+                    <div class="item-name">🎮 게임 충전: 3만원</div>
+                    <div class="item-cost">30,000 P</div>
+                </div>
+                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('게임 충전: 3만원', 30000)">구매</button>
+            </div>
+
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">🎮 게임 충전: 5만원</div>
+                    <div class="item-cost">50,000 P</div>
+                </div>
+                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('게임 충전: 5만원', 50000)">구매</button>
+            </div>
+
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">🛒 다이소 1000원</div>
+                    <div class="item-cost">1,000 P</div>
+                </div>
+                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('다이소 1000원', 1000)">구매</button>
+            </div>
+
+            <div class="shop-item">
+                <div>
+                    <div class="item-name">🍦 빙빙 1000원</div>
+                    <div class="item-cost">1,000 P</div>
+                </div>
+                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('빙빙 1000원', 1000)">구매</button>
+            </div>
+
+            <div class="shop-item">
+                <div>
                     <div class="item-name">💵 1,000원 용돈 교환권</div>
                     <div class="item-cost">1,000 P</div>
                 </div>
@@ -313,9 +346,18 @@
         <div class="glass-card" style="text-align: center;">
             <div class="title-text" id="result-title">🎉 학습 완료!</div>
             <div style="font-size: 60px; font-weight: 900; color: var(--primary); margin: 20px 0; text-shadow: 2px 2px 0px #ffeaa7;" id="result-score">100점</div>
-            <div style="font-size: 20px; color: var(--secondary); font-weight: 900; margin-bottom: 25px;" id="earned-points" style="display:none;">🎁 보너스 100P 획득!</div>
+            <div style="font-size: 16px; color: var(--secondary); font-weight: 900; margin-bottom: 25px; background-color: #f0f8ff; padding: 15px; border-radius: 12px; border: 1px solid var(--secondary);" id="earned-points" style="display:none;">🎁 보너스 100P 획득!</div>
             <div id="result-message" class="subtitle-text" style="font-size: 17px; line-height:1.5;">참 잘했어요!</div>
             <button id="result-action-btn" class="btn-main btn-primary" onclick="handleResultAction()">확인</button>
+        </div>
+    </div>
+
+    <div id="wrong-review-view" class="view-section">
+        <div class="glass-card" style="padding-bottom: 15px;">
+            <div class="title-text">📝 오답 개념 노트</div>
+            <div class="subtitle-text">내가 무엇을 실수했는지 정확한 풀이로 먼저 배워봐요!</div>
+            <div id="wrong-review-container" style="max-height: 55vh; overflow-y: auto; margin-bottom: 20px;"></div>
+            <button class="btn-main btn-primary" onclick="startRetryQuiz()">💪 다 이해했어요! 다시 풀기</button>
         </div>
     </div>
 
@@ -324,7 +366,7 @@
             <div class="title-text">👨‍🏫 부모님 관리 대시보드</div>
             
             <div class="admin-info-box">
-                <div class="admin-info-title">🔑 학생 비밀번호 상태</div>
+                <div class="admin-info-title">🔑 사용자 비밀번호 상태</div>
                 <div id="admin-pw-display" style="font-size: 16px; font-weight: bold; color: var(--text-main);">
                     정보를 불러오는 중입니다...
                 </div>
@@ -336,8 +378,9 @@
                     <select id="bonus-student-select" class="input-field" style="padding: 10px; font-size: 15px;">
                         <option value="김로운">👦 김로운</option>
                         <option value="김서아">👧 김서아</option>
+                        <option value="정지영">👩 정지영</option>
                     </select>
-                    <input type="number" id="bonus-point-input" class="input-field" placeholder="지급할 포인트 수량 입력" style="padding: 10px; font-size: 15px;">
+                    <input type="number" id="bonus-point-input" class="input-field" placeholder="지급할 수량 입력" style="padding: 10px; font-size: 15px;">
                 </div>
                 <button class="btn-main btn-secondary" style="padding: 12px; font-size: 15px;" onclick="giveBonusPoint()">포인트 지급하기</button>
             </div>
@@ -352,17 +395,18 @@
                     <button class="btn-outline active" id="filter-all" onclick="filterReport('전체')">전체</button>
                     <button class="btn-outline" id="filter-rw" onclick="filterReport('김로운')">김로운</button>
                     <button class="btn-outline" id="filter-sa" onclick="filterReport('김서아')">김서아</button>
+                    <button class="btn-outline" id="filter-jj" onclick="filterReport('정지영')">정지영</button>
                 </div>
 
-                <button class="btn-main btn-secondary" style="margin-bottom: 20px; padding:14px; font-size:16px;" onclick="analyzeWeakness()">🤖 선택 학생 AI 취약점 분석</button>
+                <button class="btn-main btn-secondary" style="margin-bottom: 20px; padding:14px; font-size:16px;" onclick="analyzeWeakness()">🤖 선택 사용자 AI 취약점 심층 분석</button>
 
                 <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 0 0 1px #dfe6e9;">
                     <table class="report-table" style="margin-top:0;">
                         <thead>
                             <tr>
                                 <th>이름</th>
-                                <th>일시</th>
-                                <th>결과</th>
+                                <th>일시/정보</th>
+                                <th>과목/점수</th>
                                 <th>오답</th>
                             </tr>
                         </thead>
@@ -376,7 +420,7 @@
                     <table class="report-table" style="margin-top:0;">
                         <thead>
                             <tr>
-                                <th>아이</th>
+                                <th>이름</th>
                                 <th>구매내역</th>
                                 <th>P</th>
                                 <th>처리</th>
@@ -404,7 +448,7 @@
         <div class="modal-content" style="text-align: center;">
             <div class="title-text">🔔 알림 권한 허용 안내</div>
             <div class="subtitle-text" style="color:var(--text-main); font-size:16px; line-height:1.5;">
-                아이의 학습 시작, 점수 결과 등을 실시간으로 받으시려면 <b>[권한 허용]</b>을 누르신 후 브라우저 팝업에서도 <b>허용</b>을 눌러주세요.<br><br>
+                학습 시작, 점수 결과 등을 실시간으로 받으시려면 <b>[권한 허용]</b>을 누르신 후 브라우저 팝업에서도 <b>허용</b>을 눌러주세요.<br><br>
                 <span style="color:var(--danger); font-size:14px;">※ 모바일 환경에서는 브라우저 탭을 백그라운드에 켜두셔야 정상적으로 알림이 수신됩니다.</span>
             </div>
             <div class="modal-btns">
@@ -444,24 +488,16 @@
     async function triggerPushNotification(msg) {
         if (!db) return;
         const pushRef = db.ref('push_notifications').push();
-        await pushRef.set({
-            message: msg,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
-        });
+        await pushRef.set({ message: msg, timestamp: firebase.database.ServerValue.TIMESTAMP });
     }
 
     function setupAdminPushListener() {
         if (!db || Notification.permission !== "granted") return;
-        
         const now = Date.now();
         db.ref('push_notifications').orderByChild('timestamp').startAt(now).on('child_added', snap => {
             const data = snap.val();
             if (data && data.message) {
-                new Notification("스마트 학습 알림", {
-                    body: data.message,
-                    icon: "icon.png?v=9",
-                    vibrate: [200, 100, 200]
-                });
+                new Notification("스마트 학습 알림", { body: data.message, icon: "icon.png?v=9", vibrate: [200, 100, 200] });
             }
         });
     }
@@ -471,19 +507,15 @@
         if ("Notification" in window) {
             const permission = await Notification.requestPermission();
             if (permission === "granted") {
-                alert("알림 권한이 허용되었습니다. 이제 백그라운드에 앱을 켜두시면 아이의 소식을 받을 수 있습니다.");
+                alert("알림 권한이 허용되었습니다. 이제 백그라운드에 앱을 켜두시면 실시간 소식을 받을 수 있습니다.");
                 setupAdminPushListener();
             } else {
                 alert("알림이 차단되었습니다. 기기 설정에서 허용으로 변경해 주세요.");
             }
-        } else {
-            alert("현재 브라우저는 알림 기능을 지원하지 않습니다.");
-        }
+        } else { alert("현재 브라우저는 알림 기능을 지원하지 않습니다."); }
     }
 
-    function closePermissionModal() {
-        document.getElementById('permission-modal').style.display = 'none';
-    }
+    function closePermissionModal() { document.getElementById('permission-modal').style.display = 'none'; }
 
     const KEY1 = "AIzaSyA1H3rfJarOuDx" + "A1NflRN96_ugCsaehU0M";
     const KEY2 = "AIzaSyBred_9lqK4Jx1" + "emrzyHWcUVnmLrqnttUQ";
@@ -507,19 +539,10 @@
     window.onload = async () => {
         initSetupUI();
         showView('login-view');
-
         if (db) {
-            db.ref('reports').on('value', snap => {
-                reportDataCache = snap.val() || [];
-                if (currentProfile === 'admin') renderReportsList();
-            });
-            db.ref('purchases').on('value', snap => {
-                purchaseDataCache = snap.val() || [];
-                if (currentProfile === 'admin') renderRewardList();
-            });
-            db.ref('users').on('value', snap => {
-                if (currentProfile === 'admin') renderAdminPasswords(snap.val());
-            });
+            db.ref('reports').on('value', snap => { reportDataCache = snap.val() || []; if (currentProfile === 'admin') renderReportsList(); });
+            db.ref('purchases').on('value', snap => { purchaseDataCache = snap.val() || []; if (currentProfile === 'admin') renderRewardList(); });
+            db.ref('users').on('value', snap => { if (currentProfile === 'admin') renderAdminPasswords(snap.val()); });
         }
     };
 
@@ -549,17 +572,16 @@
     function showView(viewId) {
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
         document.getElementById(viewId).classList.add('active');
-        
         const logoutBtn = document.getElementById('logout-btn');
         const headerTitle = document.getElementById('header-title');
         
-        if (viewId === 'login-view') {
-            logoutBtn.style.display = 'none'; headerTitle.innerText = '🌟 스마트 학습';
-        } else {
+        if (viewId === 'login-view') { logoutBtn.style.display = 'none'; headerTitle.innerText = '🌟 스마트 학습'; } 
+        else {
             logoutBtn.style.display = 'block';
             if(viewId === 'parent-view') headerTitle.innerText = '📊 관리자 센터';
             else if(viewId === 'shop-view') headerTitle.innerText = '🎁 포인트 상점';
             else if(viewId === 'profile-select-view') headerTitle.innerText = '🙋 사용자 선택';
+            else if(viewId === 'wrong-review-view') headerTitle.innerText = '📝 오답 개념 노트';
             else headerTitle.innerText = `${currentProfile}의 학습장 ✨`;
         }
     }
@@ -570,18 +592,13 @@
             currentProfile = 'admin';
             reportDataCache = await dbGet('reports') || [];
             purchaseDataCache = await dbGet('purchases') || [];
-            const usersData = await dbGet('users') || {};
-            
-            renderAdminPasswords(usersData);
+            renderAdminPasswords(await dbGet('users') || {});
             switchAdminTab('report'); 
             showView('parent-view');
 
             if ("Notification" in window) {
-                if (Notification.permission === "default") {
-                    document.getElementById('permission-modal').style.display = 'flex';
-                } else if (Notification.permission === "granted") {
-                    setupAdminPushListener();
-                }
+                if (Notification.permission === "default") document.getElementById('permission-modal').style.display = 'flex';
+                else if (Notification.permission === "granted") setupAdminPushListener();
             }
         } else if (pw !== null) alert("비밀번호가 일치하지 않습니다.");
     }
@@ -590,20 +607,19 @@
         if (!usersData) return;
         const rwPw = (usersData['김로운'] && usersData['김로운'].pw) ? usersData['김로운'].pw : '미설정';
         const saPw = (usersData['김서아'] && usersData['김서아'].pw) ? usersData['김서아'].pw : '미설정';
+        const jjPw = (usersData['정지영'] && usersData['정지영'].pw) ? usersData['정지영'].pw : '미설정';
         
         document.getElementById('admin-pw-display').innerHTML = `
             <div style="margin-bottom: 5px;">👦 김로운 : <span style="color:var(--primary);">${rwPw}</span></div>
-            <div>👧 김서아 : <span style="color:var(--primary);">${saPw}</span></div>
+            <div style="margin-bottom: 5px;">👧 김서아 : <span style="color:var(--primary);">${saPw}</span></div>
+            <div>👩 정지영 : <span style="color:var(--primary);">${jjPw}</span></div>
         `;
     }
 
     async function selectProfile(profileName) {
         showLoading(true, "사용자 정보를 불러오는 중입니다...");
         let user = await dbGet('users/' + profileName);
-        if(!user) {
-            user = { pw: '', points: 0, streak: [] };
-            await dbSet('users/' + profileName, user);
-        }
+        if(!user) { user = { pw: '', points: 0, streak: [] }; await dbSet('users/' + profileName, user); }
         showLoading(false);
         
         if (user.pw === '') {
@@ -612,7 +628,7 @@
             user.pw = newPw.trim();
             await dbSet('users/' + profileName + '/pw', user.pw);
             alert('비밀번호가 안전하게 만들어졌어요!');
-            triggerPushNotification(`[계정 알림] ${profileName} 학생이 최초 비밀번호를 설정했습니다.`);
+            triggerPushNotification(`[계정 알림] ${profileName} 님이 최초 비밀번호를 설정했습니다.`);
         } else {
             let inputPw = prompt(`[${profileName}] 비밀번호를 입력해주세요.`);
             if (inputPw === null) return;
@@ -630,13 +646,11 @@
         let oldPw = prompt("현재 비밀번호를 입력해주세요.");
         if (oldPw === null) return;
         if (oldPw.trim() !== user.pw) { alert("현재 비밀번호가 일치하지 않습니다."); return; }
-        
         let newPw = prompt("새롭게 사용할 비밀번호를 입력해주세요.");
         if (!newPw || newPw.trim() === '') { alert("유효한 비밀번호를 입력해주세요."); return; }
-        
         await dbSet('users/' + currentProfile + '/pw', newPw.trim());
         alert("비밀번호가 성공적으로 변경되었어요!");
-        triggerPushNotification(`[계정 알림] ${currentProfile} 학생이 비밀번호를 변경했습니다.`);
+        triggerPushNotification(`[계정 알림] ${currentProfile} 님이 비밀번호를 변경했습니다.`);
     }
 
     function logout() { currentProfile = null; showView('login-view'); }
@@ -654,10 +668,8 @@
         let streak = 1;
         const today = new Date(); today.setHours(0,0,0,0);
         let lastDate = new Date(dates[dates.length - 1]); lastDate.setHours(0,0,0,0);
-        
         const diffDays = Math.ceil(Math.abs(today - lastDate) / (1000 * 60 * 60 * 24));
         if (diffDays > 1) return 0;
-
         for (let i = dates.length - 1; i > 0; i--) {
             let d1 = new Date(dates[i]); d1.setHours(0,0,0,0);
             let d2 = new Date(dates[i-1]); d2.setHours(0,0,0,0);
@@ -671,7 +683,6 @@
         let user = await dbGet('users/' + currentProfile);
         let dates = user.streak || [];
         const todayStr = new Date().toDateString();
-        
         if (dates.length === 0 || dates[dates.length - 1] !== todayStr) {
             dates.push(todayStr);
             await dbSet('users/' + currentProfile + '/streak', dates);
@@ -693,34 +704,22 @@
         const student = document.getElementById('bonus-student-select').value;
         const pointInput = document.getElementById('bonus-point-input').value;
         const pointsToGive = parseInt(pointInput);
-
-        if (isNaN(pointsToGive) || pointsToGive <= 0) {
-            alert("올바른 포인트 수량을 입력해주세요.");
-            return;
-        }
-
+        if (isNaN(pointsToGive) || pointsToGive <= 0) { alert("올바른 포인트 수량을 입력해주세요."); return; }
         let user = await dbGet('users/' + student);
-        if (!user) {
-            alert("해당 학생의 계정 정보가 없습니다. 먼저 1회 로그인이 필요합니다.");
-            return;
-        }
-
+        if (!user) { alert("해당 사용자의 계정 정보가 없습니다. 먼저 1회 로그인이 필요합니다."); return; }
         let currentPoints = user.points || 0;
         await dbSet('users/' + student + '/points', currentPoints + pointsToGive);
-        
-        alert(`${student} 학생에게 특별 보너스 ${pointsToGive}P가 지급되었습니다.`);
+        alert(`${student} 님에게 특별 보너스 ${pointsToGive}P가 지급되었습니다.`);
         document.getElementById('bonus-point-input').value = '';
-        
-        triggerPushNotification(`[보너스 알림] 부모님이 ${student} 학생에게 특별 보너스 ${pointsToGive}P를 선물했습니다!`);
+        triggerPushNotification(`[보너스 알림] 관리자가 ${student} 님에게 특별 보너스 ${pointsToGive}P를 선물했습니다!`);
     }
 
     async function buyItem(itemName, cost) {
         let points = await dbGet('users/' + currentProfile + '/points') || 0;
         if (points >= cost) {
-            if(confirm(`'${itemName}'을(를) ${cost}P에 살까요?`)) {
+            if(confirm(`'${itemName}'을(를) ${cost}P에 구매할까요?`)) {
                 await dbSet('users/' + currentProfile + '/points', points - cost);
                 await updateDashboardStats();
-                
                 let purchases = await dbGet('purchases') || [];
                 purchases.unshift({
                     id: new Date().getTime(), profile: currentProfile, itemName: itemName, cost: cost,
@@ -728,12 +727,10 @@
                     status: 'pending' 
                 });
                 await dbSet('purchases', purchases);
-                alert(`성공적으로 샀어요. 부모님께 보여주세요!`);
-                triggerPushNotification(`[상점 알림] ${currentProfile} 학생이 '${itemName}'을(를) 구매했습니다.`);
+                alert(`성공적으로 구매했어요. 관리자 승인을 기다려주세요!`);
+                triggerPushNotification(`[상점 알림] ${currentProfile} 님이 '${itemName}'을(를) 구매 요청했습니다.`);
             }
-        } else {
-            alert(`앗, 포인트가 부족해요. (현재: ${points}P, 필요: ${cost}P)`);
-        }
+        } else { alert(`앗, 포인트가 부족해요. (현재: ${points}P, 필요: ${cost}P)`); }
     }
 
     function showFloatingPoint(e, text) {
@@ -751,9 +748,7 @@
         if (saved && saved.sessionState && saved.sessionState.questions) {
             document.getElementById('resume-title').innerText = `🚨 풀다 만 학습이 있어요!`;
             document.getElementById('resume-modal').style.display = 'flex';
-        } else {
-            showView('child-dashboard-view');
-        }
+        } else { showView('child-dashboard-view'); }
     }
 
     async function confirmResume() {
@@ -834,42 +829,29 @@
     }
 
     async function startNewQuiz() {
+        alert("💡 [학습 안내]\n정답 1개당 5포인트가 적립됩니다.\n단, 20문제를 모두 완료해야만 적립된 포인트가 합산되어 최종 지급됩니다.\n중도 포기 시 포인트가 날아가니 끝까지 완료해주세요!");
         showLoading(true, "AI 선생님이 교과서에 맞춰<br>문제를 만들고 있어요!");
         
         let prompt = '';
         
-        // 시각 자료 출제 금지 및 정답 일치 조건 강화
         if (config.subject === '영어') {
             prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2026년 AI 디지털 교과서' 기준 초등 ${config.grade}학년 영어(EFL 기초) 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
-            [지침] 
-            1. 원어민 수준이 아닌 '한국 초교 교육과정'의 실생활 소통 및 기초 파닉스 수준으로 출제.
-            2. 그림, 사진, 표 등 시각 자료가 필요한 문제는 절대 출제 금지. 오직 텍스트만으로 풀 수 있어야 함.
-            [규칙] 
-            1. 객관식 15개, 주관식 5개. 
-            2. 문제 지문과 보기는 모두 영어로 작성할 것. 
-            3. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
-            JSON 응답: [{"type":"objective","q":"영어질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","tts_q":"영어질문","tts_options":["보기1","보기2","보기3","보기4"]}, {"type":"subjective","q":"영어질문","a":"정답","tts_q":"영어질문"}]`;
+            [지침] 1. 원어민 수준이 아닌 '한국 초교 교육과정'의 실생활 소통 및 기초 파닉스 수준으로 출제. 2. 그림, 사진, 표 등 시각 자료가 필요한 문제는 절대 출제 금지. 오직 텍스트만으로 풀 수 있어야 함.
+            [규칙] 1. 객관식 20개. 주관식은 절대 출제하지 마십시오. 2. 문제 지문과 보기는 모두 영어로 작성할 것. 3. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            JSON 응답: [{"type":"objective","q":"영어질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","desc":"이 문제의 핵심 개념과 정답인 이유 설명","tts_q":"영어질문","tts_options":["보기1","보기2","보기3","보기4"]}]`;
         } else if (config.subject === '국어') {
             prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2026년 개정 교육과정' 기준 초등 ${config.grade}학년 국어 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
-            [지침] 
-            1. 단순 단어 맞추기를 피하고, 짧은 지문이나 문장을 읽고 문맥을 파악하는 문해력 위주로 출제.
-            2. 그림, 사진, 표 등 시각 자료가 필요한 문제는 절대 출제 금지. 오직 글(텍스트)만으로 풀 수 있어야 함.
-            [규칙] 
-            1. 객관식 15개, 주관식 5개. 
-            2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
-            JSON 응답: [{"type":"objective","q":"질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트"}, {"type":"subjective","q":"질문","a":"정답"}]`;
+            [지침] 1. 단순 단어 맞추기를 피하고, 짧은 지문이나 문장을 읽고 문맥 파악 및 문해력 위주로 출제. 2. 그림, 사진, 표 등 시각 자료가 필요한 문제는 절대 출제 금지. 오직 글(텍스트)만으로 풀 수 있어야 함.
+            [규칙] 1. 객관식 20개. 주관식은 절대 출제하지 마십시오. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            JSON 응답: [{"type":"objective","q":"질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","desc":"정답을 도출하는 구체적인 풀이 과정과 핵심 개념"}]`;
         } else {
             prompt = `당신은 대한민국 초등학교 1급 정교사입니다. '2026년 개정 교육과정' 기준 초등 ${config.grade}학년 수학 과목 문제 20개를 출제하십시오.
             난이도: ${config.difficulty}, 고유값: ${new Date().getTime()}
-            [지침] 
-            1. 실생활 상황을 반영한 '문장제 문제' 위주로 출제하되, 초등학생이 이해하기 쉽게 간결해야 함.
-            2. 도형 그림, 그래프, 표 등 시각 자료를 보고 푸는 문제는 절대 출제 금지. 오직 텍스트 설명만으로 풀 수 있어야 함.
-            [규칙] 
-            1. 객관식 15개, 주관식 5개. 
-            2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
-            JSON 응답: [{"type":"objective","q":"질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트"}, {"type":"subjective","q":"질문","a":"정답"}]`;
+            [지침] 1. 실생활 상황을 반영한 '문장제 문제' 위주로 출제하되, 초등학생이 이해하기 쉽게 간결해야 함. 2. 도형 그림, 그래프, 표 등 시각 자료를 보고 푸는 문제는 절대 출제 금지. 오직 텍스트 설명만으로 풀 수 있어야 함.
+            [규칙] 1. 객관식 20개. 주관식은 절대 출제하지 마십시오. 2. 객관식의 정답(a)은 번호나 기호가 아닌, options 배열에 있는 정답 텍스트와 100% 동일하게 작성할 것.
+            JSON 응답: [{"type":"objective","q":"질문","options":["보기1","보기2","보기3","보기4"],"a":"보기와 동일한 정답 텍스트","desc":"정답을 도출하는 구체적인 풀이 과정과 핵심 개념"}]`;
         }
 
         try {
@@ -882,7 +864,7 @@
             
             showLoading(false); showView('quiz-view'); renderCurrentQuestion();
             
-            triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 ${config.grade}학년 ${config.subject} (${config.difficulty}) 문제 풀이를 시작했습니다!`);
+            triggerPushNotification(`[학습 알림] ${currentProfile} 사용자가 ${config.grade}학년 ${config.subject} (${config.difficulty}) 문제 풀이를 시작했습니다!`);
         } catch (error) {
             console.error(error); showLoading(false); alert(`오류 발생: AI가 문제 생성에 실패했습니다. 다시 시도해주세요.`);
         }
@@ -950,7 +932,6 @@
         document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
         const qData = sessionState.questions[sessionState.currentIndex];
         
-        // 정답 검증 로직 강화 (공백 제거 후 양방향 포함 여부 확인)
         const correctAnsStr = String(qData.a).replace(/\s+/g, '').toLowerCase();
         const userAnsStr = selectedText.replace(/\s+/g, '').toLowerCase();
         const isCorrect = (userAnsStr === correctAnsStr) || userAnsStr.includes(correctAnsStr) || correctAnsStr.includes(userAnsStr);
@@ -960,14 +941,15 @@
         if (isCorrect) {
             btnElement.style.borderColor = "var(--success)"; btnElement.style.backgroundColor = "#eafaf1";
             fbEl.innerText = '정답입니다!'; fbEl.className = 'correct';
-            showFloatingPoint(event, "+5 점"); await addPoints(5);
+            showFloatingPoint(event, "+5점 (적립중)"); 
             if(!sessionState.isRetryMode) sessionState.initialScore += (100 / sessionState.totalCount);
         } else {
             btnElement.style.borderColor = "var(--danger)"; btnElement.style.backgroundColor = "#fff0f0";
             fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요.`; fbEl.className = 'incorrect';
             btnElement.style.transform = "translateX(-5px)"; setTimeout(() => btnElement.style.transform = "translateX(5px)", 50); setTimeout(() => btnElement.style.transform = "translateX(0)", 100);
-            sessionState.wrongQuestions.push(qData);
-            if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: selectedText });
+            let wrongQ = { ...qData, userAns: selectedText };
+            sessionState.wrongQuestions.push(wrongQ);
+            if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: selectedText, desc: qData.desc });
         }
         setTimeout(moveToNextQuestion, 1500);
     }
@@ -988,13 +970,13 @@
 
         if(isCorrect) {
             fbEl.innerText = '정답입니다!'; fbEl.className = 'correct';
-            showFloatingPoint(event || { clientX: window.innerWidth/2, clientY: window.innerHeight/2 }, "+5 점"); 
-            await addPoints(5);
+            showFloatingPoint(event || { clientX: window.innerWidth/2, clientY: window.innerHeight/2 }, "+5점 (적립중)"); 
             if(!sessionState.isRetryMode) sessionState.initialScore += (100 / sessionState.totalCount);
         } else {
             fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요.`; fbEl.className = 'incorrect';
-            sessionState.wrongQuestions.push(qData);
-            if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: userAnsRaw });
+            let wrongQ = { ...qData, userAns: userAnsRaw };
+            sessionState.wrongQuestions.push(wrongQ);
+            if(!sessionState.isRetryMode) sessionState.wrongHistory.push({ q: qData.q, a: qData.a, userAns: userAnsRaw, desc: qData.desc });
         }
         setTimeout(moveToNextQuestion, 1500);
     }
@@ -1023,51 +1005,74 @@
         if (!sessionState.isRetryMode) {
             scoreEl.innerText = `${finalScore}점`;
             
+            const basePoints = finalScore;
             let bonusPoints = 0;
-            if (finalScore === 100) {
-                bonusPoints = 20;
-            } else if (finalScore >= 90) {
-                bonusPoints = 10;
-            }
-
+            if (finalScore === 100) bonusPoints = 20;
+            else if (finalScore >= 90) bonusPoints = 10;
+            const totalEarnedPoints = basePoints + bonusPoints;
+            
             if (bonusPoints > 0) {
-                earnedPointsEl.innerText = `🎁 성적 우수 보너스 ${bonusPoints}P 획득!`;
-                earnedPointsEl.style.display = 'block';
-                await addPoints(bonusPoints);
+                earnedPointsEl.innerHTML = `🎁 20문제 완주! 기본 ${basePoints}P + 우수 보너스 ${bonusPoints}P<br><span style="font-size:24px; color:var(--primary);">총 ${totalEarnedPoints}P 지급 완료!</span>`;
+            } else {
+                earnedPointsEl.innerHTML = `🎁 20문제 완주!<br><span style="font-size:24px; color:var(--primary);">총 ${totalEarnedPoints}P 지급 완료!</span>`;
             }
+            earnedPointsEl.style.display = 'block';
+            await addPoints(totalEarnedPoints);
 
             if (sessionState.wrongQuestions.length > 0) {
                 titleEl.innerText = "1차 학습 완료";
                 msgEl.innerText = `총 20문제 중 ${sessionState.wrongQuestions.length}문제를 틀렸어요.\n틀린 문제를 꼼꼼하게 다시 풀어봐요!`;
-                actionBtn.innerText = "오답 다시 풀기";
+                actionBtn.innerText = "오답 개념 확인하기 💡";
             } else {
-                titleEl.innerText = "완벽해요!"; 
-                msgEl.innerText = "모든 문제를 다 맞췄어요. 정말 대단해요!"; 
-                actionBtn.innerText = "기분 좋게 끝내기";
+                titleEl.innerText = "완벽해요!"; msgEl.innerText = "모든 문제를 다 맞췄어요. 정말 대단해요!"; actionBtn.innerText = "기분 좋게 끝내기";
             }
             await saveReport();
-            triggerPushNotification(`[점수 알림] ${currentProfile} 학생이 학습을 마쳤습니다. (1차 점수: ${finalScore}점)`);
+            triggerPushNotification(`[점수 알림] ${currentProfile} 님이 20문제를 완주하여 총 ${totalEarnedPoints}P를 획득했습니다! (점수: ${finalScore}점)`);
         } else {
             scoreEl.style.display = 'none'; 
             if (sessionState.wrongQuestions.length > 0) {
-                titleEl.innerText = "다시 풀기 완료"; msgEl.innerText = `아직 ${sessionState.wrongQuestions.length}문제가 틀렸어요.\n포기하지 말고 100점을 향해 고고!`; actionBtn.innerText = "한번 더 도전!";
+                titleEl.innerText = "다시 풀기 완료"; msgEl.innerText = `아직 ${sessionState.wrongQuestions.length}문제가 틀렸어요.\n포기하지 말고 100점을 향해 고고!`; 
+                actionBtn.innerText = "다시 틀린 문제 확인하기 💡";
             } else {
                 titleEl.innerText = "최종 완료"; msgEl.innerText = "어려운 문제도 모두 해결했어요. 최고!"; actionBtn.innerText = "마무리하기";
                 await saveReport();
-                triggerPushNotification(`[학습 알림] ${currentProfile} 학생이 오답 수정을 모두 완료했습니다!`);
+                triggerPushNotification(`[학습 알림] ${currentProfile} 님이 오답 수정을 모두 완료했습니다!`);
             }
         }
     }
 
     async function handleResultAction() {
         if (sessionState.wrongQuestions.length > 0) {
-            sessionState.questions = [...sessionState.wrongQuestions]; 
-            sessionState.wrongQuestions = []; sessionState.currentIndex = 0; sessionState.isRetryMode = true;
-            showView('quiz-view'); document.getElementById('result-score').style.display = 'block'; renderCurrentQuestion();
+            showView('wrong-review-view');
+            renderWrongReview();
         } else {
             await dbSet('sessions/' + currentProfile, null); 
             document.getElementById('result-score').style.display = 'block'; showView('child-dashboard-view');
         }
+    }
+
+    function renderWrongReview() {
+        const container = document.getElementById('wrong-review-container');
+        container.innerHTML = sessionState.wrongQuestions.map((w, i) => `
+            <div class="wrong-item">
+                <div class="wrong-q">${i + 1}. ${w.q}</div>
+                <div style="margin-bottom: 5px;"><span style="color:var(--danger); font-weight:bold;">나의 선택: ${w.userAns}</span></div>
+                <div style="margin-bottom: 10px;"><span style="color:var(--success); font-weight:bold;">올바른 정답: ${w.a}</span></div>
+                <div style="background: #ffffff; padding: 12px; border-radius: 8px; border: 1px dashed #ffcccc; font-size: 14px; color: var(--text-main); line-height: 1.5;">
+                    <b>💡 선생님의 개념 풀이:</b><br>${w.desc || '설명이 제공되지 않았습니다.'}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function startRetryQuiz() {
+        sessionState.questions = [...sessionState.wrongQuestions]; 
+        sessionState.wrongQuestions = []; 
+        sessionState.currentIndex = 0; 
+        sessionState.isRetryMode = true;
+        showView('quiz-view'); 
+        document.getElementById('result-score').style.display = 'block'; 
+        renderCurrentQuestion();
     }
 
     function switchAdminTab(tabName) {
@@ -1081,7 +1086,7 @@
         let reports = await dbGet('reports') || [];
         reports.unshift({
             id: new Date().getTime(), profile: currentProfile, date: new Date().toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }),
-            grade: config.grade, subject: config.subject, score: Math.round(sessionState.initialScore), wrongDetails: sessionState.wrongHistory
+            grade: config.grade, subject: config.subject, difficulty: config.difficulty, score: Math.round(sessionState.initialScore), totalCount: sessionState.totalCount || 20, wrongDetails: sessionState.wrongHistory
         });
         if(reports.length > 100) reports.pop();
         await dbSet('reports', reports);
@@ -1089,10 +1094,11 @@
 
     function filterReport(profile) {
         currentReportFilter = profile;
-        ['filter-all', 'filter-rw', 'filter-sa'].forEach(id => document.getElementById(id).classList.remove('active'));
+        ['filter-all', 'filter-rw', 'filter-sa', 'filter-jj'].forEach(id => document.getElementById(id).classList.remove('active'));
         if(profile === '전체') document.getElementById('filter-all').classList.add('active');
         if(profile === '김로운') document.getElementById('filter-rw').classList.add('active');
         if(profile === '김서아') document.getElementById('filter-sa').classList.add('active');
+        if(profile === '정지영') document.getElementById('filter-jj').classList.add('active');
         renderReportsList();
     }
 
@@ -1104,10 +1110,11 @@
         let html = '';
         filtered.forEach(r => {
             const hasWrong = r.wrongDetails && r.wrongDetails.length > 0;
+            const diffText = r.difficulty ? r.difficulty : '중';
             html += `<tr>
                 <td style="font-weight:900; color:var(--text-main);">${r.profile}</td>
-                <td style="color:var(--text-muted);">${r.date.split(' ')[1]} ${r.date.split(' ')[2]}</td>
-                <td>${r.grade}학년 ${r.subject}<br><b style="color:${r.score===100?'var(--success)':'var(--danger)'};">${r.score}점</b></td>
+                <td style="color:var(--text-muted); font-size:12px;">${r.date.split(' ')[1]} ${r.date.split(' ')[2]}<br>${r.grade}학년 ${diffText}급</td>
+                <td>${r.subject}<br><b style="color:${r.score===100?'var(--success)':'var(--danger)'};">${r.score}점</b></td>
                 <td>${hasWrong ? `<button class="btn-small" onclick="openDetailModal(${r.id})">보기</button>` : `<span style="color:#aaa;font-size:12px;">완벽함</span>`}</td>
             </tr>`;
         });
@@ -1119,7 +1126,7 @@
         if(!report || !report.wrongDetails) return;
         let html = '';
         report.wrongDetails.forEach((item, idx) => {
-            html += `<div class="wrong-item"><div class="wrong-q">${idx + 1}. ${item.q}</div><div class="wrong-ans">아이의 답: ${item.userAns}</div><div class="correct-ans">올바른 정답: ${item.a}</div></div>`;
+            html += `<div class="wrong-item"><div class="wrong-q">${idx + 1}. ${item.q}</div><div class="wrong-ans">사용자 답: ${item.userAns}</div><div class="correct-ans">올바른 정답: ${item.a}</div></div>`;
         });
         document.getElementById('modal-title').innerText = "오답 노트 상세";
         document.getElementById('modal-body').innerHTML = html;
@@ -1127,18 +1134,32 @@
     }
 
     async function analyzeWeakness() {
-        if(currentReportFilter === '전체') { alert('학생 탭(김로운 또는 김서아)을 먼저 선택하십시오.'); return; }
+        if(currentReportFilter === '전체') { alert('사용자 탭(김로운, 김서아 또는 정지영)을 먼저 선택하십시오.'); return; }
         const studentReports = reportDataCache.filter(r => r.profile === currentReportFilter);
-        let allWrongs = []; studentReports.forEach(r => { if(r.wrongDetails) allWrongs = allWrongs.concat(r.wrongDetails); });
-        if(allWrongs.length === 0) { alert(`해당 학생의 오답 기록이 없습니다. 아주 잘하고 있습니다!`); return; }
+        if(studentReports.length === 0) { alert(`해당 사용자의 오답 기록이 없습니다. 아주 잘하고 있습니다!`); return; }
 
-        showLoading(true, `오답 패턴을 기반으로 맞춤형 취약점 리포트를 작성 중입니다.`);
-        const prompt = `당신은 교육 분석 교사입니다. 학생 '${currentReportFilter}'의 오답 데이터: ${JSON.stringify(allWrongs.slice(0, 30).map(w=>({q:w.q, a:w.a, ans:w.userAns})))}. 2026년 개정 교육과정 기준에 따라 학생의 취약점과 가정 내 지도 방안을 500자 이내 텍스트로 브리핑하십시오.`;
+        showLoading(true, `점수, 맞춘 문제, 틀린 문제를 분석하여<br>취약점 리포트를 작성 중입니다.`);
+        
+        const summaryData = studentReports.slice(0, 5).map(r => ({
+            grade: r.grade, subject: r.subject, difficulty: r.difficulty || '중', score: r.score, total_questions: r.totalCount || 20,
+            correct_count: Math.round((r.score / 100) * (r.totalCount || 20)),
+            wrong_count: r.wrongDetails ? r.wrongDetails.length : 0,
+            wrongs: r.wrongDetails ? r.wrongDetails.map(w => ({q: w.q, ans: w.userAns, correct: w.a})) : []
+        }));
+
+        const prompt = `당신은 대한민국 교육 분석 전문가입니다. 학생 '${currentReportFilter}'의 최근 5회 학습 데이터입니다: ${JSON.stringify(summaryData)}.
+        
+        [분석 지시사항]
+        1. 첫 줄에 학생이 수행한 "학년과 난이도(급)"를 반드시 노출하세요. (예: 초등학교 1학년, 난이도 중급)
+        2. [점수], [맞춘 문제 수], [틀린 문제 수]를 기반으로 전반적인 성취도를 브리핑하세요.
+        3. "👍 잘한 것(강점)"과 "⚠️ 못한 것(취약점 및 오답 분석)"을 명확히 구분하여 목차를 나누어 작성하세요.
+        4. 2026년 개정 교육과정 기준에 맞춘 구체적이고 전문적인 보완 방안을 제안하세요.
+        5. 전체 내용을 600자 이내로 읽기 편하게 작성하십시오.`;
 
         try {
             const data = await fetchFromGemini(prompt, 0, false);
             showLoading(false);
-            document.getElementById('modal-title').innerText = `AI 취약점 및 지도 리포트`;
+            document.getElementById('modal-title').innerText = `AI 취약점 정밀 분석 리포트`;
             document.getElementById('modal-body').innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
             document.getElementById('detail-modal').style.display = 'flex';
         } catch(e) { showLoading(false); alert("서버 통신 중 오류가 발생했습니다."); }
@@ -1162,7 +1183,7 @@
     }
 
     async function markRewardAsUsed(purchaseId) {
-        if(confirm("아이에게 해당 쿠폰 보상을 제공하셨습니까?\n확인 시 '사용 완료' 처리됩니다.")) {
+        if(confirm("해당 쿠폰 보상을 제공하셨습니까?\n확인 시 '사용 완료' 처리됩니다.")) {
             let purchases = await dbGet('purchases') || [];
             let itemIndex = purchases.findIndex(p => p.id === purchaseId);
             if(itemIndex !== -1) {
