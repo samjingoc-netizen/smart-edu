@@ -954,12 +954,13 @@
     const KEY2 = "AIzaSyBred_9lqK4Jx1" + "emrzyHWcUVnmLrqnttUQ";
     const API_KEYS = [KEY1, KEY2];
 
+    // 최상위 추론 성능을 보장하는 Pro 모델을 최우선으로 배치
     const AI_MODELS = [
-        "gemini-3.1-flash-lite",
-        "gemini-2.5-flash-lite",
-        "gemini-3-flash",
-        "gemini-2.5-flash",
-        "gemini-1.5-flash"
+        "gemini-3.1-pro",      
+        "gemini-2.5-pro",      
+        "gemini-3-flash",      
+        "gemini-2.5-flash",    
+        "gemini-3.1-flash-lite"
     ];
 
     let currentProfile = null;
@@ -1520,18 +1521,31 @@
             '최상': '최상위권 변별력 수준입니다. 깊은 논리적 사고와 다각적 접근이 필수적이며 복잡한 문장제 및 함정을 필수로 포함해야 합니다.'
         }[config.difficulty];
 
+        // 🚨 수능 출제 위원급 공통 규칙 (로직 오류 완벽 차단)
+        const commonStrictRules = `
+[수능 출제 위원급 엄격한 출제 원칙 - 위반 시 시스템 심각한 오류 발생]
+1. 시각/청각 자료 전면 금지: "그림을 보고", "Look at the picture", "표를 보고" 등 텍스트 외의 자료가 필요한 문제는 100% 배제하십시오.
+2. 보기(Options) 중복 절대 금지 (CRITICAL): 4개의 객관식 보기는 텍스트가 서로 '완벽하게' 달라야 합니다. 지문을 그대로 4번 복사하거나, "자랑 -> 자랑"처럼 화살표 앞뒤가 같거나, 똑같은 보기를 중복 생성하는 엉터리 출제는 절대 금지합니다.
+3. 매력적이고 구체적인 오답 창작 강제: 오답을 만들 때 무의미한 반복이 아니라, 실제 학생들이 자주 틀리는 맞춤법, 문맥상 어색한 표현, 수치 계산 실수 등을 구체적으로 창조하여 3개의 오답을 반드시 구성하십시오.
+4. 논리적 오류 100% 차단: "잘못된 부분 찾기", "틀린 띄어쓰기 찾기" 문제를 출제할 경우, 제시문(q) 텍스트 안에 '반드시 의도적으로 틀린 부분(오류)'을 1개 이상 삽입해야 합니다. 완벽한 문장을 주고 틀린 것을 찾으라는 모순된 문제를 내지 마십시오.
+5. 억지 보기 생성 금지: 정상적인 문장을 단순히 단어 단위("나", "는", "학교에")로 무의미하게 쪼개서 보기에 나열하지 마십시오. 각 보기는 그 자체로 문제의 답안 형태를 갖춰야 합니다.
+6. 문제 유효성 자체 검증: 각 보기가 서로 독립적이고 명확한 차이가 있는지, 정답이 복수가 아닌지 출제자 입장에서 반드시 검토 후 송신하십시오.
+`;
+
         if (config.subject === '영단어') {
             prompt = `당신은 대한민국 최고의 영어 교육 전문가입니다. '2026년 AI 디지털 교과서' 기준에 맞춘 영단어 학습 콘텐츠를 생성합니다.
 대상 학년: ${gradeText}
 수준 및 난이도: ${config.difficulty} (${difficultyDesc})
 고유값: ${new Date().getTime()}
 
-[출제 지침]
+${commonStrictRules}
+
+[추가 영단어 지침]
 1. ${gradeText} 학생의 인지 수준과 교과 과정에 100% 부합하는 영단어 10개를 엄선하십시오. 선행학습 단어는 절대 제외하십시오.
 2. 난이도(${config.difficulty})에 따라 단어의 길이, 추상성, 활용 빈도를 철저하게 조절하십시오.
 3. 뜻(meaning)은 해당 연령대가 이해할 수 있는 쉬운 한국어 어휘로 명확하게 작성하십시오.
-4. JSON 응답 포맷을 반드시 준수하십시오. 형식: [{"word":"영어단어", "meaning":"한국어뜻", "tts":"영어단어 발음"}]
-5. [매우 중요한 JSON 규칙] 파싱 오류가 발생하지 않도록 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 절대 실제 줄바꿈(Enter)을 사용하지 마시고, 줄바꿈이 필요한 곳은 반드시 '\\n' 문자로 입력하십시오.`;
+4. JSON 응답 포맷: [{"word":"영어단어", "meaning":"한국어뜻", "tts":"영어단어 발음"}]
+5. [JSON 규칙] 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 줄바꿈은 '\\n'으로 입력하십시오.`;
 
         } else if (config.subject === '영어') {
             prompt = `당신은 대한민국 최고의 영어 평가 출제 위원입니다. '2026년 교육과정' 기준에 맞춘 영어(EFL) 객관식 20문항을 출제합니다.
@@ -1539,15 +1553,13 @@
 수준 및 난이도: ${config.difficulty} (${difficultyDesc})
 고유값: ${new Date().getTime()}
 
-[출제 지침]
+${commonStrictRules}
+
+[추가 영어 지침]
 1. 문항 및 사고 유형: 문법, 어휘, 독해를 포함하되, 상황 적용형, 문맥 추론형 등 다양한 사고력을 요구하는 문제를 섞어 출제하십시오.
-2. 시각 자료 절대 금지(매우 중요): "Look at the picture", "다음 그림을 보고" 등 이미지나 표가 있어야만 풀 수 있는 문제는 절대로 출제하지 마십시오. 오직 100% 텍스트로만 이루어진 상황 설명이나 대화문으로 출제해야 합니다.
-3. 보기 중복 및 동어 반복 절대 금지(CRITICAL): 질문(q) 안에 'A. a book', 'B. a pen' 식으로 보기를 중복해서 적지 마십시오. options 배열의 4개 보기는 내용이 100% 완전히 달라야 합니다. 절대 똑같은 보기를 중복해서 넣거나 지문을 그대로 복사해서 넣지 마십시오.
-4. 학년별 교육과정 준수: ${gradeText} 수준에 맞게 단어와 문법 난이도를 철저히 조절하십시오.
-5. 매력적인 오답 창작 강제: 정답 외의 오답(Distractors)은 실제 학생들이 자주 헷갈리는 문법 오류, 혼동하기 쉬운 어휘, 문맥상 어색한 표현 등을 구체적으로 창조하여 구성하십시오.
-6. 문제의 유효성 검사: 각 보기가 서로 독립적이고 명확한 차이가 있는지, 정답이 중복되지 않는지 출제자 입장에서 철저히 검토 후 최종 데이터를 생성하십시오.
-7. JSON 응답 포맷: [{"type":"objective","q":"[완벽한 텍스트 기반의 대화나 상황]\\n\\n질문내용","options":["보기1","보기2","보기3","보기4"],"a":"정답 텍스트(보기와 100% 일치)","desc":"한국어로 작성된 상세한 해설과 정답인 이유","tts_q":"영어질문","tts_options":["보기1","보기2","보기3","보기4"]}]
-8. [매우 중요한 JSON 규칙] 파싱 오류가 발생하지 않도록 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 절대 실제 줄바꿈(Enter)을 사용하지 마시고, 줄바꿈이 필요한 곳은 반드시 '\\n' 문자로 입력하십시오.`;
+2. 학년별 교육과정 준수: ${gradeText} 수준에 맞게 단어와 문법 난이도를 철저히 조절하십시오.
+3. JSON 응답 포맷: [{"type":"objective","q":"[완벽한 텍스트 기반의 대화나 상황]\\n\\n질문내용","options":["오답1","오답2","정답","오답3"],"a":"정답 텍스트(보기와 100% 일치)","desc":"상세한 해설과 정답인 이유","tts_q":"영어질문","tts_options":["오답1","오답2","정답","오답3"]}]
+4. [JSON 규칙] 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 줄바꿈은 '\\n'으로 입력하십시오.`;
 
         } else if (config.subject === '국어') {
             prompt = `당신은 대한민국 최고의 국어 교육 및 평가 전문가입니다. '2026년 개정 교육과정' 기준 국어 객관식 20문항을 출제합니다.
@@ -1555,15 +1567,13 @@
 수준 및 난이도: ${config.difficulty} (${difficultyDesc})
 고유값: ${new Date().getTime()}
 
-[출제 지침]
+${commonStrictRules}
+
+[추가 국어 지침]
 1. 문항 및 사고 유형: 단순 맞춤법 문제를 넘어 주제 추론형, 비판적 사고형, 인물의 심리 파악 등 다양한 추리/사고형 문제를 골고루 출제하십시오.
-2. 시각 자료 절대 금지(매우 중요): 그림이나 표를 봐야 풀 수 있는 문제는 0%로 차단하십시오. 오직 글로 된 지문만 사용하십시오.
-3. 보기 중복 및 동어 반복 절대 금지(CRITICAL): 질문(q) 안에 보기 번호를 적지 마십시오. options 배열의 4개 보기는 내용이 100% 완전히 다르고 구별되어야 합니다. '자랑 -> 자랑'처럼 화살표 앞뒤가 같거나, 4개의 보기가 모두 똑같은 문장으로 도배되는 오류를 기술적으로 절대 금지합니다.
-4. 문제의 완전성: 지문을 바탕으로 한 문제일 경우, 해당 지문의 내용 전체를 반드시 질문(q) 텍스트 안에 직접 작성해야 합니다. 지문 누락은 절대 불가합니다.
-5. 매력적인 오답 창작 강제: 정답 외의 오답(Distractors)은 실제 학생들이 자주 틀리는 맞춤법, 문맥상 어색한 표현, 잘못된 내용 추론 등을 구체적으로 창조하여 구성하십시오.
-6. 문제의 유효성 검사: 각 보기가 서로 독립적이고 명확한 차이가 있는지 출제자 입장에서 철저히 검토 후 최종 데이터를 생성하십시오.
-7. JSON 응답 포맷: [{"type":"objective","q":"[필요한 지문 전체를 여기에 작성]\\n\\n질문내용","options":["보기1","보기2","보기3","보기4"],"a":"정답 텍스트(보기와 100% 일치)","desc":"학생 눈높이에 맞춘 상세한 해설"}]
-8. [매우 중요한 JSON 규칙] 파싱 오류가 발생하지 않도록 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 절대 실제 줄바꿈(Enter)을 사용하지 마시고, 줄바꿈이 필요한 곳은 반드시 '\\n' 문자로 입력하십시오.`;
+2. 문제의 완전성: 지문을 바탕으로 한 문제일 경우, 해당 지문의 내용 전체를 반드시 질문(q) 텍스트 안에 직접 작성해야 합니다. 지문 누락은 절대 불가합니다.
+3. JSON 응답 포맷: [{"type":"objective","q":"[필요한 지문 전체를 여기에 작성]\\n\\n질문내용","options":["오답1","오답2","정답","오답3"],"a":"정답 텍스트(보기와 100% 일치)","desc":"학생 눈높이에 맞춘 상세한 해설"}]
+4. [JSON 규칙] 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 줄바꿈은 '\\n'으로 입력하십시오.`;
 
         } else {
             prompt = `당신은 대한민국 최고의 수학 평가 전문가입니다. '2026년 개정 교육과정' 수학 객관식 20문항을 출제합니다.
@@ -1571,15 +1581,13 @@
 수준 및 난이도: ${config.difficulty} (${difficultyDesc})
 고유값: ${new Date().getTime()}
 
-[출제 지침]
+${commonStrictRules}
+
+[추가 수학 지침]
 1. 문항 및 사고 유형: 단순 연산식 계산을 피하고, 규칙 추론형, 논리적 사고형, 실생활 문제 해결형, 조건 조합형 등 수학적 사고 능력을 요구하는 문장제 문제로 구성하십시오.
-2. 시각 자료 절대 금지(매우 중요): 도형 그림, 표, 그래프를 보고 푸는 문제를 내지 마십시오. 모든 조건과 상황은 오직 "글(텍스트)"로만 완벽히 설명되어야 합니다.
-3. 보기 중복 및 동어 반복 절대 금지(CRITICAL): 질문(q) 안에 보기 번호를 적지 마십시오. options 배열의 4개 보기는 수치나 내용이 완전히 달라야 합니다. 절대 동일한 답이나 설명을 보기에 중복해서 넣지 마십시오.
-4. 학년별 연산 범위 엄수: 선행 학습 내용이 나오지 않도록 해당 학년 교과 과정 범위를 엄격히 지키십시오.
-5. 매력적인 오답 창작 강제: 정답 외의 오답(Distractors)은 단순한 무작위 숫자가 아니라, 학생들이 계산 과정에서 흔히 하는 수치 계산 실수, 연산 기호 혼동, 조건 누락 등을 반영하여 구체적으로 창조하십시오.
-6. 문제의 유효성 검사: 각 보기가 서로 독립적이고 명확한 차이가 있는지 출제자 입장에서 철저히 검토 후 최종 데이터를 생성하십시오.
-7. JSON 응답 포맷: [{"type":"objective","q":"모든 조건이 텍스트로 완벽히 포함된 문제 상황과 질문","options":["보기1","보기2","보기3","보기4"],"a":"정답 텍스트(보기와 100% 일치)","desc":"구체적인 단계별 계산 과정과 해설"}]
-8. [매우 중요한 JSON 규칙] 파싱 오류가 발생하지 않도록 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 절대 실제 줄바꿈(Enter)을 사용하지 마시고, 줄바꿈이 필요한 곳은 반드시 '\\n' 문자로 입력하십시오.`;
+2. 학년별 연산 범위 엄수: 선행 학습 내용이 나오지 않도록 해당 학년 교과 과정 범위를 엄격히 지키십시오.
+3. JSON 응답 포맷: [{"type":"objective","q":"모든 조건이 텍스트로 완벽히 포함된 문제 상황과 질문","options":["오답1","정답","오답2","오답3"],"a":"정답 텍스트(보기와 100% 일치)","desc":"구체적인 단계별 계산 과정과 해설"}]
+4. [JSON 규칙] 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 줄바꿈은 '\\n'으로 입력하십시오.`;
         }
 
         try {
@@ -1711,7 +1719,11 @@
             optContainer.style.display = 'flex';
             optContainer.innerHTML = '';
 
-            qData.options.forEach((optText, index) => {
+            // 보기 랜덤 섞기
+            let optionsCopy = [...qData.options];
+            optionsCopy.sort(() => Math.random() - 0.5);
+
+            optionsCopy.forEach((optText, index) => {
                 const row = document.createElement('div');
                 row.className = 'option-row';
 
@@ -1724,9 +1736,10 @@
                 const optTtsBtn = document.createElement('button');
                 optTtsBtn.className = 'tts-opt-btn';
                 optTtsBtn.innerText = '🔊';
-                const optTtsText = config.subject === '영어'
-                    ? (qData.tts_options ? qData.tts_options[index] : optText)
-                    : optText;
+                
+                // 섞인 순서대로 tts_options 매칭은 어려울 수 있으니, 직접 텍스트로 읽어주도록 fallback 처리
+                const optTtsText = config.subject === '영어' ? optText : optText;
+                
                 optTtsBtn.onclick = (e) => {
                     e.stopPropagation();
                     playTTS(optTtsText, ttsLang);
@@ -1760,14 +1773,14 @@
         if (isCorrect) {
             btnElement.style.borderColor = "var(--success)";
             btnElement.style.backgroundColor = "#eafaf1";
-            fbEl.innerText = '정답입니다!';
+            fbEl.innerText = '정답입니다! ✅';
             fbEl.className = 'correct';
             showFloatingPoint(event, "+5P (적립중)");
             if (!sessionState.isRetryMode) sessionState.initialScore += 5;
         } else {
             btnElement.style.borderColor = "var(--danger)";
             btnElement.style.backgroundColor = "#fff0f0";
-            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요.`;
+            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요. ❌`;
             fbEl.className = 'incorrect';
             btnElement.style.transform = "translateX(-5px)";
             setTimeout(() => btnElement.style.transform = "translateX(5px)", 50);
@@ -1799,7 +1812,7 @@
         const userAnsRaw = inputEl.value.trim();
 
         if (userAnsRaw === '') {
-            alert('정답을 먼저 적어주세요!');
+            alert('정답을 먼저 적어주세요! ✍️');
             inputEl.focus();
             return;
         }
@@ -1814,12 +1827,12 @@
         const fbEl = document.getElementById('feedback-box');
 
         if (isCorrect) {
-            fbEl.innerText = '정답입니다!';
+            fbEl.innerText = '정답입니다! ✅';
             fbEl.className = 'correct';
             showFloatingPoint(event || { clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 }, "+5P (적립중)");
             if (!sessionState.isRetryMode) sessionState.initialScore += 5;
         } else {
-            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요.`;
+            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요. ❌`;
             fbEl.className = 'incorrect';
 
             let wrongQ = { ...qData, userAns: userAnsRaw };
@@ -1896,11 +1909,11 @@
 
             if (sessionState.wrongQuestions.length > 0) {
                 titleEl.innerText = "1차 학습 완료";
-                msgEl.innerText = `총 ${sessionState.totalCount}문제 중 ${sessionState.wrongQuestions.length}문제를 틀렸어요.\n틀린 문제를 꼼꼼하게 다시 풀어봐요!`;
+                msgEl.innerText = `총 ${sessionState.totalCount}문제 중 ${sessionState.wrongQuestions.length}문제를 틀렸어요. 😅\n틀린 문제를 꼼꼼하게 다시 풀어봐요!`;
                 actionBtn.innerText = "오답 개념 확인하기 💡";
             } else {
-                titleEl.innerText = "완벽해요!";
-                msgEl.innerText = "모든 문제를 다 맞췄어요. 정말 대단해요!";
+                titleEl.innerText = "완벽해요! 💯";
+                msgEl.innerText = "모든 문제를 다 맞췄어요. 정말 대단해요! 🌟";
                 actionBtn.innerText = "기분 좋게 끝내기";
             }
         } else {
@@ -1914,11 +1927,11 @@
 
             if (sessionState.wrongQuestions.length > 0) {
                 titleEl.innerText = "다시 풀기 완료";
-                msgEl.innerText = `아직 ${sessionState.wrongQuestions.length}문제가 틀렸어요.\n포기하지 말고 100점을 향해 고고!`;
+                msgEl.innerText = `아직 ${sessionState.wrongQuestions.length}문제가 틀렸어요.\n포기하지 말고 100점을 향해 고고! 🏃‍♂️`;
                 actionBtn.innerText = "다시 틀린 문제 확인하기 💡";
             } else {
-                titleEl.innerText = "최종 완료";
-                msgEl.innerText = "어려운 문제도 모두 해결했어요. 최고!";
+                titleEl.innerText = "최종 완료 🎉";
+                msgEl.innerText = "어려운 문제도 모두 해결했어요. 최고! 👍";
                 actionBtn.innerText = "마무리하기";
             }
         }
@@ -2023,7 +2036,7 @@
                 <td style="font-weight:900; color:var(--text-main);">${r.profile}</td>
                 <td style="color:var(--text-muted); font-size:12px; line-height:1.4;">${r.date}<br>${formatGrade(r.grade)} ${diffText}급</td>
                 <td>${r.subject}<br><b style="color:${r.score === (r.totalCount * 5) ? 'var(--success)' : 'var(--danger)'};">${r.score}점</b></td>
-                <td><button class="btn-small" onclick="openDetailModal(${r.id})">상세보기</button></td>
+                <td><button class="btn-small" onclick="openDetailModal(${r.id})">상세보기 🔍</button></td>
             </tr>`;
         });
 
@@ -2039,7 +2052,7 @@
                     </div>`;
 
         if (!report.wrongDetails || report.wrongDetails.length === 0) {
-            html += `<div style="text-align:center; font-weight:bold; color:var(--success); font-size:18px; margin-top:20px;">틀린 문제가 없습니다! 완벽해요! 🎉</div>`;
+            html += `<div style="text-align:center; font-weight:bold; color:var(--success); font-size:18px; margin-top:20px;">틀린 문제가 없습니다! 완벽해요! 🎉💯</div>`;
         } else {
             report.wrongDetails.forEach((item, idx) => {
                 html += `<div class="wrong-item">
@@ -2051,7 +2064,7 @@
             });
         }
 
-        document.getElementById('modal-title').innerText = "오답 노트 상세";
+        document.getElementById('modal-title').innerText = "오답 노트 상세 📝";
         document.getElementById('modal-body').innerHTML = html;
         document.getElementById('detail-modal').style.display = 'flex';
     }
@@ -2060,7 +2073,7 @@
         const report = reportDataCache.find(r => r.id === reportId);
         if (!report) return;
 
-        showLoading(true, "해당 회차의 학습 결과를<br>AI가 분석 중입니다...");
+        showLoading(true, "해당 회차의 학습 결과를<br>AI가 분석 중입니다... 🧐");
 
         const summary = {
             profile: report.profile,
@@ -2089,13 +2102,13 @@
             document.getElementById('modal-body').innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
         } catch (e) {
             showLoading(false);
-            alert("분석 실패");
+            alert("분석 실패 😅");
         }
     }
 
     async function analyzeComprehensiveWeakness() {
         if (currentReportFilter === '전체') {
-            alert('사용자 탭(김로운, 김서아 또는 정지영)을 먼저 선택하십시오.');
+            alert('사용자 탭(김로운, 김서아 또는 정지영)을 먼저 선택하십시오. 🙋');
             return;
         }
 
@@ -2104,11 +2117,11 @@
             .sort((a, b) => a.id - b.id);
 
         if (studentReports.length < 2) {
-            alert(`종합 성장 분석을 위해 최소 2회 이상의 누적 학습 기록이 필요합니다. (현재 ${studentReports.length}회)`);
+            alert(`종합 성장 분석을 위해 최소 2회 이상의 누적 학습 기록이 필요합니다. (현재 ${studentReports.length}회) 📚`);
             return;
         }
 
-        showLoading(true, `최초 성적과 최근 성적을 비교하여<br>종합 성장 리포트를 작성 중입니다.`);
+        showLoading(true, `최초 성적과 최근 성적을 비교하여<br>종합 성장 리포트를 작성 중입니다. 📈`);
 
         const oldestReport = studentReports[0];
         const newestReport = studentReports[studentReports.length - 1];
@@ -2150,7 +2163,7 @@
             document.getElementById('detail-modal').style.display = 'flex';
         } catch (e) {
             showLoading(false);
-            alert("서버 통신 중 오류가 발생했습니다.");
+            alert("서버 통신 중 오류가 발생했습니다. ❌");
         }
     }
 
@@ -2158,7 +2171,7 @@
         const tbody = document.getElementById('reward-tbody');
 
         if (!purchaseDataCache || purchaseDataCache.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="empty-report">쿠폰 구매 내역이 없습니다.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-report">쿠폰 구매 내역이 없습니다. 🛒</td></tr>';
             return;
         }
 
