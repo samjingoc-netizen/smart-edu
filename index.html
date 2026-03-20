@@ -9,9 +9,9 @@
     <meta name="theme-color" content="#ff6b6b">
     <title>🌟 스마트 학습 시스템 🌟</title>
 
-    <link rel="icon" href="icon.png?v=17">
-    <link rel="apple-touch-icon" href="icon.png?v=17">
-    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=17","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=17","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="icon" href="icon.png?v=18">
+    <link rel="apple-touch-icon" href="icon.png?v=18">
+    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=18","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=18","sizes":"512x512","type":"image/png"}]}'>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -292,7 +292,7 @@
             line-height: 1.5;
             color: var(--text-main);
             margin-bottom: 25px;
-            white-space: pre-line;
+            white-space: normal;
             word-break: keep-all;
             text-align: left;
             background: #f8fbfa;
@@ -300,6 +300,9 @@
             border-radius: 16px;
             border: 1px solid #dfe6e9;
         }
+
+        .question-box br { line-height: 1.8; }
+        .question-box u { text-underline-offset: 4px; }
 
                 .options-container {
             display: flex;
@@ -325,11 +328,13 @@
             cursor: pointer;
             transition: all 0.2s;
             box-shadow: 0 4px 0 #dfe6e9;
+            line-height: 1.55;
         }
 
         .option-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: none; }
         .option-btn:hover:not(:disabled) { border-color: var(--secondary); background: #f0f8ff; }
         .option-btn:disabled { cursor: not-allowed; opacity: 0.9; }
+        .option-btn u { text-underline-offset: 4px; }
 
         .tts-opt-btn {
             width: 65px;
@@ -562,10 +567,11 @@
             font-weight: 900;
             margin-bottom: 10px;
             color: var(--text-main);
-            white-space: pre-line;
+            white-space: normal;
+            line-height: 1.6;
         }
 
-        .wrong-ans {
+                .wrong-ans {
             color: var(--danger);
             margin-bottom: 5px;
             font-weight: 700;
@@ -622,7 +628,7 @@
         </div>
     </div>
 
-        <div id="profile-select-view" class="view-section">
+    <div id="profile-select-view" class="view-section">
         <div class="glass-card" style="margin-top: 20px;">
             <div class="title-text">🙋 사용자 선택</div>
             <div class="subtitle-text">이름을 선택하고 비밀번호를 입력해요. 🔐</div>
@@ -742,7 +748,7 @@
         </div>
     </div>
 
-    <div id="learning-view" class="view-section">
+        <div id="learning-view" class="view-section">
         <div class="glass-card" style="text-align: center;">
             <div class="title-text">📝 영단어 학습 📝</div>
             <div class="subtitle-text" id="learning-progress">1 / 10</div>
@@ -794,7 +800,7 @@
         </div>
     </div>
 
-        <div id="parent-view" class="view-section">
+    <div id="parent-view" class="view-section">
         <div class="glass-card">
             <div class="title-text">👨‍🏫 부모님 관리 대시보드 📊</div>
 
@@ -907,7 +913,7 @@
     <div id="detail-modal" class="modal">
         <div class="modal-content">
             <div class="title-text" id="modal-title">🔍 상세 정보</div>
-            <div id="modal-body" style="line-height: 1.6; color: var(--text-main); font-size: 16px; margin-bottom: 25px; white-space: pre-line;"></div>
+            <div id="modal-body" style="line-height: 1.6; color: var(--text-main); font-size: 16px; margin-bottom: 25px; white-space: normal;"></div>
             <button class="btn-main btn-dark" onclick="document.getElementById('detail-modal').style.display='none'">닫기 ❌</button>
         </div>
     </div>
@@ -964,7 +970,7 @@
         reportSavedRetry: false
     };
 
-    function getKSTTime() {
+        function getKSTTime() {
         const d = new Date();
         const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
         const kstTime = new Date(utc + (9 * 3600000));
@@ -1006,7 +1012,7 @@
             return;
         }
 
-        const cleanText = String(text || '').trim();
+        const cleanText = stripHtmlTags(String(text || '')).trim();
         if (!cleanText) {
             alert("읽어줄 내용이 없습니다. 😅");
             return;
@@ -1034,16 +1040,37 @@
         }
     }
 
-    function stripMarkdownFence(text = '') {
-        return String(text || '')
-            .replace(/^```json\s*/i, '')
-            .replace(/^```\s*/i, '')
-            .replace(/\s*```$/i, '')
+    function escapeHtml(text = '') {
+        return String(text ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function sanitizeLimitedHtml(text = '') {
+        let safe = escapeHtml(String(text ?? ''));
+        safe = safe.replace(/&lt;(\/?(?:u|b|strong|i|em))&gt;/gi, '<$1>');
+        safe = safe.replace(/&lt;br\s*\/?&gt;/gi, '<br>');
+        safe = safe.replace(/\n/g, '<br>');
+        return safe;
+    }
+
+    function stripHtmlTags(text = '') {
+        return String(text ?? '')
+            .replace(/<br\s*\/?>/gi, ' ')
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/&nbsp;/gi, ' ')
+            .replace(/&quot;/gi, '"')
+            .replace(/&#39;/gi, "'")
+            .replace(/&amp;/gi, '&')
+            .replace(/\s+/g, ' ')
             .trim();
     }
 
     function normalizeCompareText(text = '') {
-        return String(text ?? '')
+        return stripHtmlTags(String(text ?? ''))
             .replace(/\s+/g, ' ')
             .replace(/^["'“”‘’]+|["'“”‘’]+$/g, '')
             .replace(/[.,!?]+$/g, '')
@@ -1055,8 +1082,17 @@
         return normalizeCompareText(a) === normalizeCompareText(b);
     }
 
-        function extractJSONArrayText(rawText = '') {
-        const cleaned = stripMarkdownFence(rawText);
+    function renderSafeHtml(el, text = '') {
+        el.innerHTML = sanitizeLimitedHtml(text);
+    }
+
+    function extractJSONArrayText(rawText = '') {
+        const cleaned = String(rawText || '')
+            .replace(/^```json\s*/i, '')
+            .replace(/^```\s*/i, '')
+            .replace(/\s*```$/i, '')
+            .trim();
+
         const start = cleaned.indexOf('[');
         const end = cleaned.lastIndexOf(']');
 
@@ -1068,6 +1104,10 @@
 
     function parseJSONArray(rawText = '') {
         return JSON.parse(extractJSONArrayText(rawText));
+    }
+
+    function plainQuestionSignature(questionObj) {
+        return normalizeCompareText(stripHtmlTags(questionObj?.q || '')).slice(0, 140);
     }
 
     function validateVocabArray(arr) {
@@ -1143,7 +1183,41 @@
         });
     }
 
-    async function fetchFromGemini(promptText, attempt = 0, isJson = true) {
+    function getQualityIssue(questionObj) {
+        const plainQ = stripHtmlTags(questionObj?.q || '');
+        const rawQ = String(questionObj?.q || '');
+        const options = Array.isArray(questionObj?.options) ? questionObj.options : [];
+
+        if (plainQ.length < 8) return '질문 길이가 너무 짧음';
+        if (/그림|표를 보고/.test(plainQ)) return '텍스트 외 자료 요구 문제';
+        if (/바르게 배열하여 문장을 만들 때/.test(plainQ)) return '배열형 문제는 자동 제외';
+        if (/세 번째에 올 말|두 번째에 올 말|네 번째에 올 말|첫 번째에 올 말/.test(plainQ)) return '순서 배열형 문제는 자동 제외';
+
+        if (/밑줄|밑줄 친|밑 친/.test(plainQ)) {
+            const hasUnderline = /<u>.*?<\/u>/i.test(rawQ) || options.some(opt => /<u>.*?<\/u>/i.test(String(opt || '')));
+            if (!hasUnderline) return '밑줄 문제인데 실제 밑줄 표시가 없음';
+        }
+
+        if (/괄호 안/.test(plainQ)) {
+            const hasParen = /[()（）]/.test(plainQ);
+            if (!hasParen) return '괄호 문제인데 괄호가 없음';
+        }
+
+        if (questionObj.type === 'objective') {
+            if (!Array.isArray(options) || options.length !== 4) return '보기가 4개가 아님';
+            if (options.some(opt => stripHtmlTags(opt).length < 2)) return '보기 길이가 너무 짧음';
+
+            const answerMatches = options.filter(opt => isSameAnswer(opt, questionObj.a));
+            if (answerMatches.length !== 1) return '정답이 보기와 정확히 1개만 일치하지 않음';
+
+            const optionDedup = new Set(options.map(opt => normalizeCompareText(opt)));
+            if (optionDedup.size !== 4) return '보기 중복';
+        }
+
+        return '';
+    }
+
+        async function fetchFromGemini(promptText, attempt = 0, isJson = true) {
         const totalAttempts = AI_MODELS.length * API_KEYS.length;
 
         if (attempt >= totalAttempts) {
@@ -1237,6 +1311,89 @@
         throw lastError || new Error("문제 JSON 생성에 최종 실패했습니다.");
     }
 
+    async function regenerateInvalidQuestions(basePrompt, invalidItems, existingQuestions) {
+        const count = invalidItems.length;
+        const existingStems = existingQuestions
+            .map((q, idx) => `${idx + 1}. ${stripHtmlTags(q.q).slice(0, 80)}`)
+            .join('\n');
+
+        const invalidReasons = invalidItems
+            .map((item, i) => `${i + 1}. 기존 ${item.index + 1}번 / 사유: ${item.reason}`)
+            .join('\n');
+
+        const regeneratePrompt = `${basePrompt}
+
+[부분 재출제 요청]
+직전 생성 문항 중 일부가 품질 검증에서 탈락했습니다.
+아래 탈락 수만큼 새로운 문항 ${count}개만 JSON 배열로 다시 생성하십시오.
+
+[필수 조건]
+1. 기존 문항과 절대 겹치지 마십시오.
+2. '바르게 배열하여 문장을 만들 때' 유형은 금지합니다.
+3. '첫 번째/두 번째/세 번째/네 번째에 올 말' 유형은 금지합니다.
+4. 밑줄 문제는 반드시 실제 <u>태그를 포함하십시오.
+5. 정답 a는 반드시 options 중 하나와 완전히 동일해야 합니다.
+6. desc는 2문장 이하, 120자 이내로 짧게 작성하십시오.
+7. 오직 JSON 배열만 출력하십시오.
+
+[탈락 사유]
+${invalidReasons}
+
+[중복 금지 참고용 기존 문항]
+${existingStems}`;
+
+        return await fetchStructuredArrayWithRetry(regeneratePrompt, count, 'quiz');
+    }
+
+    async function postProcessQuizQuestions(questions, basePrompt, maxRounds = 3) {
+        let current = [...questions];
+
+        for (let round = 0; round < maxRounds; round++) {
+            const invalidMap = new Map();
+            const seen = new Set();
+
+            current.forEach((q, idx) => {
+                const sig = plainQuestionSignature(q);
+                if (seen.has(sig)) {
+                    if (!invalidMap.has(idx)) invalidMap.set(idx, { index: idx, reason: '중복 문항' });
+                } else {
+                    seen.add(sig);
+                }
+
+                const issue = getQualityIssue(q);
+                if (issue && !invalidMap.has(idx)) {
+                    invalidMap.set(idx, { index: idx, reason: issue });
+                }
+            });
+
+            const invalidItems = [...invalidMap.values()];
+            if (invalidItems.length === 0) return current;
+
+            const replacements = await regenerateInvalidQuestions(basePrompt, invalidItems, current);
+            invalidItems.forEach((item, i) => {
+                if (replacements[i]) current[item.index] = replacements[i];
+            });
+        }
+
+        const finalIssues = [];
+        const seenFinal = new Set();
+
+        current.forEach((q, idx) => {
+            const sig = plainQuestionSignature(q);
+            if (seenFinal.has(sig)) finalIssues.push(`${idx + 1}번 중복`);
+            else seenFinal.add(sig);
+
+            const issue = getQualityIssue(q);
+            if (issue) finalIssues.push(`${idx + 1}번 ${issue}`);
+        });
+
+        if (finalIssues.length) {
+            throw new Error(`문제 품질 재검증 최종 실패: ${finalIssues.join(', ')}`);
+        }
+
+        return current;
+    }
+
     async function dbGet(path) {
         if (db) {
             const snap = await db.ref(path).once('value');
@@ -1267,7 +1424,7 @@
             if (data && data.message) {
                 new Notification("스마트 학습 알림 🔔", {
                     body: data.message,
-                    icon: "icon.png?v=17",
+                    icon: "icon.png?v=18",
                     vibrate: [200, 100, 200]
                 });
             }
@@ -1625,9 +1782,9 @@
         const jjAge = (usersData['정지영'] && usersData['정지영'].age) ? usersData['정지영'].age + '세' : '나이 미설정';
 
         document.getElementById('admin-pw-display').innerHTML = `
-            <div style="margin-bottom: 5px;">👦 김로운 : 비밀번호 <span style="color:var(--primary);">${rwPw}</span> | ${rwAge}</div>
-            <div style="margin-bottom: 5px;">👧 김서아 : 비밀번호 <span style="color:var(--primary);">${saPw}</span> | ${saAge}</div>
-            <div>👩 정지영 : 비밀번호 <span style="color:var(--primary);">${jjPw}</span> | ${jjAge}</div>
+            <div style="margin-bottom: 5px;">👦 김로운 : 비밀번호 <span style="color:var(--primary);">${escapeHtml(rwPw)}</span> | ${rwAge}</div>
+            <div style="margin-bottom: 5px;">👧 김서아 : 비밀번호 <span style="color:var(--primary);">${escapeHtml(saPw)}</span> | ${saAge}</div>
+            <div>👩 정지영 : 비밀번호 <span style="color:var(--primary);">${escapeHtml(jjPw)}</span> | ${jjAge}</div>
         `;
     }
 
@@ -1859,6 +2016,9 @@
 4. 정답은 반드시 1개만 존재해야 합니다.
 5. 보기 중 정답은 a 값과 완전히 동일해야 합니다.
 6. 해설(desc)은 2문장 이하, 120자 이내로 짧게 작성하십시오.
+7. '바르게 배열하여 문장을 만들 때' 문제는 금지합니다.
+8. '첫 번째/두 번째/세 번째/네 번째에 올 말' 유형은 금지합니다.
+9. '밑줄 친' 문제는 반드시 실제 <u>태그를 사용하십시오.
 `;
 
         const jsonOutputRules = `
@@ -1949,9 +2109,11 @@ ${jsonOutputRules}
                 showView('learning-view', { push: true });
                 renderLearningWord();
             } else {
+                const polishedQuestions = await postProcessQuizQuestions(parsedArray.slice(0, 20), prompt);
+
                 sessionState = {
                     mode: 'quiz',
-                    questions: parsedArray.slice(0, 20),
+                    questions: polishedQuestions,
                     currentIndex: 0,
                     wrongQuestions: [],
                     wrongHistory: [],
@@ -2023,7 +2185,7 @@ ${jsonOutputRules}
             ? `오답 풀이 : ${sessionState.currentIndex + 1} / ${sessionState.questions.length}`
             : `${sessionState.currentIndex + 1} / ${sessionState.questions.length} ${typeLabel}`;
 
-        document.getElementById('question-text').innerText = qData.q;
+        renderSafeHtml(document.getElementById('question-text'), qData.q);
         document.getElementById('feedback-box').innerText = '';
 
         const ttsLang = (config.subject === '영어') ? 'en-US' : 'ko-KR';
@@ -2052,7 +2214,7 @@ ${jsonOutputRules}
 
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
-                btn.innerText = optText;
+                renderSafeHtml(btn, optText);
                 btn.onclick = (e) => processObjectiveAnswer(optText, btn, e);
                 row.appendChild(btn);
 
@@ -2095,7 +2257,7 @@ ${jsonOutputRules}
         } else {
             btnElement.style.borderColor = "var(--danger)";
             btnElement.style.backgroundColor = "#fff0f0";
-            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요. ❌`;
+            fbEl.innerText = `아쉬워요! 정답은 '${stripHtmlTags(qData.a)}' 였어요. ❌`;
             fbEl.className = 'incorrect';
             btnElement.style.transform = "translateX(-5px)";
             setTimeout(() => btnElement.style.transform = "translateX(5px)", 50);
@@ -2143,7 +2305,7 @@ ${jsonOutputRules}
             showFloatingPoint(event || { clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 }, "+5P (적립중) 💰");
             if (!sessionState.isRetryMode) sessionState.initialScore += 5;
         } else {
-            fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요. ❌`;
+            fbEl.innerText = `아쉬워요! 정답은 '${stripHtmlTags(qData.a)}' 였어요. ❌`;
             fbEl.className = 'incorrect';
 
             let wrongQ = { ...qData, userAns: userAnsRaw };
@@ -2259,11 +2421,11 @@ ${jsonOutputRules}
         const container = document.getElementById('wrong-review-container');
         container.innerHTML = sessionState.wrongQuestions.map((w, i) => `
             <div class="wrong-item">
-                <div class="wrong-q">${i + 1}. ${w.q}</div>
-                <div style="margin-bottom: 5px;"><span style="color:var(--danger); font-weight:bold;">나의 선택: ${w.userAns}</span></div>
-                <div style="margin-bottom: 10px;"><span style="color:var(--success); font-weight:bold;">올바른 정답: ${w.a}</span></div>
+                <div class="wrong-q">${i + 1}. ${sanitizeLimitedHtml(w.q)}</div>
+                <div style="margin-bottom: 5px;"><span style="color:var(--danger); font-weight:bold;">나의 선택: ${sanitizeLimitedHtml(stripHtmlTags(w.userAns || ''))}</span></div>
+                <div style="margin-bottom: 10px;"><span style="color:var(--success); font-weight:bold;">올바른 정답: ${sanitizeLimitedHtml(w.a)}</span></div>
                 <div style="background: #ffffff; padding: 12px; border-radius: 8px; border: 1px dashed #ffcccc; font-size: 14px; color: var(--text-main); line-height: 1.5;">
-                    <b>💡 선생님의 개념 풀이:</b><br>${w.desc || '설명이 제공되지 않았습니다.'}
+                    <b>💡 선생님의 개념 풀이:</b><br>${sanitizeLimitedHtml(w.desc || '설명이 제공되지 않았습니다.')}
                 </div>
             </div>
         `).join('');
@@ -2345,9 +2507,9 @@ ${jsonOutputRules}
         filtered.forEach(r => {
             const diffText = r.difficulty ? r.difficulty : '중';
             html += `<tr>
-                <td style="font-weight:900; color:var(--text-main);">${r.profile}</td>
-                <td style="color:var(--text-muted); font-size:12px; line-height:1.4;">${r.date}<br>${formatGrade(r.grade)} ${diffText}급</td>
-                <td>${r.subject}<br><b style="color:${r.score === (r.totalCount * 5) ? 'var(--success)' : 'var(--danger)'};">${r.score}점</b></td>
+                <td style="font-weight:900; color:var(--text-main);">${escapeHtml(r.profile)}</td>
+                <td style="color:var(--text-muted); font-size:12px; line-height:1.4;">${escapeHtml(r.date)}<br>${formatGrade(r.grade)} ${escapeHtml(diffText)}급</td>
+                <td>${escapeHtml(r.subject)}<br><b style="color:${r.score === (r.totalCount * 5) ? 'var(--success)' : 'var(--danger)'};">${r.score}점</b></td>
                 <td><button class="btn-small" onclick="openDetailModal(${r.id})">상세보기 🔍</button></td>
             </tr>`;
         });
@@ -2368,10 +2530,10 @@ ${jsonOutputRules}
         } else {
             report.wrongDetails.forEach((item, idx) => {
                 html += `<div class="wrong-item">
-                    <div class="wrong-q">${idx + 1}. ${item.q}</div>
-                    <div class="wrong-ans">사용자 답: ${item.userAns}</div>
-                    <div class="correct-ans">올바른 정답: ${item.a}</div>
-                    <div style="margin-top:10px; font-size:13px; color:#555; background:#fff; padding:10px; border-radius:8px; border:1px dashed #ccc; line-height:1.4;">💡 해설: ${item.desc || '제공되지 않음'}</div>
+                    <div class="wrong-q">${idx + 1}. ${sanitizeLimitedHtml(item.q)}</div>
+                    <div class="wrong-ans">사용자 답: ${sanitizeLimitedHtml(stripHtmlTags(item.userAns || ''))}</div>
+                    <div class="correct-ans">올바른 정답: ${sanitizeLimitedHtml(item.a)}</div>
+                    <div style="margin-top:10px; font-size:13px; color:#555; background:#fff; padding:10px; border-radius:8px; border:1px dashed #ccc; line-height:1.4;">💡 해설: ${sanitizeLimitedHtml(item.desc || '제공되지 않음')}</div>
                 </div>`;
             });
         }
@@ -2395,10 +2557,10 @@ ${jsonOutputRules}
             score: report.score,
             total: report.totalCount || 20,
             wrongs: report.wrongDetails ? report.wrongDetails.map(w => ({
-                q: w.q,
-                ans: w.userAns,
-                correct: w.a,
-                desc: w.desc
+                q: stripHtmlTags(w.q),
+                ans: stripHtmlTags(w.userAns || ''),
+                correct: stripHtmlTags(w.a),
+                desc: stripHtmlTags(w.desc)
             })) : []
         };
 
@@ -2411,7 +2573,7 @@ ${jsonOutputRules}
             const data = await fetchFromGemini(prompt, 0, false);
             showLoading(false);
             document.getElementById('modal-title').innerText = `📊 해당 회차 집중 AI 분석`;
-            document.getElementById('modal-body').innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+            document.getElementById('modal-body').innerHTML = sanitizeLimitedHtml(data.candidates[0].content.parts[0].text);
         } catch (e) {
             showLoading(false);
             alert("분석 실패 😅");
@@ -2447,14 +2609,14 @@ ${jsonOutputRules}
                 date: oldestReport.date,
                 subject: oldestReport.subject,
                 score: oldestReport.score,
-                wrong_concepts: oldestReport.wrongDetails ? oldestReport.wrongDetails.slice(0, 3).map(w => w.q) : []
+                wrong_concepts: oldestReport.wrongDetails ? oldestReport.wrongDetails.slice(0, 3).map(w => stripHtmlTags(w.q)) : []
             },
             current_state: {
                 date: newestReport.date,
                 subject: newestReport.subject,
                 score: newestReport.score,
                 recent_avg_score: recentAverage,
-                wrong_concepts: newestReport.wrongDetails ? newestReport.wrongDetails.slice(0, 3).map(w => w.q) : []
+                wrong_concepts: newestReport.wrongDetails ? newestReport.wrongDetails.slice(0, 3).map(w => stripHtmlTags(w.q)) : []
             }
         };
 
@@ -2470,7 +2632,7 @@ ${jsonOutputRules}
             const data = await fetchFromGemini(prompt, 0, false);
             showLoading(false);
             document.getElementById('modal-title').innerText = `📈 AI 종합 성장 리포트`;
-            document.getElementById('modal-body').innerHTML = data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
+            document.getElementById('modal-body').innerHTML = sanitizeLimitedHtml(data.candidates[0].content.parts[0].text);
             document.getElementById('detail-modal').style.display = 'flex';
         } catch (e) {
             showLoading(false);
@@ -2493,8 +2655,8 @@ ${jsonOutputRules}
                 : `<button class="btn-small used" disabled>사용 완료 🎁</button>`;
 
             html += `<tr>
-                <td style="font-weight:900; color:var(--text-main);">${p.profile}</td>
-                <td><div style="font-weight:800;">${p.itemName}</div><div style="font-size:11px; color:var(--text-muted);">${p.date}</div></td>
+                <td style="font-weight:900; color:var(--text-main);">${escapeHtml(p.profile)}</td>
+                <td><div style="font-weight:800;">${escapeHtml(p.itemName)}</div><div style="font-size:11px; color:var(--text-muted);">${escapeHtml(p.date)}</div></td>
                 <td style="color:var(--secondary); font-weight:900;">${p.cost}P</td>
                 <td>${actionBtn}</td>
             </tr>`;
