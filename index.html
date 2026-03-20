@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ff6b6b">
-    <title>🌟 스마트 학습 시스템</title>
+    <title>🌟 스마트 학습 시스템 🌟</title>
 
     <link rel="icon" href="icon.png?v=15">
     <link rel="apple-touch-icon" href="icon.png?v=15">
@@ -559,20 +559,20 @@
 <div class="app-container" id="app">
     <div class="header">
         <span id="header-title">🌟 스마트 학습</span>
-        <button id="logout-btn" class="header-btn" style="display:none;" onclick="logout()">나가기</button>
+        <button id="logout-btn" class="header-btn" style="display:none;" onclick="logout()">나가기 🏃‍♂️</button>
     </div>
 
     <div id="loading-overlay" class="overlay">
         <div class="spinner"></div>
         <div style="font-size: 18px; font-weight: 900; color: var(--primary); text-align: center; line-height: 1.6;" id="loading-msg">
-            열심히 요청을 처리하고 있어요!
+            열심히 요청을 처리하고 있어요! ⏳🤓
         </div>
     </div>
 
     <div id="login-view" class="view-section active">
         <div class="glass-card" style="margin-top: 20px;">
             <div class="title-text">👨‍👩‍👧‍👦 로그인 구분</div>
-            <div class="subtitle-text">누가 사용하나요? 버튼을 눌러주세요.</div>
+            <div class="subtitle-text">누가 사용하나요? 버튼을 눌러주세요. 👇</div>
 
             <button class="btn-main btn-primary" style="margin-bottom: 20px;" onclick="showView('profile-select-view')">🎒 학생/일반 사용하기</button>
             <button class="btn-main btn-dark" onclick="loginAsParent()">📊 관리자 로그인</button>
@@ -582,14 +582,14 @@
     <div id="profile-select-view" class="view-section">
         <div class="glass-card" style="margin-top: 20px;">
             <div class="title-text">🙋 사용자 선택</div>
-            <div class="subtitle-text">이름을 선택하고 비밀번호를 입력해요.</div>
+            <div class="subtitle-text">이름을 선택하고 비밀번호를 입력해요. 🔐</div>
 
             <button class="btn-main btn-secondary" style="margin-bottom: 20px;" onclick="selectProfile('김로운')">👦 김로운</button>
             <button class="btn-main btn-secondary" style="margin-bottom: 20px;" onclick="selectProfile('김서아')">👧 김서아</button>
             <button class="btn-main btn-secondary" onclick="selectProfile('정지영')">👩 정지영</button>
         </div>
         <div style="margin-top: auto; padding-top: 20px;">
-            <button class="btn-main btn-outline" onclick="showView('login-view')">뒤로 가기</button>
+            <button class="btn-main btn-outline" onclick="showView('login-view')">뒤로 가기 🔙</button>
         </div>
     </div>
 
@@ -600,12 +600,12 @@
         </div>
 
         <div class="glass-card">
-            <div class="title-text">🚀 오늘의 학습 시작</div>
+            <div class="title-text">🚀 오늘의 학습 시작 🚀</div>
 
-            <div class="subtitle-text" style="text-align: left; margin-bottom:10px; font-weight:800; color:var(--text-main);">1. 과정(학년) 선택</div>
+            <div class="subtitle-text" style="text-align: left; margin-bottom:10px; font-weight:800; color:var(--text-main);">1. 과정(학년) 선택 🏫</div>
             <div class="btn-group" id="grade-container"></div>
 
-            <div class="subtitle-text" style="text-align: left; margin-bottom:10px; font-weight:800; color:var(--text-main);">2. 과목 선택</div>
+            <div class="subtitle-text" style="text-align: left; margin-bottom:10px; font-weight:800; color:var(--text-main);">2. 과목 선택 📚</div>
             <div class="btn-group" id="subject-container">
                 <button class="btn-outline active" onclick="selectConfig('subject', '국어')">📖 국어</button>
                 <button class="btn-outline" onclick="selectConfig('subject', '영어')">🔤 영어</button>
@@ -613,7 +613,7 @@
                 <button class="btn-outline" onclick="selectConfig('subject', '영단어')">📝 영단어</button>
             </div>
 
-            <div class="subtitle-text" style="text-align: left; margin-bottom:10px; font-weight:800; color:var(--text-main);">3. 난이도 선택</div>
+            <div class="subtitle-text" style="text-align: left; margin-bottom:10px; font-weight:800; color:var(--text-main);">3. 난이도 선택 🎯</div>
             <div class="btn-group" id="difficulty-container">
                 <button class="btn-outline" onclick="selectConfig('difficulty', '최저')">최저</button>
                 <button class="btn-outline" onclick="selectConfig('difficulty', '하')">하</button>
@@ -622,7 +622,7 @@
                 <button class="btn-outline" onclick="selectConfig('difficulty', '최상')">최상</button>
             </div>
 
-            <button class="btn-main btn-primary" onclick="startNewQuiz()" style="margin-top:10px;">✨ 문제 풀기 출발!</button>
+            <button class="btn-main btn-primary" onclick="startNewQuiz()" style="margin-top:10px;">✨ 문제 풀기 출발! 🏃‍♂️💨</button>
         </div>
 
         <div style="display: flex; gap: 15px;">
@@ -633,7 +633,7 @@
 
     <div id="shop-view" class="view-section">
         <div class="glass-card">
-            <div class="title-text">🎁 내 포인트 상점</div>
+            <div class="title-text">🎁 내 포인트 상점 🎁</div>
             <div class="subtitle-text" id="shop-point-display" style="color:var(--primary); font-size:18px;">현재 보유: 0P</div>
 
             <div class="shop-item">
@@ -701,19 +701,19 @@
             </div>
         </div>
         <div style="margin-top: auto; padding-top: 20px;">
-            <button class="btn-main btn-outline" onclick="showView('child-dashboard-view')">메인으로 가기</button>
+            <button class="btn-main btn-outline" onclick="showView('child-dashboard-view')">메인으로 가기 🔙</button>
         </div>
     </div>
 
     <div id="learning-view" class="view-section">
         <div class="glass-card" style="text-align: center;">
-            <div class="title-text">📝 영단어 학습</div>
+            <div class="title-text">📝 영단어 학습 📝</div>
             <div class="subtitle-text" id="learning-progress">1 / 10</div>
             <div class="progress-bar-bg"><div class="progress-bar-fill" id="learning-progress-bar"></div></div>
             <div id="learning-word" style="font-size: 40px; font-weight: 900; color: var(--primary); margin: 20px 0;"></div>
             <div id="learning-meaning" style="font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 30px;"></div>
             <button id="learning-tts-btn" class="btn-main btn-accent" style="margin: 0 auto 25px; padding: 12px; font-size:16px;">🔊 발음 듣기</button>
-            <button id="learning-next-btn" class="btn-main btn-primary" onclick="nextLearningWord()">다음 단어</button>
+            <button id="learning-next-btn" class="btn-main btn-primary" onclick="nextLearningWord()">다음 단어 ➡️</button>
         </div>
     </div>
 
@@ -726,12 +726,12 @@
 
             <div class="progress-bar-bg"><div class="progress-bar-fill" id="quiz-progress-bar"></div></div>
 
-            <div id="question-text" class="question-box">문제를 불러오는 중입니다...</div>
+            <div id="question-text" class="question-box">문제를 불러오는 중입니다... 🧐</div>
             <button id="tts-btn" class="btn-main btn-accent" style="display: none; margin: 0 auto 25px; padding: 12px; font-size:16px;">🔊 문제 읽어주기</button>
 
             <div id="options-container" class="options-container" style="display: none;"></div>
 
-            <input type="text" id="answer-input" class="input-field" placeholder="단어를 정확히 쓰세요!" style="display: none; margin-bottom: 20px;" autocomplete="off">
+            <input type="text" id="answer-input" class="input-field" placeholder="단어를 정확히 쓰세요! ✍️" style="display: none; margin-bottom: 20px;" autocomplete="off">
             <button class="btn-main btn-secondary" id="submit-btn" onclick="processSubjectiveAnswer()" style="display: none;">✅ 정답 확인</button>
 
             <div id="feedback-box"></div>
@@ -740,36 +740,36 @@
 
     <div id="result-view" class="view-section">
         <div class="glass-card" style="text-align: center;">
-            <div class="title-text" id="result-title">🎉 학습 완료!</div>
+            <div class="title-text" id="result-title">🎉 학습 완료! 🎉</div>
             <div style="font-size: 60px; font-weight: 900; color: var(--primary); margin: 20px 0; text-shadow: 2px 2px 0px #ffeaa7;" id="result-score">100점</div>
             <div style="font-size: 16px; color: var(--secondary); font-weight: 900; margin-bottom: 25px; background-color: #f0f8ff; padding: 15px; border-radius: 12px; border: 1px solid var(--secondary);" id="earned-points"></div>
-            <div id="result-message" class="subtitle-text" style="font-size: 17px; line-height:1.5;">참 잘했어요!</div>
-            <button id="result-action-btn" class="btn-main btn-primary" onclick="handleResultAction()">확인</button>
+            <div id="result-message" class="subtitle-text" style="font-size: 17px; line-height:1.5;">참 잘했어요! 👏</div>
+            <button id="result-action-btn" class="btn-main btn-primary" onclick="handleResultAction()">확인 ✅</button>
         </div>
     </div>
 
     <div id="wrong-review-view" class="view-section">
         <div class="glass-card" style="padding-bottom: 15px;">
-            <div class="title-text">📝 오답 개념 노트</div>
-            <div class="subtitle-text">내가 무엇을 실수했는지 정확한 풀이로 먼저 배워봐요!</div>
+            <div class="title-text">📝 오답 개념 노트 🧐</div>
+            <div class="subtitle-text">내가 무엇을 실수했는지 정확한 풀이로 먼저 배워봐요! 💡</div>
             <div id="wrong-review-container" style="max-height: 55vh; overflow-y: auto; margin-bottom: 20px;"></div>
-            <button class="btn-main btn-primary" onclick="startRetryQuiz()">💪 다 이해했어요! 다시 풀기</button>
+            <button class="btn-main btn-primary" onclick="startRetryQuiz()">💪 다 이해했어요! 다시 풀기 🚀</button>
         </div>
     </div>
 
     <div id="parent-view" class="view-section">
         <div class="glass-card">
-            <div class="title-text">👨‍🏫 부모님 관리 대시보드</div>
+            <div class="title-text">👨‍🏫 부모님 관리 대시보드 📊</div>
 
             <div class="admin-info-box">
                 <div class="admin-info-title">🔑 사용자 비밀번호 상태</div>
                 <div id="admin-pw-display" style="font-size: 16px; font-weight: bold; color: var(--text-main);">
-                    정보를 불러오는 중입니다...
+                    정보를 불러오는 중입니다... ⏳
                 </div>
             </div>
 
             <div class="admin-info-box" style="border-color: var(--primary); background-color: #fff0f0;">
-                <div class="admin-info-title" style="color: var(--primary);">👶 학생 나이 설정 (과정 제한용)</div>
+                <div class="admin-info-title" style="color: var(--primary);">👶 학생 나이 설정 (과정 제한용) 🎂</div>
                 <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                     <select id="age-student-select" class="input-field" style="padding: 10px; font-size: 15px;">
                         <option value="김로운">👦 김로운</option>
@@ -778,11 +778,11 @@
                     </select>
                     <input type="number" id="age-input" class="input-field" placeholder="나이 입력 (예: 8)" style="padding: 10px; font-size: 15px;">
                 </div>
-                <button class="btn-main btn-primary" style="padding: 12px; font-size: 15px;" onclick="setStudentAge()">나이 설정하기</button>
+                <button class="btn-main btn-primary" style="padding: 12px; font-size: 15px;" onclick="setStudentAge()">나이 설정하기 ✅</button>
             </div>
 
             <div class="admin-info-box" style="border-color: var(--secondary); background-color: #f0f8ff;">
-                <div class="admin-info-title" style="color: var(--secondary);">🎁 특별 보너스 포인트 지급</div>
+                <div class="admin-info-title" style="color: var(--secondary);">🎁 특별 보너스 포인트 지급 ⭐</div>
                 <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                     <select id="bonus-student-select" class="input-field" style="padding: 10px; font-size: 15px;">
                         <option value="김로운">👦 김로운</option>
@@ -791,7 +791,7 @@
                     </select>
                     <input type="number" id="bonus-point-input" class="input-field" placeholder="지급할 수량 입력" style="padding: 10px; font-size: 15px;">
                 </div>
-                <button class="btn-main btn-secondary" style="padding: 12px; font-size: 15px;" onclick="giveBonusPoint()">포인트 지급하기</button>
+                <button class="btn-main btn-secondary" style="padding: 12px; font-size: 15px;" onclick="giveBonusPoint()">포인트 지급하기 💰</button>
             </div>
 
             <div class="btn-group" style="margin-bottom: 25px;">
@@ -807,7 +807,7 @@
                     <button class="btn-outline" id="filter-jj" onclick="filterReport('정지영')">정지영</button>
                 </div>
 
-                <button class="btn-main btn-secondary" style="margin-bottom: 20px; padding:14px; font-size:16px;" onclick="analyzeComprehensiveWeakness()">🤖 선택 사용자 AI 종합 성장 리포트</button>
+                <button class="btn-main btn-secondary" style="margin-bottom: 20px; padding:14px; font-size:16px;" onclick="analyzeComprehensiveWeakness()">🤖 선택 사용자 AI 종합 성장 리포트 📈</button>
 
                 <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 0 0 1px #dfe6e9;">
                     <table class="report-table" style="margin-top:0;">
@@ -844,25 +844,25 @@
 
     <div id="resume-modal" class="modal">
         <div class="modal-content" style="text-align: center;">
-            <div class="title-text" id="resume-title">🚨 풀다 만 학습이 있어요!</div>
-            <div class="subtitle-text">이전에 풀던 문제부터 이어서 진행할까요?</div>
+            <div class="title-text" id="resume-title">🚨 풀다 만 학습이 있어요! 🚨</div>
+            <div class="subtitle-text">이전에 풀던 문제부터 이어서 진행할까요? 🤔</div>
             <div class="modal-btns">
-                <button class="btn-main btn-outline" style="flex: none; width: 45%; margin: 0 auto;" onclick="cancelResume()">처음부터</button>
-                <button class="btn-main btn-primary" style="flex: none; width: 45%; margin: 0 auto;" onclick="confirmResume()">이어하기</button>
+                <button class="btn-main btn-outline" style="flex: none; width: 45%; margin: 0 auto;" onclick="cancelResume()">처음부터 🔙</button>
+                <button class="btn-main btn-primary" style="flex: none; width: 45%; margin: 0 auto;" onclick="confirmResume()">이어하기 🚀</button>
             </div>
         </div>
     </div>
 
     <div id="permission-modal" class="modal">
         <div class="modal-content" style="text-align: center;">
-            <div class="title-text">🔔 알림 권한 허용 안내</div>
+            <div class="title-text">🔔 알림 권한 허용 안내 🔔</div>
             <div class="subtitle-text" style="color:var(--text-main); font-size:16px; line-height:1.5;">
                 학습 시작, 점수 결과 등을 실시간으로 받으시려면 <b>[권한 허용]</b>을 누르신 후 브라우저 팝업에서도 <b>허용</b>을 눌러주세요.<br><br>
                 <span style="color:var(--danger); font-size:14px;">※ 모바일 환경에서는 브라우저 탭을 백그라운드에 켜두셔야 정상적으로 알림이 수신됩니다.</span>
             </div>
             <div class="modal-btns">
                 <button class="btn-main btn-outline" style="flex: none; width: 40%; margin: 0 auto;" onclick="closePermissionModal()">다음에</button>
-                <button class="btn-main btn-primary" style="flex: none; width: 50%; margin: 0 auto;" onclick="requestPushPermission()">권한 허용</button>
+                <button class="btn-main btn-primary" style="flex: none; width: 50%; margin: 0 auto;" onclick="requestPushPermission()">권한 허용 ✅</button>
             </div>
         </div>
     </div>
@@ -871,7 +871,7 @@
         <div class="modal-content">
             <div class="title-text" id="modal-title">🔍 상세 정보</div>
             <div id="modal-body" style="line-height: 1.6; color: var(--text-main); font-size: 16px; margin-bottom: 25px; white-space: pre-line;"></div>
-            <button class="btn-main btn-dark" onclick="document.getElementById('detail-modal').style.display='none'">닫기</button>
+            <button class="btn-main btn-dark" onclick="document.getElementById('detail-modal').style.display='none'">닫기 ❌</button>
         </div>
     </div>
 </div>
@@ -926,7 +926,7 @@
         db.ref('push_notifications').orderByChild('timestamp').startAt(now).on('child_added', snap => {
             const data = snap.val();
             if (data && data.message) {
-                new Notification("스마트 학습 알림", {
+                new Notification("스마트 학습 알림 🔔", {
                     body: data.message,
                     icon: "icon.png?v=15",
                     vibrate: [200, 100, 200]
@@ -940,13 +940,13 @@
         if ("Notification" in window) {
             const permission = await Notification.requestPermission();
             if (permission === "granted") {
-                alert("알림 권한이 허용되었습니다. 이제 백그라운드에 앱을 켜두시면 실시간 소식을 받을 수 있습니다.");
+                alert("알림 권한이 허용되었습니다. 이제 백그라운드에 앱을 켜두시면 실시간 소식을 받을 수 있습니다. 🎉");
                 setupAdminPushListener();
             } else {
-                alert("알림이 차단되었습니다. 기기 설정에서 허용으로 변경해 주세요.");
+                alert("알림이 차단되었습니다. 기기 설정에서 허용으로 변경해 주세요. 😅");
             }
         } else {
-            alert("현재 브라우저는 알림 기능을 지원하지 않습니다.");
+            alert("현재 브라우저는 알림 기능을 지원하지 않습니다. 🚫");
         }
     }
 
@@ -954,13 +954,12 @@
     const KEY2 = "AIzaSyBred_9lqK4Jx1" + "emrzyHWcUVnmLrqnttUQ";
     const API_KEYS = [KEY1, KEY2];
 
-    // 최상위 추론 성능을 보장하는 Pro 모델을 최우선으로 배치
+    // API 호출 시 안정적이고 뛰어난 모델 라인업 (404 방지 및 엉터리 문제 출제 차단)
     const AI_MODELS = [
-        "gemini-3.1-pro",      
-        "gemini-2.5-pro",      
-        "gemini-3-flash",      
-        "gemini-2.5-flash",    
-        "gemini-3.1-flash-lite"
+        "gemini-2.5-pro",
+        "gemini-2.5-flash",
+        "gemini-1.5-pro",
+        "gemini-1.5-flash"
     ];
 
     let currentProfile = null;
@@ -1008,13 +1007,13 @@
 
     function playTTS(text, lang = 'ko-KR') {
         if (!('speechSynthesis' in window)) {
-            alert("현재 브라우저는 음성 듣기 기능(TTS)을 지원하지 않습니다.");
+            alert("현재 브라우저는 음성 듣기 기능(TTS)을 지원하지 않습니다. 🚫");
             return;
         }
 
         const cleanText = String(text || '').trim();
         if (!cleanText) {
-            alert("읽어줄 내용이 없습니다.");
+            alert("읽어줄 내용이 없습니다. 😅");
             return;
         }
 
@@ -1037,7 +1036,7 @@
             window.speechSynthesis.speak(utterance);
         } catch (e) {
             console.error("playTTS 오류:", e);
-            alert("음성 재생 중 오류가 발생했습니다.");
+            alert("음성 재생 중 오류가 발생했습니다. ❌");
         }
     }
 
@@ -1114,20 +1113,20 @@
 
         if (viewId === 'login-view') {
             logoutBtn.style.display = 'none';
-            headerTitle.innerText = '🌟 스마트 학습';
+            headerTitle.innerText = '🌟 스마트 학습 🌟';
         } else {
             logoutBtn.style.display = 'block';
-            if (viewId === 'parent-view') headerTitle.innerText = '📊 관리자 센터';
-            else if (viewId === 'shop-view') headerTitle.innerText = '🎁 포인트 상점';
-            else if (viewId === 'profile-select-view') headerTitle.innerText = '🙋 사용자 선택';
-            else if (viewId === 'wrong-review-view') headerTitle.innerText = '📝 오답 개념 노트';
-            else if (viewId === 'learning-view') headerTitle.innerText = '📝 영단어 학습';
+            if (viewId === 'parent-view') headerTitle.innerText = '📊 관리자 센터 📊';
+            else if (viewId === 'shop-view') headerTitle.innerText = '🎁 포인트 상점 🎁';
+            else if (viewId === 'profile-select-view') headerTitle.innerText = '🙋 사용자 선택 🙋';
+            else if (viewId === 'wrong-review-view') headerTitle.innerText = '📝 오답 개념 노트 📝';
+            else if (viewId === 'learning-view') headerTitle.innerText = '📝 영단어 학습 📝';
             else headerTitle.innerText = `${currentProfile}의 학습장 ✨`;
         }
     }
 
     async function loginAsParent() {
-        const pw = prompt("관리자 비밀번호를 입력하십시오.");
+        const pw = prompt("관리자 비밀번호를 입력하십시오. 🔐");
         if (pw === "1010") {
             currentProfile = 'admin';
             renderAdminPasswords(await dbGet('users') || {});
@@ -1142,7 +1141,7 @@
                 }
             }
         } else if (pw !== null) {
-            alert("비밀번호가 일치하지 않습니다.");
+            alert("비밀번호가 일치하지 않습니다. ❌");
         }
     }
 
@@ -1170,18 +1169,18 @@
         const ageInput = parseInt(document.getElementById('age-input').value);
 
         if (isNaN(ageInput) || ageInput < 7) {
-            alert("7 이상의 올바른 나이를 입력해주세요.");
+            alert("7 이상의 올바른 나이를 입력해주세요. 😅");
             return;
         }
 
         let user = await dbGet('users/' + student);
         if (!user) {
-            alert("사용자 정보가 없습니다. 먼저 1회 로그인이 필요합니다.");
+            alert("사용자 정보가 없습니다. 먼저 1회 로그인이 필요합니다. 💡");
             return;
         }
 
         await dbSet('users/' + student + '/age', ageInput);
-        alert(`${student} 님의 나이가 ${ageInput}세로 설정되었습니다.`);
+        alert(`${student} 님의 나이가 ${ageInput}세로 설정되었습니다. ✅`);
         document.getElementById('age-input').value = '';
 
         let usersData = await dbGet('users');
@@ -1189,7 +1188,7 @@
     }
 
     async function selectProfile(profileName) {
-        showLoading(true, "사용자 정보를 불러오는 중입니다...");
+        showLoading(true, "사용자 정보를 불러오는 중입니다... ⏳");
 
         let user = await dbGet('users/' + profileName);
         if (!user) {
@@ -1200,17 +1199,17 @@
         showLoading(false);
 
         if (user.pw === '') {
-            let newPw = prompt(`[${profileName}] 처음 오셨네요! 사용할 비밀번호를 만들어주세요.`);
+            let newPw = prompt(`[${profileName}] 처음 오셨네요! 사용할 비밀번호를 만들어주세요. 🔐`);
             if (!newPw || newPw.trim() === '') return;
             user.pw = newPw.trim();
             await dbSet('users/' + profileName + '/pw', user.pw);
-            alert('비밀번호가 안전하게 만들어졌어요!');
+            alert('비밀번호가 안전하게 만들어졌어요! 🎉');
             triggerPushNotification(`[계정 알림] ${profileName} 님이 최초 비밀번호를 설정했습니다.`);
         } else {
-            let inputPw = prompt(`[${profileName}] 비밀번호를 입력해주세요.`);
+            let inputPw = prompt(`[${profileName}] 비밀번호를 입력해주세요. 🔑`);
             if (inputPw === null) return;
             if (inputPw.trim() !== user.pw) {
-                alert('비밀번호가 틀렸어요. 다시 시도해봐요!');
+                alert('비밀번호가 틀렸어요. 다시 시도해봐요! 😅');
                 return;
             }
         }
@@ -1224,19 +1223,19 @@
 
     async function changePassword() {
         let user = await dbGet('users/' + currentProfile);
-        let oldPw = prompt("현재 비밀번호를 입력해주세요.");
+        let oldPw = prompt("현재 비밀번호를 입력해주세요. 🔑");
         if (oldPw === null) return;
         if (oldPw.trim() !== user.pw) {
-            alert("현재 비밀번호가 일치하지 않습니다.");
+            alert("현재 비밀번호가 일치하지 않습니다. ❌");
             return;
         }
-        let newPw = prompt("새롭게 사용할 비밀번호를 입력해주세요.");
+        let newPw = prompt("새롭게 사용할 비밀번호를 입력해주세요. 🔐");
         if (!newPw || newPw.trim() === '') {
-            alert("유효한 비밀번호를 입력해주세요.");
+            alert("유효한 비밀번호를 입력해주세요. 😅");
             return;
         }
         await dbSet('users/' + currentProfile + '/pw', newPw.trim());
-        alert("비밀번호가 성공적으로 변경되었어요!");
+        alert("비밀번호가 성공적으로 변경되었어요! ✅");
         triggerPushNotification(`[계정 알림] ${currentProfile} 님이 비밀번호를 변경했습니다.`);
     }
 
@@ -1291,7 +1290,7 @@
             await dbSet('users/' + currentProfile + '/streak', dates);
             let currentStreak = calculateStreak(dates);
             await addPoints(currentStreak);
-            alert(`출석 완료! 연속 ${currentStreak}일 보상으로 ${currentStreak}포인트를 받았어요!`);
+            alert(`출석 완료! 연속 ${currentStreak}일 보상으로 ${currentStreak}포인트를 받았어요! 🎉`);
         }
 
         document.getElementById('streak-display').innerText = `🔥 연속 ${calculateStreak(dates)}일`;
@@ -1310,28 +1309,28 @@
         const pointsToGive = parseInt(pointInput);
 
         if (isNaN(pointsToGive) || pointsToGive <= 0) {
-            alert("올바른 포인트 수량을 입력해주세요.");
+            alert("올바른 포인트 수량을 입력해주세요. 😅");
             return;
         }
 
         let user = await dbGet('users/' + student);
         if (!user) {
-            alert("해당 사용자의 계정 정보가 없습니다. 먼저 1회 로그인이 필요합니다.");
+            alert("해당 사용자의 계정 정보가 없습니다. 먼저 1회 로그인이 필요합니다. 💡");
             return;
         }
 
         let currentPoints = user.points || 0;
         await dbSet('users/' + student + '/points', currentPoints + pointsToGive);
-        alert(`${student} 님에게 특별 보너스 ${pointsToGive}P가 지급되었습니다.`);
+        alert(`${student} 님에게 특별 보너스 ${pointsToGive}P가 지급되었습니다! 🎉`);
         document.getElementById('bonus-point-input').value = '';
-        triggerPushNotification(`[보너스 알림] 관리자가 ${student} 님에게 특별 보너스 ${pointsToGive}P를 선물했습니다!`);
+        triggerPushNotification(`[보너스 알림] 관리자가 ${student} 님에게 특별 보너스 ${pointsToGive}P를 선물했습니다! 🎁`);
     }
 
     async function buyItem(itemName, cost) {
         let points = await dbGet('users/' + currentProfile + '/points') || 0;
 
         if (points >= cost) {
-            if (confirm(`'${itemName}'을(를) ${cost}P에 구매할까요?`)) {
+            if (confirm(`'${itemName}'을(를) ${cost}P에 구매할까요? 🛒`)) {
                 await dbSet('users/' + currentProfile + '/points', points - cost);
                 await updateDashboardStats();
 
@@ -1346,18 +1345,18 @@
                 });
 
                 await dbSet('purchases', purchases);
-                alert(`성공적으로 구매했어요. 관리자 승인을 기다려주세요!`);
-                triggerPushNotification(`[상점 알림] ${currentProfile} 님이 '${itemName}'을(를) 구매 요청했습니다.`);
+                alert(`성공적으로 구매했어요. 관리자 승인을 기다려주세요! ✅`);
+                triggerPushNotification(`[상점 알림] ${currentProfile} 님이 '${itemName}'을(를) 구매 요청했습니다. 🛍️`);
             }
         } else {
-            alert(`앗, 포인트가 부족해요. (현재: ${points}P, 필요: ${cost}P)`);
+            alert(`앗, 포인트가 부족해요. (현재: ${points}P, 필요: ${cost}P) 😅`);
         }
     }
 
     async function checkSavedSession() {
         const saved = await dbGet('sessions/' + currentProfile);
         if (saved && saved.sessionState && saved.sessionState.questions && saved.sessionState.currentIndex < saved.sessionState.questions.length) {
-            document.getElementById('resume-title').innerText = `🚨 풀다 만 학습이 있어요!`;
+            document.getElementById('resume-title').innerText = `🚨 풀다 만 학습이 있어요! 🚨`;
             document.getElementById('resume-modal').style.display = 'flex';
         } else {
             showView('child-dashboard-view');
@@ -1410,13 +1409,13 @@
         const minGradeIndex = Math.max(0, userAge - 8);
 
         const grades = [
-            { val: 0, text: '7세' },
+            { val: 0, text: '7세 👶' },
             { val: 1, text: '1학년' },
             { val: 2, text: '2학년' },
             { val: 3, text: '3학년' },
             { val: 4, text: '4학년' },
             { val: 5, text: '5학년' },
-            { val: 6, text: '6학년' }
+            { val: 6, text: '6학년 🎓' }
         ];
 
         if (config.grade < minGradeIndex) config.grade = minGradeIndex;
@@ -1458,7 +1457,7 @@
         });
     }
 
-    function showLoading(show, message = "요청을 처리 중입니다.") {
+    function showLoading(show, message = "요청을 처리 중입니다. ⏳") {
         const overlay = document.getElementById('loading-overlay');
         if (show) {
             document.getElementById('loading-msg').innerHTML = message;
@@ -1472,7 +1471,7 @@
         const totalAttempts = AI_MODELS.length * API_KEYS.length;
         if (attempt >= totalAttempts) {
             console.error("[시스템 오류] 통신 실패");
-            alert("통신 상태가 불안정하거나 한도에 도달했습니다.\n잠시 후 다시 시도해주세요.");
+            alert("통신 상태가 불안정하거나 한도에 도달했습니다. 잠시 후 다시 시도해주세요. 😅");
             throw new Error("통신 제한 도달");
         }
 
@@ -1507,8 +1506,8 @@
     }
 
     async function startNewQuiz() {
-        alert("[학습 안내]\n정답 1개당 5포인트가 적립됩니다.\n단, 과정을 끝까지 완료해야만 적립된 포인트가 합산되어 최종 지급됩니다.\n중도 포기 시 포인트가 날아가니 끝까지 완료해주세요!");
-        showLoading(true, "🤖 AI 선생님이 맞춤형 문제를<br>만들고 있어요!");
+        alert("[학습 안내 💡]\n정답 1개당 5포인트가 적립됩니다.\n단, 과정을 끝까지 완료해야만 적립된 포인트가 합산되어 최종 지급됩니다.\n중도 포기 시 포인트가 날아가니 끝까지 완료해주세요! 💪");
+        showLoading(true, "👩‍🏫 꼼꼼한 AI 선생님이<br>시험 문제를 출제하고 있어요! ⏳");
 
         let prompt = '';
         const gradeText = config.grade === 0 ? "유치원 7세(예비 초등)" : "초등학교 " + config.grade + "학년";
@@ -1523,13 +1522,15 @@
 
         // 🚨 수능 출제 위원급 공통 규칙 (로직 오류 완벽 차단)
         const commonStrictRules = `
-[수능 출제 위원급 엄격한 출제 원칙 - 위반 시 시스템 심각한 오류 발생]
-1. 시각/청각 자료 전면 금지: "그림을 보고", "Look at the picture", "표를 보고" 등 텍스트 외의 자료가 필요한 문제는 100% 배제하십시오.
-2. 보기(Options) 중복 절대 금지 (CRITICAL): 4개의 객관식 보기는 텍스트가 서로 '완벽하게' 달라야 합니다. 지문을 그대로 4번 복사하거나, "자랑 -> 자랑"처럼 화살표 앞뒤가 같거나, 똑같은 보기를 중복 생성하는 엉터리 출제는 절대 금지합니다.
-3. 매력적이고 구체적인 오답 창작 강제: 오답을 만들 때 무의미한 반복이 아니라, 실제 학생들이 자주 틀리는 맞춤법, 문맥상 어색한 표현, 수치 계산 실수 등을 구체적으로 창조하여 3개의 오답을 반드시 구성하십시오.
-4. 논리적 오류 100% 차단: "잘못된 부분 찾기", "틀린 띄어쓰기 찾기" 문제를 출제할 경우, 제시문(q) 텍스트 안에 '반드시 의도적으로 틀린 부분(오류)'을 1개 이상 삽입해야 합니다. 완벽한 문장을 주고 틀린 것을 찾으라는 모순된 문제를 내지 마십시오.
-5. 억지 보기 생성 금지: 정상적인 문장을 단순히 단어 단위("나", "는", "학교에")로 무의미하게 쪼개서 보기에 나열하지 마십시오. 각 보기는 그 자체로 문제의 답안 형태를 갖춰야 합니다.
-6. 문제 유효성 자체 검증: 각 보기가 서로 독립적이고 명확한 차이가 있는지, 정답이 복수가 아닌지 출제자 입장에서 반드시 검토 후 송신하십시오.
+[🚨 수능 출제 위원급 엄격한 출제 원칙 🚨]
+이 원칙을 어기면 출제 사고로 간주됩니다. 반드시 100% 준수하십시오.
+1. 정답 스포일러 절대 금지: 빈칸 ( ) 문제를 낼 때, 절대로 괄호 옆이나 문장 내에 정답 단어를 미리 적어두지 마십시오. (나쁜 예: 정성껏 ( ) 싸서 준비했다. -> 좋은 예: 정성껏 (   ) 준비했다.)
+2. 명확한 기호 사용: 특정 단어나 문장의 쓰임을 물을 때는 밑줄 대신 대괄호 [ ] 를 사용하여 명확하게 표시하십시오. (예: 다음 문장에서 [부딪혀]의 쓰임이...)
+3. 오류 찾기 문제의 논리성: "틀린 부분을 찾으시오", "잘못된 띄어쓰기" 등의 문제를 낼 때는, 제시문(q) 텍스트 안에 **반드시 의도적으로 틀린 부분(오타, 오문, 띄어쓰기 오류 등)**을 실제로 삽입하십시오. 완벽한 문장을 주고 틀린 것을 찾으라는 억지 문제를 내면 안 됩니다.
+4. 보기(Options) 중복 절대 금지: 4개의 객관식 보기는 텍스트가 서로 '완벽하게' 달라야 합니다. "자랑 -> 자랑"처럼 억지 보기를 만들거나, 똑같은 문장을 중복해서 나열하지 마십시오.
+5. 시각/청각 자료 전면 금지: "그림을 보고", "표를 보고" 등 텍스트 외의 자료가 필요한 문제는 100% 배제하십시오. 오직 글로만 완벽하게 상황이 이해되어야 합니다.
+6. 억지 보기 생성 금지: 정상적인 문장을 단순히 띄어쓰기 단위로 무의미하게 쪼개서 보기에 나열하지 마십시오. 각 보기는 문제의 답안으로서 독립적이고 매력적인 오답이어야 합니다.
+7. 문제 유효성 검사 (자가 진단): 각 보기가 서로 독립적이고 명확한 차이가 있는지, 정답이 복수가 아닌지 출제자 입장에서 반드시 검토 후 송신하십시오.
 `;
 
         if (config.subject === '영단어') {
@@ -1571,9 +1572,8 @@ ${commonStrictRules}
 
 [추가 국어 지침]
 1. 문항 및 사고 유형: 단순 맞춤법 문제를 넘어 주제 추론형, 비판적 사고형, 인물의 심리 파악 등 다양한 추리/사고형 문제를 골고루 출제하십시오.
-2. 문제의 완전성: 지문을 바탕으로 한 문제일 경우, 해당 지문의 내용 전체를 반드시 질문(q) 텍스트 안에 직접 작성해야 합니다. 지문 누락은 절대 불가합니다.
-3. JSON 응답 포맷: [{"type":"objective","q":"[필요한 지문 전체를 여기에 작성]\\n\\n질문내용","options":["오답1","오답2","정답","오답3"],"a":"정답 텍스트(보기와 100% 일치)","desc":"학생 눈높이에 맞춘 상세한 해설"}]
-4. [JSON 규칙] 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 줄바꿈은 '\\n'으로 입력하십시오.`;
+2. JSON 응답 포맷: [{"type":"objective","q":"[필요한 지문 전체를 여기에 작성]\\n\\n질문내용","options":["오답1","오답2","정답","오답3"],"a":"정답 텍스트(보기와 100% 일치)","desc":"학생 눈높이에 맞춘 상세한 해설"}]
+3. [JSON 규칙] 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 줄바꿈은 '\\n'으로 입력하십시오.`;
 
         } else {
             prompt = `당신은 대한민국 최고의 수학 평가 전문가입니다. '2026년 개정 교육과정' 수학 객관식 20문항을 출제합니다.
@@ -1634,7 +1634,7 @@ ${commonStrictRules}
                     renderCurrentQuestion();
                 }
 
-                triggerPushNotification(`[학습 알림] ${currentProfile} 사용자가 ${formatGrade(config.grade)} ${config.subject} (${config.difficulty}) 학습을 시작했습니다!`);
+                triggerPushNotification(`[학습 알림 🔔] ${currentProfile} 사용자가 ${formatGrade(config.grade)} ${config.subject} (${config.difficulty}) 학습을 시작했습니다! 🚀`);
             } catch (parseError) {
                 console.error("JSON Parse Error:", parseError);
                 console.error("Raw JSON text from API:", jsonText);
@@ -1644,7 +1644,7 @@ ${commonStrictRules}
         } catch (error) {
             console.error(error);
             showLoading(false);
-            alert(`오류 발생: 문제 생성에 실패했습니다. 다시 시도해주세요.`);
+            alert(`오류 발생: 문제 생성에 실패했습니다. 다시 시도해주세요. 😅`);
         }
     }
 
@@ -1660,7 +1660,7 @@ ${commonStrictRules}
         document.getElementById('learning-tts-btn').onclick = () => playTTS(wData.tts || wData.word, 'en-US');
 
         const nextBtn = document.getElementById('learning-next-btn');
-        if (sessionState.currentIndex === 9) nextBtn.innerText = "✏️ 퀴즈 풀기 시작!";
+        if (sessionState.currentIndex === 9) nextBtn.innerText = "✏️ 퀴즈 풀기 시작! 🚀";
         else nextBtn.innerText = "다음 단어 ➡️";
     }
 
@@ -1737,7 +1737,6 @@ ${commonStrictRules}
                 optTtsBtn.className = 'tts-opt-btn';
                 optTtsBtn.innerText = '🔊';
                 
-                // 섞인 순서대로 tts_options 매칭은 어려울 수 있으니, 직접 텍스트로 읽어주도록 fallback 처리
                 const optTtsText = config.subject === '영어' ? optText : optText;
                 
                 optTtsBtn.onclick = (e) => {
@@ -1775,7 +1774,7 @@ ${commonStrictRules}
             btnElement.style.backgroundColor = "#eafaf1";
             fbEl.innerText = '정답입니다! ✅';
             fbEl.className = 'correct';
-            showFloatingPoint(event, "+5P (적립중)");
+            showFloatingPoint(event, "+5P (적립중) 💰");
             if (!sessionState.isRetryMode) sessionState.initialScore += 5;
         } else {
             btnElement.style.borderColor = "var(--danger)";
@@ -1827,9 +1826,9 @@ ${commonStrictRules}
         const fbEl = document.getElementById('feedback-box');
 
         if (isCorrect) {
-            fbEl.innerText = '정답입니다! ✅';
+            fbEl.innerText = '정답입니다! 💯';
             fbEl.className = 'correct';
-            showFloatingPoint(event || { clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 }, "+5P (적립중)");
+            showFloatingPoint(event || { clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 }, "+5P (적립중) 💰");
             if (!sessionState.isRetryMode) sessionState.initialScore += 5;
         } else {
             fbEl.innerText = `아쉬워요! 정답은 '${qData.a}' 였어요. ❌`;
@@ -1887,52 +1886,52 @@ ${commonStrictRules}
 
             if (!sessionState.reportSaved) {
                 if (bonusPoints > 0) {
-                    earnedPointsEl.innerHTML = `🎁 ${sessionState.totalCount}문제 완주! 기본 ${basePoints}P + 우수 보너스 ${bonusPoints}P<br><span style="font-size:24px; color:var(--primary);">총 ${totalEarnedPoints}P 지급 완료!</span>`;
+                    earnedPointsEl.innerHTML = `🎁 ${sessionState.totalCount}문제 완주! 기본 ${basePoints}P + 우수 보너스 ${bonusPoints}P<br><span style="font-size:24px; color:var(--primary);">총 ${totalEarnedPoints}P 지급 완료! 🎉</span>`;
                 } else {
-                    earnedPointsEl.innerHTML = `🎁 ${sessionState.totalCount}문제 완주!<br><span style="font-size:24px; color:var(--primary);">총 ${totalEarnedPoints}P 지급 완료!</span>`;
+                    earnedPointsEl.innerHTML = `🎁 ${sessionState.totalCount}문제 완주!<br><span style="font-size:24px; color:var(--primary);">총 ${totalEarnedPoints}P 지급 완료! 🎉</span>`;
                 }
                 earnedPointsEl.style.display = 'block';
 
                 await addPoints(totalEarnedPoints);
                 await saveReport();
-                triggerPushNotification(`[점수 알림] ${currentProfile} 님이 학습을 완주하여 총 ${totalEarnedPoints}P를 획득했습니다! (점수: ${finalScore}점)`);
+                triggerPushNotification(`[점수 알림] ${currentProfile} 님이 학습을 완주하여 총 ${totalEarnedPoints}P를 획득했습니다! (점수: ${finalScore}점) 🌟`);
                 sessionState.reportSaved = true;
                 saveSession();
             } else {
                 if (bonusPoints > 0) {
-                    earnedPointsEl.innerHTML = `🎁 ${sessionState.totalCount}문제 완주! 기본 ${basePoints}P + 우수 보너스 ${bonusPoints}P<br><span style="font-size:24px; color:var(--primary);">총 ${totalEarnedPoints}P 지급 완료!</span>`;
+                    earnedPointsEl.innerHTML = `🎁 ${sessionState.totalCount}문제 완주! 기본 ${basePoints}P + 우수 보너스 ${bonusPoints}P<br><span style="font-size:24px; color:var(--primary);">총 ${totalEarnedPoints}P 지급 완료! 🎉</span>`;
                 } else {
-                    earnedPointsEl.innerHTML = `🎁 ${sessionState.totalCount}문제 완주!<br><span style="font-size:24px; color:var(--primary);">총 ${totalEarnedPoints}P 지급 완료!</span>`;
+                    earnedPointsEl.innerHTML = `🎁 ${sessionState.totalCount}문제 완주!<br><span style="font-size:24px; color:var(--primary);">총 ${totalEarnedPoints}P 지급 완료! 🎉</span>`;
                 }
                 earnedPointsEl.style.display = 'block';
             }
 
             if (sessionState.wrongQuestions.length > 0) {
-                titleEl.innerText = "1차 학습 완료";
-                msgEl.innerText = `총 ${sessionState.totalCount}문제 중 ${sessionState.wrongQuestions.length}문제를 틀렸어요. 😅\n틀린 문제를 꼼꼼하게 다시 풀어봐요!`;
+                titleEl.innerText = "1차 학습 완료 😅";
+                msgEl.innerText = `총 ${sessionState.totalCount}문제 중 ${sessionState.wrongQuestions.length}문제를 틀렸어요.\n틀린 문제를 꼼꼼하게 다시 풀어봐요! ✍️`;
                 actionBtn.innerText = "오답 개념 확인하기 💡";
             } else {
                 titleEl.innerText = "완벽해요! 💯";
                 msgEl.innerText = "모든 문제를 다 맞췄어요. 정말 대단해요! 🌟";
-                actionBtn.innerText = "기분 좋게 끝내기";
+                actionBtn.innerText = "기분 좋게 끝내기 🏃‍♂️";
             }
         } else {
             scoreEl.style.display = 'none';
 
             if (!sessionState.reportSavedRetry) {
-                triggerPushNotification(`[학습 알림] ${currentProfile} 님이 오답 수정을 모두 완료했습니다!`);
+                triggerPushNotification(`[학습 알림] ${currentProfile} 님이 오답 수정을 모두 완료했습니다! 👏`);
                 sessionState.reportSavedRetry = true;
                 saveSession();
             }
 
             if (sessionState.wrongQuestions.length > 0) {
-                titleEl.innerText = "다시 풀기 완료";
+                titleEl.innerText = "다시 풀기 완료 😅";
                 msgEl.innerText = `아직 ${sessionState.wrongQuestions.length}문제가 틀렸어요.\n포기하지 말고 100점을 향해 고고! 🏃‍♂️`;
                 actionBtn.innerText = "다시 틀린 문제 확인하기 💡";
             } else {
                 titleEl.innerText = "최종 완료 🎉";
                 msgEl.innerText = "어려운 문제도 모두 해결했어요. 최고! 👍";
-                actionBtn.innerText = "마무리하기";
+                actionBtn.innerText = "마무리하기 🏃‍♂️";
             }
         }
     }
@@ -2025,7 +2024,7 @@ ${commonStrictRules}
             : reportDataCache;
 
         if (!filtered || filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="empty-report">학습 기록이 없습니다.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-report">학습 기록이 없습니다. 📭</td></tr>';
             return;
         }
 
@@ -2178,8 +2177,8 @@ ${commonStrictRules}
         let html = '';
         purchaseDataCache.forEach(p => {
             let actionBtn = p.status === 'pending'
-                ? `<button class="btn-small" style="background-color: var(--primary);" onclick="markRewardAsUsed(${p.id})">사용 승인</button>`
-                : `<button class="btn-small used" disabled>사용 완료</button>`;
+                ? `<button class="btn-small" style="background-color: var(--primary);" onclick="markRewardAsUsed(${p.id})">사용 승인 ✅</button>`
+                : `<button class="btn-small used" disabled>사용 완료 🎁</button>`;
 
             html += `<tr>
                 <td style="font-weight:900; color:var(--text-main);">${p.profile}</td>
@@ -2193,7 +2192,7 @@ ${commonStrictRules}
     }
 
     async function markRewardAsUsed(purchaseId) {
-        if (confirm("해당 쿠폰 보상을 제공하셨습니까?\n확인 시 '사용 완료' 처리됩니다.")) {
+        if (confirm("해당 쿠폰 보상을 제공하셨습니까?\n확인 시 '사용 완료' 처리됩니다. ✅")) {
             let purchases = await dbGet('purchases') || [];
             let itemIndex = purchases.findIndex(p => p.id === purchaseId);
             if (itemIndex !== -1) {
