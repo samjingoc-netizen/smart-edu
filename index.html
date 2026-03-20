@@ -9,9 +9,9 @@
     <meta name="theme-color" content="#ff6b6b">
     <title>🌟 스마트 학습 시스템 🌟</title>
 
-    <link rel="icon" href="icon.png?v=16">
-    <link rel="apple-touch-icon" href="icon.png?v=16">
-    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=16","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=16","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="icon" href="icon.png?v=17">
+    <link rel="apple-touch-icon" href="icon.png?v=17">
+    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=17","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=17","sizes":"512x512","type":"image/png"}]}'>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -301,7 +301,7 @@
             border: 1px solid #dfe6e9;
         }
 
-        .options-container {
+                .options-container {
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -358,7 +358,7 @@
         .correct { color: var(--success); }
         .incorrect { color: var(--danger); }
 
-                .report-table {
+        .report-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 14px;
@@ -622,7 +622,7 @@
         </div>
     </div>
 
-    <div id="profile-select-view" class="view-section">
+        <div id="profile-select-view" class="view-section">
         <div class="glass-card" style="margin-top: 20px;">
             <div class="title-text">🙋 사용자 선택</div>
             <div class="subtitle-text">이름을 선택하고 비밀번호를 입력해요. 🔐</div>
@@ -671,7 +671,7 @@
         </div>
     </div>
 
-        <div id="shop-view" class="view-section">
+    <div id="shop-view" class="view-section">
         <div class="glass-card">
             <div class="title-text">🎁 내 포인트 상점 🎁</div>
             <div class="subtitle-text" id="shop-point-display" style="color:var(--primary); font-size:18px;">현재 보유: 0P</div>
@@ -794,7 +794,7 @@
         </div>
     </div>
 
-    <div id="parent-view" class="view-section">
+        <div id="parent-view" class="view-section">
         <div class="glass-card">
             <div class="title-text">👨‍🏫 부모님 관리 대시보드 📊</div>
 
@@ -1034,7 +1034,7 @@
         }
     }
 
-        function stripMarkdownFence(text = '') {
+    function stripMarkdownFence(text = '') {
         return String(text || '')
             .replace(/^```json\s*/i, '')
             .replace(/^```\s*/i, '')
@@ -1055,7 +1055,7 @@
         return normalizeCompareText(a) === normalizeCompareText(b);
     }
 
-    function extractJSONArrayText(rawText = '') {
+        function extractJSONArrayText(rawText = '') {
         const cleaned = stripMarkdownFence(rawText);
         const start = cleaned.indexOf('[');
         const end = cleaned.lastIndexOf(']');
@@ -1267,7 +1267,7 @@
             if (data && data.message) {
                 new Notification("스마트 학습 알림 🔔", {
                     body: data.message,
-                    icon: "icon.png?v=16",
+                    icon: "icon.png?v=17",
                     vibrate: [200, 100, 200]
                 });
             }
@@ -1329,6 +1329,51 @@
         }
     }
 
+    function confirmAction(message) {
+        return window.confirm(message);
+    }
+
+    function getActiveViewId() {
+        return document.querySelector('.view-section.active')?.id || '';
+    }
+
+    function isLearningFlowView(viewId) {
+        return ['learning-view', 'quiz-view', 'result-view', 'wrong-review-view'].includes(viewId);
+    }
+
+    function confirmLeaveCurrentView(actionType = 'home') {
+        const activeId = getActiveViewId();
+
+        if (isLearningFlowView(activeId)) {
+            if (actionType === 'logout') {
+                return confirmAction(
+                    "정말 나가시겠습니까?\n\n진행 중인 학습 화면에서 나가게 됩니다.\n현재 진행 내용은 저장되어 이어하기가 가능하지만,\n지금 화면은 종료됩니다."
+                );
+            }
+            return confirmAction(
+                "정말 홈으로 가시겠습니까?\n\n진행 중인 학습 화면에서 나가게 됩니다.\n현재 진행 내용은 저장되어 이어하기가 가능하지만,\n지금 화면은 종료됩니다."
+            );
+        }
+
+        if (activeId === 'shop-view') {
+            return confirmAction(
+                actionType === 'logout'
+                    ? "정말 나가시겠습니까?"
+                    : "정말 홈으로 이동하시겠습니까?"
+            );
+        }
+
+        if (activeId === 'parent-view') {
+            return confirmAction(
+                actionType === 'logout'
+                    ? "정말 나가시겠습니까?"
+                    : "정말 홈으로 이동하시겠습니까?"
+            );
+        }
+
+        return true;
+    }
+
     function updateHeaderUI(viewId) {
         const headerTitle = document.getElementById('header-title');
         const logoutBtn = document.getElementById('logout-btn');
@@ -1341,17 +1386,34 @@
             return;
         }
 
-        if (viewId === 'profile-select-view') headerTitle.innerText = '🙋 사용자 선택 🙋';
-        else if (viewId === 'parent-view') headerTitle.innerText = '📊 관리자 센터 📊';
-        else if (viewId === 'shop-view') headerTitle.innerText = '🎁 포인트 상점 🎁';
-        else if (viewId === 'wrong-review-view') headerTitle.innerText = '📝 오답 개념 노트 📝';
-        else if (viewId === 'learning-view') headerTitle.innerText = '📝 영단어 학습 📝';
-        else if (viewId === 'quiz-view') headerTitle.innerText = `${currentProfile || '학습자'}의 문제 풀이 ✨`;
-        else if (viewId === 'result-view') headerTitle.innerText = '🎉 학습 결과 🎉';
-        else headerTitle.innerText = currentProfile ? `${currentProfile}의 학습장 ✨` : '🌟 스마트 학습 🌟';
+        if (viewId === 'profile-select-view') {
+            headerTitle.innerText = '🙋 사용자 선택 🙋';
+        } else if (viewId === 'parent-view') {
+            headerTitle.innerText = '📊 관리자 센터 📊';
+        } else if (viewId === 'shop-view') {
+            headerTitle.innerText = '🎁 포인트 상점 🎁';
+        } else if (viewId === 'wrong-review-view') {
+            headerTitle.innerText = '📝 오답 개념 노트 📝';
+        } else if (viewId === 'learning-view') {
+            headerTitle.innerText = '📝 영단어 학습 📝';
+        } else if (viewId === 'quiz-view') {
+            headerTitle.innerText = `${currentProfile || '학습자'}의 문제 풀이 ✨`;
+        } else if (viewId === 'result-view') {
+            headerTitle.innerText = '🎉 학습 결과 🎉';
+        } else {
+            headerTitle.innerText = currentProfile ? `${currentProfile}의 학습장 ✨` : '🌟 스마트 학습 🌟';
+        }
 
-        backBtn.style.display = 'inline-flex';
-        backBtn.innerText = viewHistory.length > 0 ? '← 뒤로' : '← 홈';
+        if (
+            viewId === 'profile-select-view' ||
+            viewId === 'child-dashboard-view' ||
+            viewId === 'parent-view'
+        ) {
+            backBtn.style.display = 'none';
+        } else {
+            backBtn.style.display = 'inline-flex';
+            backBtn.innerText = viewHistory.length > 0 ? '← 뒤로' : '← 홈';
+        }
 
         logoutBtn.style.display = currentProfile ? 'inline-flex' : 'none';
     }
@@ -1387,13 +1449,15 @@
             return;
         }
 
+        if (!confirmLeaveCurrentView('home')) return;
+
         if (viewHistory.length > 0) {
             const prevId = viewHistory.pop();
             showView(prevId, { push: false });
             return;
         }
 
-        const activeId = document.querySelector('.view-section.active')?.id;
+        const activeId = getActiveViewId();
 
         if (currentProfile === 'admin') {
             showView('parent-view', { push: false, resetHistory: true });
@@ -1582,6 +1646,11 @@
             return;
         }
 
+        const ok = confirmAction(
+            `[나이 설정 확인]\n\n${student} 님의 나이를 ${ageInput}세로 설정하시겠습니까?`
+        );
+        if (!ok) return;
+
         await dbSet('users/' + student + '/age', ageInput);
         alert(`${student} 님의 나이가 ${ageInput}세로 설정되었습니다. ✅`);
         document.getElementById('age-input').value = '';
@@ -1628,21 +1697,31 @@
         let user = await dbGet('users/' + currentProfile);
         let oldPw = prompt("현재 비밀번호를 입력해주세요. 🔑");
         if (oldPw === null) return;
+
         if (oldPw.trim() !== user.pw) {
             alert("현재 비밀번호가 일치하지 않습니다. ❌");
             return;
         }
+
         let newPw = prompt("새롭게 사용할 비밀번호를 입력해주세요. 🔐");
         if (!newPw || newPw.trim() === '') {
             alert("유효한 비밀번호를 입력해주세요. 😅");
             return;
         }
+
+        const ok = confirmAction(
+            `[비밀번호 변경 확인]\n\n정말 비밀번호를 변경하시겠습니까?`
+        );
+        if (!ok) return;
+
         await dbSet('users/' + currentProfile + '/pw', newPw.trim());
         alert("비밀번호가 성공적으로 변경되었어요! ✅");
         triggerPushNotification(`[계정 알림] ${currentProfile} 님이 비밀번호를 변경했습니다.`);
     }
 
     function logout() {
+        if (!confirmLeaveCurrentView('logout')) return;
+
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         currentProfile = null;
         viewHistory = [];
@@ -1665,6 +1744,11 @@
             return;
         }
 
+        const ok = confirmAction(
+            `[보너스 지급 확인]\n\n${student} 님에게 ${pointsToGive}P를 지급하시겠습니까?`
+        );
+        if (!ok) return;
+
         let currentPoints = user.points || 0;
         await dbSet('users/' + student + '/points', currentPoints + pointsToGive);
         alert(`${student} 님에게 특별 보너스 ${pointsToGive}P가 지급되었습니다! 🎉`);
@@ -1675,28 +1759,32 @@
     async function buyItem(itemName, cost) {
         let points = await dbGet('users/' + currentProfile + '/points') || 0;
 
-        if (points >= cost) {
-            if (confirm(`'${itemName}'을(를) ${cost}P에 구매할까요? 🛒`)) {
-                await dbSet('users/' + currentProfile + '/points', points - cost);
-                await updateDashboardStats();
-
-                let purchases = await dbGet('purchases') || [];
-                purchases.push({
-                    id: new Date().getTime(),
-                    profile: currentProfile,
-                    itemName: itemName,
-                    cost: cost,
-                    date: getKSTTime(),
-                    status: 'pending'
-                });
-
-                await dbSet('purchases', purchases);
-                alert(`성공적으로 구매했어요. 관리자 승인을 기다려주세요! ✅`);
-                triggerPushNotification(`[상점 알림] ${currentProfile} 님이 '${itemName}'을(를) 구매 요청했습니다. 🛍️`);
-            }
-        } else {
+        if (points < cost) {
             alert(`앗, 포인트가 부족해요. (현재: ${points}P, 필요: ${cost}P) 😅`);
+            return;
         }
+
+        const ok = confirmAction(
+            `[구매 확인]\n\n'${itemName}'을(를) ${cost}P에 정말 구매하시겠습니까?\n구매 후에는 포인트가 즉시 차감되고,\n관리자 승인 대기 상태가 됩니다.`
+        );
+        if (!ok) return;
+
+        await dbSet('users/' + currentProfile + '/points', points - cost);
+        await updateDashboardStats();
+
+        let purchases = await dbGet('purchases') || [];
+        purchases.push({
+            id: new Date().getTime(),
+            profile: currentProfile,
+            itemName: itemName,
+            cost: cost,
+            date: getKSTTime(),
+            status: 'pending'
+        });
+
+        await dbSet('purchases', purchases);
+        alert(`성공적으로 구매했어요. 관리자 승인을 기다려주세요! ✅`);
+        triggerPushNotification(`[상점 알림] ${currentProfile} 님이 '${itemName}'을(를) 구매 요청했습니다. 🛍️`);
     }
 
     async function checkSavedSession() {
@@ -1735,13 +1823,22 @@
     }
 
     async function cancelResume() {
+        const ok = confirmAction(
+            "[처음부터 시작 확인]\n\n정말 처음부터 다시 시작하시겠습니까?\n저장된 이어하기 정보는 삭제됩니다."
+        );
+        if (!ok) return;
+
         await dbSet('sessions/' + currentProfile, null);
         document.getElementById('resume-modal').style.display = 'none';
         showView('child-dashboard-view', { push: false, resetHistory: true });
     }
 
     async function startNewQuiz() {
-        alert("[학습 안내 💡]\n정답 1개당 5포인트가 적립됩니다.\n단, 과정을 끝까지 완료해야만 적립된 포인트가 합산되어 최종 지급됩니다.\n중도 포기 시 포인트가 날아가니 끝까지 완료해주세요! 💪");
+        const startOk = confirmAction(
+            `[학습 시작 확인]\n\n${formatGrade(config.grade)} ${config.subject} (${config.difficulty}) 학습을 시작할까요?\n\n정답 1개당 5포인트가 적립됩니다.\n단, 과정을 끝까지 완료해야 최종 지급됩니다.\n중도 포기 시 포인트가 지급되지 않습니다.`
+        );
+        if (!startOk) return;
+
         showLoading(true, "👩‍🏫 꼼꼼한 AI 선생님이<br>시험 문제를 출제하고 있어요! ⏳");
 
         const gradeText = config.grade === 0 ? "유치원 7세(예비 초등)" : "초등학교 " + config.grade + "학년";
@@ -1949,7 +2046,7 @@ ${jsonOutputRules}
             let optionsCopy = [...qData.options];
             optionsCopy.sort(() => Math.random() - 0.5);
 
-            optionsCopy.forEach((optText, index) => {
+            optionsCopy.forEach((optText) => {
                 const row = document.createElement('div');
                 row.className = 'option-row';
 
@@ -1962,11 +2059,9 @@ ${jsonOutputRules}
                 const optTtsBtn = document.createElement('button');
                 optTtsBtn.className = 'tts-opt-btn';
                 optTtsBtn.innerText = '🔊';
-                const spokenText = (config.subject === '영어' && Array.isArray(qData.tts_options) && qData.tts_options[index]) ? qData.tts_options[index] : optText;
-
                 optTtsBtn.onclick = (e) => {
                     e.stopPropagation();
-                    playTTS(spokenText, ttsLang);
+                    playTTS(optText, ttsLang);
                 };
                 row.appendChild(optTtsBtn);
 
@@ -2175,6 +2270,11 @@ ${jsonOutputRules}
     }
 
     function startRetryQuiz() {
+        const ok = confirmAction(
+            "[오답 다시 풀기 확인]\n\n오답 문제 다시 풀기를 시작하시겠습니까?"
+        );
+        if (!ok) return;
+
         sessionState.questions = [...sessionState.wrongQuestions];
         sessionState.wrongQuestions = [];
         sessionState.currentIndex = 0;
@@ -2404,13 +2504,16 @@ ${jsonOutputRules}
     }
 
     async function markRewardAsUsed(purchaseId) {
-        if (confirm("해당 쿠폰 보상을 제공하셨습니까?\n확인 시 '사용 완료' 처리됩니다. ✅")) {
-            let purchases = await dbGet('purchases') || [];
-            let itemIndex = purchases.findIndex(p => p.id === purchaseId);
-            if (itemIndex !== -1) {
-                purchases[itemIndex].status = 'used';
-                await dbSet('purchases', purchases);
-            }
+        const ok = confirmAction(
+            "[사용 승인 확인]\n\n해당 쿠폰 보상을 실제로 제공하셨습니까?\n확인 시 '사용 완료' 처리됩니다."
+        );
+        if (!ok) return;
+
+        let purchases = await dbGet('purchases') || [];
+        let itemIndex = purchases.findIndex(p => p.id === purchaseId);
+        if (itemIndex !== -1) {
+            purchases[itemIndex].status = 'used';
+            await dbSet('purchases', purchases);
         }
     }
 
@@ -2442,4 +2545,3 @@ ${jsonOutputRules}
 
 </body>
 </html>
-    
