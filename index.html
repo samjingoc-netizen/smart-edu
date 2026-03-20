@@ -1481,7 +1481,12 @@
         const currentKey = API_KEYS[keyIndex];
 
         const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${currentKey}`;
-        const generationConfig = { temperature: 0.1 };
+        
+        // 토큰 확장 적용 (출력 끊김 현상 방지)
+        const generationConfig = { 
+            temperature: 0.1,
+            maxOutputTokens: 8192
+        };
         if (isJson) generationConfig.response_mime_type = "application/json";
 
         try {
@@ -1503,7 +1508,7 @@
 
     async function startNewQuiz() {
         alert("[학습 안내]\n정답 1개당 5포인트가 적립됩니다.\n단, 과정을 끝까지 완료해야만 적립된 포인트가 합산되어 최종 지급됩니다.\n중도 포기 시 포인트가 날아가니 끝까지 완료해주세요!");
-        showLoading(true, "선생님이 맞춤형 문제를<br>만들고 있어요!");
+        showLoading(true, "🤖 AI 선생님이 맞춤형 문제를<br>만들고 있어요!");
 
         let prompt = '';
         const gradeText = config.grade === 0 ? "유치원 7세(예비 초등)" : "초등학교 " + config.grade + "학년";
@@ -1526,7 +1531,8 @@
 1. ${gradeText} 학생의 인지 수준과 교과 과정에 100% 부합하는 영단어 10개를 엄선하십시오. 선행학습 단어는 절대 제외하십시오.
 2. 난이도(${config.difficulty})에 따라 단어의 길이, 추상성, 활용 빈도를 철저하게 조절하십시오.
 3. 뜻(meaning)은 해당 연령대가 이해할 수 있는 쉬운 한국어 어휘로 명확하게 작성하십시오.
-4. JSON 응답 포맷을 반드시 준수하십시오. 형식: [{"word":"영어단어", "meaning":"한국어뜻", "tts":"영어단어 발음"}]`;
+4. JSON 응답 포맷을 반드시 준수하십시오. 형식: [{"word":"영어단어", "meaning":"한국어뜻", "tts":"영어단어 발음"}]
+5. [매우 중요한 JSON 규칙] 파싱 오류가 발생하지 않도록 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 절대 실제 줄바꿈(Enter)을 사용하지 마시고, 줄바꿈이 필요한 곳은 반드시 '\\n' 문자로 입력하십시오.`;
 
         } else if (config.subject === '영어') {
             prompt = `당신은 대한민국 최고의 영어 평가 출제 위원입니다. '2026년 교육과정' 기준에 맞춘 영어(EFL) 객관식 20문항을 출제합니다.
@@ -1535,11 +1541,12 @@
 고유값: ${new Date().getTime()}
 
 [출제 지침]
-1. 문항 및 사고 유형: 문법, 어휘, 독해를 포함하되, 단순 암기 확인(사실 일치)뿐만 아니라 문맥 추론형(Inference), 논리적 전개 파악형, 상황 적용형 등 다양한 인지적 사고 유형을 골고루 섞어 출제하십시오.
-2. 문제의 완전성(매우 중요): "다음 대화를 읽고", "다음 글을 보고"와 같이 특정 지문을 참조하는 문제의 경우, **반드시 해당 지문(Text) 또는 대화문 전체를 질문(q) 안에 명확히 포함시켜야 합니다.** 지문 내용 없이 질문만 제시되는 불완전한 문제는 절대 금지합니다.
-3. 학년별 교육과정 준수: ${gradeText} 수준에서 절대 벗어나는 복잡한 관계대명사나 가정법 등을 저학년에 출제하지 마십시오.
-4. 시각 자료 없이 텍스트만으로 완벽히 이해되고 풀 수 있는 문항만 출제하십시오. 주관식은 절대 출제하지 마십시오.
-5. JSON 응답 포맷: [{"type":"objective","q":"[지문내용이 있다면 여기에 반드시 포함]\\n\\n질문내용","options":["보기1","보기2","보기3","보기4"],"a":"정답 텍스트(보기와 100% 일치)","desc":"한국어로 작성된 상세한 해설과 정답인 이유","tts_q":"영어질문","tts_options":["보기1","보기2","보기3","보기4"]}]`;
+1. 문항 및 사고 유형: 문법, 어휘, 독해를 포함하되, 상황 적용형, 문맥 추론형 등 다양한 사고력을 요구하는 문제를 섞어 출제하십시오.
+2. 시각 자료 절대 금지(매우 중요): "Look at the picture", "다음 그림을 보고" 등 이미지나 표가 있어야만 풀 수 있는 문제는 절대로 출제하지 마십시오. 오직 100% 텍스트로만 이루어진 상황 설명이나 대화문으로 출제해야 합니다.
+3. 보기 나열 금지(매우 중요): 질문(q) 안에 'A. a book', 'B. a pen' 식으로 보기를 중복해서 적지 마십시오. 보기는 오직 options 배열에만 넣어야 합니다.
+4. 학년별 교육과정 준수: ${gradeText} 수준에 맞게 단어와 문법 난이도를 철저히 조절하십시오.
+5. JSON 응답 포맷: [{"type":"objective","q":"[완벽한 텍스트 기반의 대화나 상황]\\n\\n질문내용","options":["보기1","보기2","보기3","보기4"],"a":"정답 텍스트(보기와 100% 일치)","desc":"한국어로 작성된 상세한 해설과 정답인 이유","tts_q":"영어질문","tts_options":["보기1","보기2","보기3","보기4"]}]
+6. [매우 중요한 JSON 규칙] 파싱 오류가 발생하지 않도록 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 절대 실제 줄바꿈(Enter)을 사용하지 마시고, 줄바꿈이 필요한 곳은 반드시 '\\n' 문자로 입력하십시오.`;
 
         } else if (config.subject === '국어') {
             prompt = `당신은 대한민국 최고의 국어 교육 및 평가 전문가입니다. '2026년 개정 교육과정' 기준 국어 객관식 20문항을 출제합니다.
@@ -1548,11 +1555,12 @@
 고유값: ${new Date().getTime()}
 
 [출제 지침]
-1. 사고 유형의 다양화: 단순 어휘/맞춤법이나 내용 일치 문제에 국한하지 마십시오. 글의 주제 추론, 인물의 심리 및 태도 파악, 비판적 사고, 상황 적용형 등 다양한 사고력과 추리력을 요구하는 문제를 골고루 섞어 출제하십시오.
-2. 문제의 완전성(매우 중요): "다음 시를 읽고", "다음 글의 일부분을 보고"와 같이 지문을 제시하는 형태의 문제라면, **반드시 해당 시나 글의 내용을 질문(q) 텍스트 안에 직접 작성하여 포함시켜야 합니다.** 지문을 생략하고 '윗글을 보고'식으로 질문만 던지는 불완전한 출제는 절대 불가합니다. 학생이 문제 화면만 보고도 모든 문맥을 파악할 수 있어야 합니다.
-3. 보기(Options) 품질: 단순 말장난을 피하고 지문의 내용을 헷갈리게 하는 매력적인 오답을 구성하되, 논란의 여지가 없는 단 하나의 정답을 제시하십시오.
-4. 시각 자료 없이 텍스트 지문과 질문만으로 완벽히 풀 수 있어야 합니다. 주관식 출제는 불가합니다.
-5. JSON 응답 포맷: [{"type":"objective","q":"[여기에 참조할 지문, 시, 대화 등을 반드시 상세히 입력]\\n\\n질문내용","options":["보기1","보기2","보기3","보기4"],"a":"정답 텍스트(보기와 100% 일치)","desc":"정답을 도출하는 구체적인 풀이 과정과 핵심 개념 (학생 눈높이에 맞춘 해설)"}]`;
+1. 문항 및 사고 유형: 단순 맞춤법 문제를 넘어 주제 추론형, 비판적 사고형, 인물의 심리 파악 등 다양한 추리/사고형 문제를 골고루 출제하십시오.
+2. 시각 자료 절대 금지(매우 중요): 그림이나 표를 봐야 풀 수 있는 문제는 0%로 차단하십시오. 오직 글로 된 지문만 사용하십시오.
+3. 보기 나열 금지(매우 중요): 질문(q) 안에 보기 번호(1번, 2번 등)와 텍스트를 중복해서 나열하지 마십시오. 보기는 반드시 options 배열에만 분리해서 넣으십시오.
+4. 문제의 완전성: 지문을 바탕으로 한 문제일 경우, 해당 지문의 내용 전체를 반드시 질문(q) 텍스트 안에 직접 작성해야 합니다. 지문 누락은 절대 불가합니다.
+5. JSON 응답 포맷: [{"type":"objective","q":"[필요한 지문 전체를 여기에 작성]\\n\\n질문내용","options":["보기1","보기2","보기3","보기4"],"a":"정답 텍스트(보기와 100% 일치)","desc":"학생 눈높이에 맞춘 상세한 해설"}]
+6. [매우 중요한 JSON 규칙] 파싱 오류가 발생하지 않도록 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 절대 실제 줄바꿈(Enter)을 사용하지 마시고, 줄바꿈이 필요한 곳은 반드시 '\\n' 문자로 입력하십시오.`;
 
         } else {
             prompt = `당신은 대한민국 최고의 수학 평가 전문가입니다. '2026년 개정 교육과정' 수학 객관식 20문항을 출제합니다.
@@ -1561,56 +1569,65 @@
 고유값: ${new Date().getTime()}
 
 [출제 지침]
-1. 사고 유형의 다양화: 단순 연산 문제뿐만 아니라, 규칙 추론형, 논리적 사고형, 실생활 문제 해결형, 조건 조합형 등 다양한 수학적 사고 능력을 요구하는 문장제 문제를 골고루 섞어 출제하십시오.
-2. 문제의 완전성(매우 중요): 문제를 풀기 위해 필요한 모든 조건, 수치, 상황 설명은 질문(q) 안에 명확하고 빠짐없이 제시되어야 합니다. 데이터나 조건이 누락된 불완전한 문제나 시각 자료(표, 그래프)가 있어야만 풀 수 있는 문제는 절대 금지합니다. 오직 텍스트만으로 완벽한 조건이 주어져야 합니다.
-3. 학년별 연산 범위 엄수: ${gradeText}의 수학 성취기준을 완벽히 지키십시오. 절대 선행 학습 수준의 개념이나 기호를 포함하지 마십시오.
-4. 정답(a)은 번호나 기호가 아닌, options 배열에 있는 텍스트와 100% 동일하게 작성하십시오. 주관식 출제는 불가합니다.
-5. JSON 응답 포맷: [{"type":"objective","q":"모든 조건이 완벽하게 포함된 문제 상황과 질문","options":["보기1","보기2","보기3","보기4"],"a":"정답 텍스트(보기와 100% 일치)","desc":"정답을 도출하는 구체적인 단계별 계산 과정과 해설"}]`;
+1. 문항 및 사고 유형: 단순 연산식 계산을 피하고, 규칙 추론형, 논리적 사고형, 실생활 문제 해결형, 조건 조합형 등 수학적 사고 능력을 요구하는 문장제 문제로 구성하십시오.
+2. 시각 자료 절대 금지(매우 중요): 도형 그림, 표, 그래프를 보고 푸는 문제를 내지 마십시오. 모든 조건과 상황은 오직 "글(텍스트)"로만 완벽히 설명되어야 합니다.
+3. 보기 나열 금지(매우 중요): 질문(q) 안에 보기 번호(1번, 2번 등)와 수식을 중복해서 나열하지 마십시오. 보기는 반드시 options 배열에만 넣으십시오.
+4. 학년별 연산 범위 엄수: 선행 학습 내용이 나오지 않도록 해당 학년 교과 과정 범위를 엄격히 지키십시오.
+5. JSON 응답 포맷: [{"type":"objective","q":"모든 조건이 텍스트로 완벽히 포함된 문제 상황과 질문","options":["보기1","보기2","보기3","보기4"],"a":"정답 텍스트(보기와 100% 일치)","desc":"구체적인 단계별 계산 과정과 해설"}]
+6. [매우 중요한 JSON 규칙] 파싱 오류가 발생하지 않도록 문자열 내부에 큰따옴표(")를 사용할 때는 반드시 역슬래시를 붙여(\\") 이스케이프 하십시오. 절대 실제 줄바꿈(Enter)을 사용하지 마시고, 줄바꿈이 필요한 곳은 반드시 '\\n' 문자로 입력하십시오.`;
         }
 
         try {
             const data = await fetchFromGemini(prompt, 0, true);
             let jsonText = data.candidates[0].content.parts[0].text;
-            const parsedArray = JSON.parse(jsonText.replace(/```json/gi, '').replace(/```/g, '').trim());
+            
+            try {
+                const parsedArray = JSON.parse(jsonText.replace(/```json/gi, '').replace(/```/g, '').trim());
 
-            if (!Array.isArray(parsedArray)) throw new Error("데이터 구조 오류");
+                if (!Array.isArray(parsedArray)) throw new Error("데이터 구조 오류");
 
-            if (config.subject === '영단어') {
-                sessionState = {
-                    mode: 'learning',
-                    learningWords: parsedArray.slice(0, 10),
-                    questions: [],
-                    currentIndex: 0,
-                    wrongQuestions: [],
-                    wrongHistory: [],
-                    initialScore: 0,
-                    isRetryMode: false,
-                    totalCount: 10,
-                    reportSaved: false,
-                    reportSavedRetry: false
-                };
-                showLoading(false);
-                showView('learning-view');
-                renderLearningWord();
-            } else {
-                sessionState = {
-                    mode: 'quiz',
-                    questions: parsedArray.slice(0, 20),
-                    currentIndex: 0,
-                    wrongQuestions: [],
-                    wrongHistory: [],
-                    initialScore: 0,
-                    isRetryMode: false,
-                    totalCount: 20,
-                    reportSaved: false,
-                    reportSavedRetry: false
-                };
-                showLoading(false);
-                showView('quiz-view');
-                renderCurrentQuestion();
+                if (config.subject === '영단어') {
+                    sessionState = {
+                        mode: 'learning',
+                        learningWords: parsedArray.slice(0, 10),
+                        questions: [],
+                        currentIndex: 0,
+                        wrongQuestions: [],
+                        wrongHistory: [],
+                        initialScore: 0,
+                        isRetryMode: false,
+                        totalCount: 10,
+                        reportSaved: false,
+                        reportSavedRetry: false
+                    };
+                    showLoading(false);
+                    showView('learning-view');
+                    renderLearningWord();
+                } else {
+                    sessionState = {
+                        mode: 'quiz',
+                        questions: parsedArray.slice(0, 20),
+                        currentIndex: 0,
+                        wrongQuestions: [],
+                        wrongHistory: [],
+                        initialScore: 0,
+                        isRetryMode: false,
+                        totalCount: 20,
+                        reportSaved: false,
+                        reportSavedRetry: false
+                    };
+                    showLoading(false);
+                    showView('quiz-view');
+                    renderCurrentQuestion();
+                }
+
+                triggerPushNotification(`[학습 알림] ${currentProfile} 사용자가 ${formatGrade(config.grade)} ${config.subject} (${config.difficulty}) 학습을 시작했습니다!`);
+            } catch (parseError) {
+                console.error("JSON Parse Error:", parseError);
+                console.error("Raw JSON text from API:", jsonText);
+                throw parseError;
             }
 
-            triggerPushNotification(`[학습 알림] ${currentProfile} 사용자가 ${formatGrade(config.grade)} ${config.subject} (${config.difficulty}) 학습을 시작했습니다!`);
         } catch (error) {
             console.error(error);
             showLoading(false);
