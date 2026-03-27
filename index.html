@@ -1,2036 +1,2106 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#2563EB">
-    <title>🌟 스마트 학습 시스템 🌟</title>
-    <link rel="icon" href="icon.png?v=18">
-    <link rel="apple-touch-icon" href="icon.png?v=18">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#F0F4FF","theme_color":"#2563EB","icons":[{"src":"icon.png?v=18","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=18","sizes":"512x512","type":"image/png"}]}'>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#6C63FF">
+<title>🌟 스마트 학습</title>
+<link rel="icon" href="icon.png?v=18">
+<link rel="apple-touch-icon" href="icon.png?v=18">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+/* ═══════════════════════════════════
+   ROOT VARIABLES
+═══════════════════════════════════ */
+:root{
+  --ko:#3B82F6;   --ko-d:#2563EB;  --ko-bg:#EFF6FF; --ko-soft:#DBEAFE;
+  --en:#10B981;   --en-d:#059669;  --en-bg:#ECFDF5; --en-soft:#A7F3D0;
+  --ma:#F97316;   --ma-d:#EA580C;  --ma-bg:#FFF7ED; --ma-soft:#FED7AA;
+  --vb:#8B5CF6;   --vb-d:#7C3AED;  --vb-bg:#F5F3FF; --vb-soft:#DDD6FE;
+  --primary:#6C63FF; --primary-d:#5A52E0;
+  --gold:#F59E0B; --gold-d:#D97706;
+  --red:#EF4444;  --red-d:#DC2626;
+  --green:#22C55E;--green-d:#16A34A;
+  --bg:#F0F2FF;
+  --card:#FFFFFF;
+  --text:#1E1B4B;
+  --text2:#6B7280;
+  --border:#E5E7EB;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+  --r12:12px; --r16:16px; --r20:20px; --r999:999px;
+}
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+/* ═══════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════ */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;outline:none;user-select:none;-webkit-user-select:none;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  background:var(--bg); color:var(--text); margin:0; padding:0;
+  display:flex; justify-content:center; align-items:flex-start;
+  overscroll-behavior:none;
+}
+input,textarea{user-select:text;-webkit-user-select:text;}
 
-    <style>
-        :root {
-            --blue:       #2563EB;
-            --blue-dark:  #1D4ED8;
-            --blue-light: #EFF6FF;
-            --blue-mid:   #BFDBFE;
-            --green:      #059669;
-            --green-light:#D1FAE5;
-            --amber:      #D97706;
-            --amber-light:#FEF3C7;
-            --red:        #DC2626;
-            --red-light:  #FEE2E2;
-            --purple:     #7C3AED;
-            --purple-light:#EDE9FE;
-            --teal:       #0891B2;
-            --teal-light: #CFFAFE;
-            --gray-50:    #F9FAFB;
-            --gray-100:   #F3F4F6;
-            --gray-200:   #E5E7EB;
-            --gray-400:   #9CA3AF;
-            --gray-600:   #4B5563;
-            --gray-800:   #1F2937;
-            --white:      #FFFFFF;
-            --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md:  0 4px 12px rgba(37,99,235,0.10), 0 2px 4px rgba(0,0,0,0.06);
-            --shadow-lg:  0 10px 30px rgba(37,99,235,0.15), 0 4px 8px rgba(0,0,0,0.08);
-            --radius-sm:  10px;
-            --radius:     16px;
-            --radius-lg:  24px;
-        }
+.app{
+  width:100%; max-width:430px; height:100svh;
+  display:flex; flex-direction:column;
+  background:var(--bg); position:relative; overflow:hidden;
+}
 
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+/* ═══════════════════════════════════
+   HEADER
+═══════════════════════════════════ */
+.hdr{
+  padding: calc(var(--safe-top) + 10px) 16px 10px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--card); border-bottom:1px solid var(--border);
+  position:relative; z-index:40; flex-shrink:0;
+  box-shadow:0 2px 12px rgba(108,99,255,.08);
+}
+.hdr-left,.hdr-right{min-width:72px;display:flex;align-items:center;}
+.hdr-right{justify-content:flex-end;}
+.hdr-center{flex:1;text-align:center;}
+.hdr-title{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.5px;}
+.hdr-sub{font-size:11px;color:var(--text2);font-weight:600;margin-top:1px;}
 
-        body {
-            font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-            background: #EFF6FF;
-            color: var(--gray-800);
-            margin: 0; padding: 0;
-            display: flex; justify-content: center;
-            min-height: 100vh;
-        }
+.hbtn{
+  display:flex;align-items:center;gap:4px;
+  background:none; border:none; color:var(--primary);
+  font-size:14px; font-weight:700; cursor:pointer; padding:8px 4px;
+  border-radius:var(--r12); transition:opacity .15s;
+  font-family:inherit;
+}
+.hbtn:active{opacity:.6;}
+.hbtn-icon{font-size:18px;}
 
-        .app-container {
-            width: 100%; max-width: 500px; min-height: 100vh;
-            display: flex; flex-direction: column;
-            background: var(--gray-50);
-            position: relative; overflow-x: hidden;
-        }
+/* ═══════════════════════════════════
+   SCROLL CONTAINER
+═══════════════════════════════════ */
+.scroll{
+  flex:1; overflow-y:auto; overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:0 0 calc(var(--safe-bot) + 20px);
+}
+.scroll::-webkit-scrollbar{display:none;}
 
-        /* ── HEADER ── */
-        .header {
-            background: var(--blue);
-            color: white;
-            padding: 0 16px;
-            height: 56px;
-            display: flex; align-items: center;
-            justify-content: space-between; gap: 10px;
-            box-shadow: 0 2px 8px rgba(37,99,235,0.25);
-            position: sticky; top: 0; z-index: 50;
-        }
-        .header-left, .header-right { display: flex; align-items: center; gap: 8px; min-width: 80px; }
-        .header-center { flex: 1; text-align: center; font-size: 17px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.3px; }
-        .header-right { justify-content: flex-end; }
+/* ═══════════════════════════════════
+   VIEWS
+═══════════════════════════════════ */
+.view{display:none;flex-direction:column;padding:16px;}
+.view.active{display:flex;animation:slideUp .3s cubic-bezier(.25,.8,.25,1);}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 
-        .header-btn {
-            background: rgba(255,255,255,0.18);
-            border: 1px solid rgba(255,255,255,0.25);
-            color: white; padding: 6px 12px;
-            border-radius: 8px; cursor: pointer;
-            font-size: 13px; font-weight: 700;
-            transition: background 0.15s;
-            white-space: nowrap;
-        }
-        .header-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.95); }
+/* ═══════════════════════════════════
+   CARDS
+═══════════════════════════════════ */
+.card{
+  background:var(--card); border-radius:var(--r20);
+  padding:24px 20px; margin-bottom:14px;
+  box-shadow:0 4px 20px rgba(108,99,255,.06);
+  border:1px solid rgba(108,99,255,.06);
+}
+.card-sm{border-radius:var(--r16);padding:18px 16px;}
 
-        /* ── VIEW ── */
-        .view-section { display: none; flex: 1; flex-direction: column; padding: 20px 16px 32px; animation: fadeSlideIn 0.3s ease; }
-        .view-section.active { display: flex; }
+/* ═══════════════════════════════════
+   BUTTONS
+═══════════════════════════════════ */
+.btn{
+  width:100%; min-height:54px; padding:0 20px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  border:none; border-radius:var(--r16); cursor:pointer;
+  font-size:16px; font-weight:800; font-family:inherit;
+  letter-spacing:-.3px; transition:transform .1s,box-shadow .1s;
+  position:relative; overflow:hidden;
+}
+.btn::after{content:'';position:absolute;inset:0;background:transparent;transition:background .15s;}
+.btn:active{transform:scale(.97);}
+.btn:active::after{background:rgba(0,0,0,.08);}
 
-        @keyframes fadeSlideIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+.btn-primary{background:linear-gradient(135deg,var(--primary),#9333EA);color:#fff;box-shadow:0 4px 15px rgba(108,99,255,.35);}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#EF4444);color:#fff;box-shadow:0 4px 15px rgba(245,158,11,.35);}
+.btn-green{background:linear-gradient(135deg,var(--green),#06B6D4);color:#fff;box-shadow:0 4px 15px rgba(34,197,94,.35);}
+.btn-dark{background:var(--text);color:#fff;box-shadow:0 4px 12px rgba(30,27,75,.25);}
+.btn-ghost{background:var(--bg);color:var(--text2);border:2px solid var(--border);}
+.btn-sm{min-height:40px;font-size:14px;border-radius:var(--r12);}
 
-        /* ── CARDS ── */
-        .card {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 24px 20px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-200);
-            margin-bottom: 16px;
-        }
-        .card-title {
-            font-size: 18px; font-weight: 900; color: var(--gray-800);
-            margin: 0 0 6px; letter-spacing: -0.5px;
-        }
-        .card-sub {
-            font-size: 13px; color: var(--gray-400);
-            font-weight: 500; margin-bottom: 20px; line-height: 1.5;
-        }
+/* ═══════════════════════════════════
+   LOGIN VIEW
+═══════════════════════════════════ */
+#login-view{
+  justify-content:center; min-height:calc(100svh - 64px);
+  background:linear-gradient(160deg,#EEF2FF 0%,#F5F3FF 50%,#FDF4FF 100%);
+  border-radius:0; padding:24px 20px;
+}
+.login-hero{text-align:center;padding:32px 0 28px;}
+.login-mascot{font-size:72px;display:block;margin-bottom:12px;animation:bounce 2s ease-in-out infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.login-title{font-size:26px;font-weight:900;color:var(--text);letter-spacing:-.5px;margin-bottom:4px;}
+.login-sub{font-size:14px;color:var(--text2);font-weight:600;}
 
-        /* ── SECTION LABEL ── */
-        .section-label {
-            display: flex; align-items: center; gap: 6px;
-            font-size: 12px; font-weight: 700;
-            color: var(--blue); letter-spacing: 0.3px;
-            text-transform: uppercase; margin-bottom: 10px;
-        }
-        .section-label::before {
-            content: ''; display: block; width: 3px; height: 14px;
-            background: var(--blue); border-radius: 2px;
-        }
+.login-card{
+  background:rgba(255,255,255,.9);border-radius:24px;
+  padding:24px 20px; box-shadow:0 8px 32px rgba(108,99,255,.12);
+  border:1px solid rgba(108,99,255,.1);
+  backdrop-filter:blur(10px);
+}
+.login-divider{display:flex;align-items:center;gap:12px;margin:16px 0;}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.login-divider span{font-size:12px;color:var(--text2);font-weight:600;}
 
-        /* ── BUTTONS ── */
-        .btn {
-            width: 100%; padding: 15px;
-            font-size: 16px; font-weight: 700;
-            border: none; border-radius: var(--radius-sm);
-            cursor: pointer; transition: all 0.15s;
-            display: flex; justify-content: center; align-items: center; gap: 8px;
-            letter-spacing: -0.3px;
-        }
-        .btn:active { transform: translateY(2px); opacity: 0.9; }
+/* ═══════════════════════════════════
+   PROFILE VIEW
+═══════════════════════════════════ */
+.profile-grid{display:flex;flex-direction:column;gap:12px;}
+.profile-card{
+  background:var(--card); border-radius:var(--r20);
+  padding:20px; display:flex; align-items:center; gap:16px;
+  border:2px solid var(--border); cursor:pointer;
+  transition:border-color .2s,box-shadow .2s,transform .15s;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+.profile-card:active{transform:scale(.97);}
+.profile-card:hover{border-color:var(--primary);box-shadow:0 4px 16px rgba(108,99,255,.15);}
+.profile-avatar{font-size:44px;width:64px;height:64px;background:var(--bg);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.profile-info .name{font-size:18px;font-weight:900;color:var(--text);}
+.profile-info .desc{font-size:13px;color:var(--text2);font-weight:500;margin-top:2px;}
+.profile-arrow{margin-left:auto;font-size:20px;color:var(--border);}
 
-        .btn-primary   { background: var(--blue);   color: white; box-shadow: 0 4px 0 var(--blue-dark); }
-        .btn-primary:active { box-shadow: none; }
-        .btn-green     { background: var(--green);  color: white; box-shadow: 0 4px 0 #047857; }
-        .btn-green:active { box-shadow: none; }
-        .btn-amber     { background: var(--amber);  color: white; box-shadow: 0 4px 0 #B45309; }
-        .btn-amber:active { box-shadow: none; }
-        .btn-purple    { background: var(--purple); color: white; box-shadow: 0 4px 0 #6D28D9; }
-        .btn-purple:active { box-shadow: none; }
-        .btn-dark      { background: var(--gray-800); color: white; box-shadow: 0 4px 0 #111827; }
-        .btn-dark:active { box-shadow: none; }
-        .btn-outline   { background: white; color: var(--gray-600); border: 1.5px solid var(--gray-200); box-shadow: 0 2px 0 var(--gray-200); }
-        .btn-outline:active { box-shadow: none; }
-        .btn-ghost     { background: var(--gray-100); color: var(--gray-600); }
-        .btn-sm        { padding: 8px 14px; font-size: 13px; border-radius: 8px; }
+/* ═══════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════ */
+.dash-top{
+  background:linear-gradient(135deg,var(--primary) 0%,#9333EA 100%);
+  border-radius:0 0 28px 28px; padding:20px 20px 28px;
+  margin:-16px -16px 16px;
+}
+.dash-welcome{color:rgba(255,255,255,.8);font-size:13px;font-weight:600;margin-bottom:4px;}
+.dash-name{color:#fff;font-size:22px;font-weight:900;letter-spacing:-.5px;}
+.dash-stats{display:flex;gap:10px;margin-top:16px;}
+.dash-stat{
+  flex:1; background:rgba(255,255,255,.18); border-radius:var(--r12);
+  padding:12px; text-align:center; border:1px solid rgba(255,255,255,.2);
+  backdrop-filter:blur(4px);
+}
+.dash-stat .icon{font-size:22px;margin-bottom:4px;}
+.dash-stat .val{font-size:20px;font-weight:900;color:#fff;line-height:1;}
+.dash-stat .lbl{font-size:11px;color:rgba(255,255,255,.7);font-weight:600;margin-top:2px;}
 
-        /* ── CHIP/TAG BUTTONS ── */
-        .chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-        .chip {
-            padding: 8px 16px; border: 1.5px solid var(--gray-200);
-            border-radius: 100px; background: white;
-            color: var(--gray-600); font-size: 14px; font-weight: 700;
-            cursor: pointer; transition: all 0.15s;
-            white-space: nowrap;
-        }
-        .chip:active { transform: scale(0.96); }
-        .chip.active { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
-        .chip.active-green { background: var(--green-light); border-color: var(--green); color: var(--green); }
-        .chip.active-purple { background: var(--purple-light); border-color: var(--purple); color: var(--purple); }
-        .chip.active-amber { background: var(--amber-light); border-color: var(--amber); color: var(--amber); }
-        .chip.active-teal { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
-        .chip[disabled] { opacity: 0.3; cursor: not-allowed; }
+.section-hd{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:800;color:var(--text2);
+  letter-spacing:.2px;margin-bottom:12px;
+}
+.section-hd::before{content:'';width:4px;height:16px;background:var(--primary);border-radius:2px;}
 
-        /* ── SUBJECT CHIPS ── */
-        .subject-chip[data-subject="국어"].active  { background:#EFF6FF; border-color:#2563EB; color:#2563EB; }
-        .subject-chip[data-subject="영어"].active  { background:#F0FDF4; border-color:#059669; color:#059669; }
-        .subject-chip[data-subject="수학"].active  { background:#FFF7ED; border-color:#EA580C; color:#EA580C; }
-        .subject-chip[data-subject="영단어"].active{ background:#FAF5FF; border-color:#7C3AED; color:#7C3AED; }
+/* 과목 선택 카드 */
+.subj-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;}
+.subj-card{
+  border-radius:var(--r16);padding:16px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  cursor:pointer;border:2.5px solid transparent;
+  transition:transform .15s,box-shadow .15s,border-color .15s;
+  background:var(--card);
+}
+.subj-card:active{transform:scale(.95);}
+.subj-card .s-icon{font-size:32px;}
+.subj-card .s-name{font-size:14px;font-weight:800;color:var(--text);}
+.subj-card .s-desc{font-size:11px;color:var(--text2);font-weight:500;}
+.subj-card.active-ko{border-color:var(--ko);background:var(--ko-bg);box-shadow:0 4px 16px rgba(59,130,246,.2);}
+.subj-card.active-en{border-color:var(--en);background:var(--en-bg);box-shadow:0 4px 16px rgba(16,185,129,.2);}
+.subj-card.active-ma{border-color:var(--ma);background:var(--ma-bg);box-shadow:0 4px 16px rgba(249,115,22,.2);}
+.subj-card.active-vb{border-color:var(--vb);background:var(--vb-bg);box-shadow:0 4px 16px rgba(139,92,246,.2);}
 
-        /* ── INPUT ── */
-        .input-field {
-            width: 100%; padding: 14px 16px;
-            border: 1.5px solid var(--gray-200);
-            border-radius: var(--radius-sm);
-            font-size: 17px; font-weight: 700;
-            background: var(--gray-50); color: var(--gray-800);
-            transition: all 0.2s; text-align: center;
-            font-family: inherit;
-        }
-        .input-field:focus { border-color: var(--blue); background: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+/* 난이도 */
+.diff-row{display:flex;gap:6px;margin-bottom:4px;}
+.diff-btn{
+  flex:1;min-height:42px;border-radius:var(--r12);
+  border:2px solid var(--border);background:var(--card);
+  font-size:13px;font-weight:800;color:var(--text2);
+  cursor:pointer;transition:all .15s;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;
+}
+.diff-btn:active{transform:scale(.93);}
+.diff-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 3px 10px rgba(108,99,255,.35);}
 
-        /* ── DASHBOARD STATS ── */
-        .stats-row { display: flex; gap: 10px; margin-bottom: 16px; }
-        .stat-card {
-            flex: 1; background: white; border: 1px solid var(--gray-200);
-            border-radius: var(--radius-sm); padding: 12px 14px;
-            display: flex; align-items: center; gap: 10px;
-            box-shadow: var(--shadow-sm);
-        }
-        .stat-icon { font-size: 24px; flex-shrink: 0; }
-        .stat-label { font-size: 11px; color: var(--gray-400); font-weight: 600; }
-        .stat-value { font-size: 18px; font-weight: 900; color: var(--gray-800); line-height: 1; }
+/* 학년 */
+.grade-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.grade-btn{
+  padding:8px 14px;border-radius:var(--r999);
+  border:2px solid var(--border);background:var(--card);
+  font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;
+  transition:all .15s;font-family:inherit;
+}
+.grade-btn:active{transform:scale(.93);}
+.grade-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.grade-btn:disabled{opacity:.3;cursor:not-allowed;}
 
-        /* ── QUIZ HEADER ── */
-        .quiz-meta {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px;
-        }
-        .quiz-badge {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 4px 10px; border-radius: 100px;
-            font-size: 12px; font-weight: 700; letter-spacing: 0.2px;
-        }
-        .badge-blue   { background: var(--blue-light);   color: var(--blue); }
-        .badge-green  { background: var(--green-light);  color: var(--green); }
-        .badge-orange { background: #FFF7ED; color: #EA580C; }
-        .badge-purple { background: var(--purple-light); color: var(--purple); }
-        .badge-gray   { background: var(--gray-100);     color: var(--gray-600); }
+/* 학습 시작 버튼 */
+.start-btn{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--primary),#9333EA);
+  color:#fff; border:none; width:100%; min-height:58px;
+  border-radius:var(--r20); display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:900;gap:10px;cursor:pointer;
+  box-shadow:0 6px 24px rgba(108,99,255,.4);
+  letter-spacing:-.3px; font-family:inherit;
+}
+.start-btn::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .15s;}
+.start-btn:active::after{background:rgba(0,0,0,.1);}
+.start-btn:active{transform:scale(.98);}
+.start-btn-sub{font-size:12px;font-weight:600;opacity:.8;display:block;}
 
-        /* ── PROGRESS BAR ── */
-        .progress-wrap { margin-bottom: 20px; }
-        .progress-info { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--gray-400); margin-bottom: 6px; }
-        .progress-track { width: 100%; height: 8px; background: var(--gray-200); border-radius: 100px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue), #60A5FA); border-radius: 100px; transition: width 0.4s cubic-bezier(.4,0,.2,1); width: 0%; }
-        .progress-fill.green { background: linear-gradient(90deg, var(--green), #34D399); }
+/* ═══════════════════════════════════
+   LEARNING VIEW (단어)
+═══════════════════════════════════ */
+.vocab-card{
+  border-radius:24px;padding:40px 24px;text-align:center;
+  margin-bottom:16px; position:relative; overflow:hidden;
+  box-shadow:0 12px 40px rgba(0,0,0,.15);
+  animation:cardIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes cardIn{from{opacity:0;transform:scale(.9)translateY(20px);}to{opacity:1;transform:scale(1)translateY(0);}}
+.vocab-card::before{
+  content:'';position:absolute;top:-30px;right:-30px;
+  width:120px;height:120px;border-radius:50%;
+  background:rgba(255,255,255,.1);
+}
+.vocab-num{font-size:12px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:1px;margin-bottom:20px;}
+.vocab-word{font-size:44px;font-weight:900;color:#fff;margin-bottom:12px;letter-spacing:1px;}
+.vocab-pron{font-size:16px;color:rgba(255,255,255,.75);font-weight:600;margin-bottom:16px;}
+.vocab-meaning{font-size:22px;font-weight:800;color:rgba(255,255,255,.92);}
 
-        /* ── QUESTION BOX ── */
-        .question-number {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 28px; height: 28px; border-radius: 8px;
-            background: var(--blue); color: white;
-            font-size: 14px; font-weight: 900; margin-bottom: 12px; flex-shrink: 0;
-        }
-        .question-box {
-            font-size: 17px; font-weight: 700; line-height: 1.7;
-            color: var(--gray-800); margin-bottom: 20px;
-            word-break: keep-all; white-space: normal;
-            background: var(--gray-50);
-            padding: 16px; border-radius: var(--radius-sm);
-            border: 1px solid var(--gray-200);
-            border-left: 3px solid var(--blue);
-        }
-        .question-box u { text-underline-offset: 3px; text-decoration-color: var(--blue); }
+.vocab-tts{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  background:rgba(255,255,255,.2);border:none;border-radius:var(--r999);
+  color:#fff;font-size:14px;font-weight:700;padding:10px 20px;
+  cursor:pointer;margin:16px auto 0;font-family:inherit;
+  backdrop-filter:blur(4px); border:1px solid rgba(255,255,255,.3);
+  transition:background .15s;
+}
+.vocab-tts:active{background:rgba(255,255,255,.35);}
 
-        /* ── OPTION BUTTONS ── */
-        .options-container { display: flex; flex-direction: column; gap: 10px; }
-        .option-row { display: flex; gap: 8px; align-items: stretch; }
+/* ═══════════════════════════════════
+   QUIZ VIEW
+═══════════════════════════════════ */
+.quiz-hdr{
+  border-radius:24px 24px 0 0;
+  padding:20px 20px 24px; margin:-16px -16px 0;
+  position:relative; overflow:hidden;
+}
+.quiz-hdr::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;height:20px;
+  background:var(--bg);border-radius:20px 20px 0 0;
+}
+.quiz-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.quiz-subj-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.3);
+  color:#fff;padding:5px 12px;border-radius:var(--r999);
+  font-size:12px;font-weight:700;backdrop-filter:blur(4px);
+}
+.quiz-no{color:rgba(255,255,255,.85);font-size:13px;font-weight:700;}
 
-        .option-btn {
-            flex: 1; padding: 14px 16px;
-            background: white; border: 1.5px solid var(--gray-200);
-            border-radius: var(--radius-sm); cursor: pointer;
-            transition: all 0.15s; display: flex; align-items: center; gap: 12px;
-            text-align: left; line-height: 1.5;
-            font-family: inherit;
-        }
-        .option-btn:hover:not(:disabled) { border-color: var(--blue); background: var(--blue-light); }
-        .option-btn:active:not(:disabled) { transform: scale(0.98); }
-        .option-btn:disabled { cursor: not-allowed; }
+.quiz-prog-track{height:6px;background:rgba(255,255,255,.25);border-radius:3px;overflow:hidden;}
+.quiz-prog-fill{height:100%;background:#fff;border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1);}
 
-        .option-num {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 26px; height: 26px; border-radius: 50%;
-            background: var(--gray-100); border: 1.5px solid var(--gray-200);
-            font-size: 13px; font-weight: 900; color: var(--gray-600);
-            flex-shrink: 0; transition: all 0.15s;
-        }
-        .option-text { font-size: 15px; font-weight: 600; color: var(--gray-800); }
+.quiz-body{
+  background:var(--card);border-radius:0 0 20px 20px;
+  padding:24px 20px 20px; margin:0 -16px; position:relative;
+  box-shadow:0 6px 24px rgba(0,0,0,.06);
+}
 
-        .option-btn.correct-ans { border-color: var(--green); background: var(--green-light); }
-        .option-btn.correct-ans .option-num { background: var(--green); border-color: var(--green); color: white; }
-        .option-btn.wrong-ans { border-color: var(--red); background: var(--red-light); }
-        .option-btn.wrong-ans .option-num { background: var(--red); border-color: var(--red); color: white; }
+.qtype-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  border-radius:8px;padding:4px 10px;
+  font-size:12px;font-weight:700;margin-bottom:12px;
+}
+.qtype-obj{background:#EEF2FF;color:#4F46E5;}
+.qtype-sub{background:#F5F3FF;color:#7C3AED;}
 
-        .tts-opt-btn {
-            width: 44px; flex-shrink: 0;
-            background: var(--amber-light); border: 1.5px solid #FCD34D;
-            border-radius: var(--radius-sm); color: var(--amber);
-            font-size: 16px; cursor: pointer; transition: all 0.15s;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .tts-opt-btn:active { transform: scale(0.92); }
+.question-text{
+  font-size:17px;font-weight:700;line-height:1.7;
+  color:var(--text);margin-bottom:20px;word-break:keep-all;
+}
+.question-text u{text-decoration-color:var(--primary);text-underline-offset:3px;}
 
-        /* ── TTS BUTTON ── */
-        .tts-main-btn {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--amber-light); border: 1.5px solid #FCD34D;
-            color: var(--amber); padding: 10px 16px;
-            border-radius: var(--radius-sm); cursor: pointer;
-            font-size: 14px; font-weight: 700; margin-bottom: 16px;
-            transition: all 0.15s; width: fit-content;
-        }
-        .tts-main-btn:active { transform: scale(0.96); }
+.tts-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--bg);border:1.5px solid var(--border);
+  border-radius:var(--r999);padding:8px 14px;
+  font-size:13px;font-weight:700;color:var(--text2);
+  cursor:pointer;margin-bottom:16px;font-family:inherit;
+  transition:all .15s;
+}
+.tts-pill:active{transform:scale(.95);background:var(--border);}
 
-        /* ── FEEDBACK ── */
-        #feedback-box {
-            margin-top: 16px; font-size: 16px; font-weight: 800;
-            text-align: center; min-height: 24px; animation: popIn 0.25s;
-            letter-spacing: -0.3px;
-        }
-        .fb-correct { color: var(--green); }
-        .fb-wrong   { color: var(--red); }
+/* 보기 버튼 */
+.opts{display:flex;flex-direction:column;gap:10px;}
+.opt-row{display:flex;gap:8px;align-items:stretch;}
+.opt-btn{
+  flex:1;min-height:56px;padding:14px 16px;
+  background:var(--card);border:2px solid var(--border);
+  border-radius:var(--r16);cursor:pointer;
+  display:flex;align-items:center;gap:12px;text-align:left;
+  transition:border-color .15s,background .15s,transform .1s;
+  font-family:inherit;
+}
+.opt-btn:active:not(:disabled){transform:scale(.98);}
+.opt-btn:disabled{cursor:not-allowed;}
 
-        /* ── RESULT ── */
-        .result-score-ring {
-            width: 130px; height: 130px; border-radius: 50%;
-            background: conic-gradient(var(--blue) 0%, var(--blue-mid) 100%);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px; position: relative;
-            box-shadow: 0 0 0 6px var(--blue-light);
-        }
-        .result-score-ring::before {
-            content: ''; position: absolute; inset: 8px; border-radius: 50%;
-            background: white;
-        }
-        .result-score-text {
-            position: relative; z-index: 1; text-align: center;
-        }
-        .result-score-num { font-size: 32px; font-weight: 900; color: var(--blue); line-height: 1; }
-        .result-score-label { font-size: 13px; font-weight: 700; color: var(--gray-400); }
+.opt-num{
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:900;
+  border:2px solid var(--border);color:var(--text2);
+  background:var(--bg); transition:all .15s;
+}
+.opt-text{font-size:15px;font-weight:600;color:var(--text);line-height:1.45;flex:1;}
 
-        .points-earned {
-            background: linear-gradient(135deg, var(--blue-light), #EDE9FE);
-            border: 1px solid var(--blue-mid); border-radius: var(--radius-sm);
-            padding: 16px; text-align: center; margin-bottom: 16px;
-        }
-        .points-earned-num { font-size: 28px; font-weight: 900; color: var(--blue); }
-        .points-earned-label { font-size: 13px; color: var(--gray-600); font-weight: 600; }
+/* 상태 */
+.opt-btn.state-correct{border-color:var(--green);background:#F0FDF4;}
+.opt-btn.state-correct .opt-num{background:var(--green);border-color:var(--green);color:#fff;}
+.opt-btn.state-wrong{border-color:var(--red);background:#FEF2F2;animation:shake .3s ease;}
+.opt-btn.state-wrong .opt-num{background:var(--red);border-color:var(--red);color:#fff;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
 
-        /* ── WRONG REVIEW ── */
-        .wrong-item {
-            background: white; border: 1px solid var(--gray-200);
-            border-radius: var(--radius-sm); padding: 16px;
-            margin-bottom: 12px; border-left: 3px solid var(--red);
-        }
-        .wrong-q   { font-weight: 700; color: var(--gray-800); line-height: 1.6; margin-bottom: 10px; font-size: 15px; }
-        .wrong-ans { color: var(--red);   font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-        .right-ans { color: var(--green); font-size: 14px; font-weight: 700; margin-bottom: 10px; }
-        .wrong-desc { background: var(--gray-50); border: 1px dashed var(--gray-200); border-radius: 8px; padding: 12px; font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+.tts-opt{
+  width:44px;flex-shrink:0;border-radius:var(--r12);
+  background:var(--bg);border:2px solid var(--border);
+  font-size:18px;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;
+}
+.tts-opt:active{transform:scale(.9);background:var(--border);}
 
-        /* ── LEARNING VIEW (단어) ── */
-        .word-card {
-            background: linear-gradient(135deg, var(--blue), #7C3AED);
-            border-radius: var(--radius-lg); padding: 36px 24px;
-            text-align: center; margin-bottom: 16px;
-            box-shadow: var(--shadow-lg);
-        }
-        .word-text   { font-size: 44px; font-weight: 900; color: white; letter-spacing: 1px; margin-bottom: 12px; }
-        .word-meaning{ font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.85); }
+/* 주관식 */
+.ans-input{
+  width:100%;min-height:54px;padding:0 18px;
+  border:2px solid var(--border);border-radius:var(--r16);
+  font-size:18px;font-weight:700;text-align:center;
+  background:var(--bg);color:var(--text);font-family:inherit;
+  transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;
+}
+.ans-input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 4px rgba(108,99,255,.12);}
+.ans-input::placeholder{color:var(--border);font-weight:600;}
 
-        /* ── ADMIN / REPORT TABLE ── */
-        .report-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .report-table th { background: var(--gray-50); color: var(--gray-400); font-weight: 700; padding: 12px 8px; text-align: center; border-bottom: 2px solid var(--gray-200); font-size: 12px; }
-        .report-table td { padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--gray-100); line-height: 1.4; }
+/* 피드백 */
+.feedback{
+  min-height:48px;border-radius:var(--r12);padding:12px 16px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:16px;font-weight:800;margin-top:14px;
+  animation:popIn .25s cubic-bezier(.34,1.56,.64,1);
+  text-align:center;letter-spacing:-.3px;
+}
+.fb-correct{background:#F0FDF4;color:var(--green-d);border:2px solid #BBF7D0;}
+.fb-wrong{background:#FEF2F2;color:var(--red-d);border:2px solid #FECACA;}
+.fb-empty{display:none;}
+@keyframes popIn{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
 
-        .btn-small {
-            background: var(--blue); color: white; border: none;
-            padding: 6px 12px; border-radius: 6px; font-weight: 700;
-            cursor: pointer; font-size: 12px; font-family: inherit;
-        }
-        .btn-small.used { background: var(--gray-400); cursor: default; }
-        .btn-small:hover { opacity: 0.85; }
+/* ═══════════════════════════════════
+   RESULT VIEW
+═══════════════════════════════════ */
+.result-hero{text-align:center;padding:10px 0 24px;}
+.result-emoji{font-size:64px;display:block;margin-bottom:12px;animation:popBounce .6s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popBounce{from{transform:scale(0);}to{transform:scale(1);}}
+.result-title{font-size:24px;font-weight:900;color:var(--text);letter-spacing:-.5px;}
+.result-sub{font-size:14px;color:var(--text2);font-weight:600;margin-top:6px;}
 
-        /* ── SHOP ── */
-        .shop-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 16px; border: 1px solid var(--gray-200);
-            border-radius: var(--radius-sm); margin-bottom: 10px; background: white;
-            box-shadow: var(--shadow-sm); gap: 12px;
-        }
-        .item-name  { font-weight: 700; font-size: 15px; margin-bottom: 2px; }
-        .item-price { font-size: 13px; font-weight: 700; color: var(--blue); }
+.score-ring-wrap{
+  position:relative;width:150px;height:150px;margin:24px auto;
+}
+.score-ring-svg{transform:rotate(-90deg);}
+.score-ring-bg{fill:none;stroke:var(--border);stroke-width:10;}
+.score-ring-fill{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:408;stroke-dashoffset:408;transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1);}
+.score-ring-text{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.score-num{font-size:38px;font-weight:900;line-height:1;}
+.score-max{font-size:14px;color:var(--text2);font-weight:700;}
 
-        /* ── ADMIN BOXES ── */
-        .admin-box {
-            background: var(--gray-50); border: 1px solid var(--gray-200);
-            border-radius: var(--radius-sm); padding: 16px; margin-bottom: 14px;
-        }
-        .admin-box-title { font-weight: 700; font-size: 13px; color: var(--gray-600); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-        .admin-box.warn  { background: #FFF7ED; border-color: #FCD34D; }
-        .admin-box.info  { background: var(--blue-light); border-color: var(--blue-mid); }
-        .admin-box.success { background: var(--green-light); border-color: #6EE7B7; }
+.points-box{
+  background:linear-gradient(135deg,#FEF3C7,#FDE68A);
+  border:2px solid #F59E0B;border-radius:var(--r16);
+  padding:16px;text-align:center;margin-bottom:14px;
+}
+.points-num{font-size:28px;font-weight:900;color:var(--gold-d);}
+.points-lbl{font-size:13px;color:#92400E;font-weight:600;margin-top:2px;}
 
-        /* ── OVERLAY / SPINNER ── */
-        .overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(255,255,255,0.92);
-            z-index: 9999; flex-direction: column;
-            align-items: center; justify-content: center;
-            backdrop-filter: blur(4px);
-        }
-        .spinner-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-        .spinner {
-            width: 44px; height: 44px; border: 4px solid var(--blue-mid);
-            border-top-color: var(--blue); border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        .loading-title { font-size: 16px; font-weight: 700; color: var(--gray-800); text-align: center; line-height: 1.6; }
-        .loading-sub   { font-size: 13px; color: var(--gray-400); font-weight: 500; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+.result-stats{display:flex;gap:10px;margin-bottom:20px;}
+.rstat{flex:1;background:var(--bg);border-radius:var(--r12);padding:14px;text-align:center;}
+.rstat .ri{font-size:24px;margin-bottom:4px;}
+.rstat .rv{font-size:20px;font-weight:900;color:var(--text);}
+.rstat .rl{font-size:11px;color:var(--text2);font-weight:600;}
 
-        /* ── MODAL ── */
-        .modal {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.55); z-index: 9000;
-            align-items: center; justify-content: center;
-            backdrop-filter: blur(2px);
-        }
-        .modal-content {
-            background: white; width: 90%; max-height: 82vh;
-            border-radius: var(--radius-lg); padding: 28px 20px;
-            overflow-y: auto; display: flex; flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            animation: popIn 0.3s cubic-bezier(.34,1.56,.64,1);
-        }
-        .modal-title  { font-size: 18px; font-weight: 900; margin-bottom: 16px; color: var(--gray-800); }
-        .modal-body   { font-size: 15px; line-height: 1.7; color: var(--gray-800); flex: 1; margin-bottom: 20px; white-space: pre-wrap; }
-        .modal-footer { display: flex; gap: 10px; }
-        .modal-footer .btn { flex: 1; }
+/* ═══════════════════════════════════
+   WRONG REVIEW
+═══════════════════════════════════ */
+.wrong-card{
+  background:var(--card);border-radius:var(--r16);padding:18px;
+  margin-bottom:12px;border-left:4px solid var(--red);
+  box-shadow:0 2px 8px rgba(239,68,68,.08);
+}
+.wrong-q{font-size:15px;font-weight:700;color:var(--text);line-height:1.6;margin-bottom:12px;}
+.wrong-ua{font-size:13px;font-weight:600;color:var(--red);margin-bottom:4px;}
+.wrong-ca{font-size:14px;font-weight:800;color:var(--green-d);margin-bottom:10px;}
+.wrong-desc{
+  background:var(--bg);border-radius:var(--r12);
+  padding:12px;font-size:13px;color:var(--text2);line-height:1.6;
+  border:1px dashed var(--border);
+}
+.wrong-desc strong{color:var(--primary);}
 
-        /* ── ANIMATIONS ── */
-        @keyframes popIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to   { opacity: 1; transform: scale(1); }
-        }
-        @keyframes floatUp {
-            from { opacity: 1; transform: translateY(0) scale(1); }
-            to   { opacity: 0; transform: translateY(-70px) scale(1.4); }
-        }
-        @keyframes fall {
-            to { transform: translateY(105vh) rotate(720deg); }
-        }
+/* ═══════════════════════════════════
+   SHOP VIEW
+═══════════════════════════════════ */
+.shop-top{
+  background:linear-gradient(135deg,var(--gold) 0%,#EF4444 100%);
+  border-radius:20px;padding:20px;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.shop-bal{color:rgba(255,255,255,.8);font-size:13px;font-weight:600;}
+.shop-pts{color:#fff;font-size:28px;font-weight:900;letter-spacing:-.5px;}
 
-        .floating-point {
-            position: fixed; color: var(--green);
-            font-size: 22px; font-weight: 900;
-            pointer-events: none; z-index: 9999;
-            animation: floatUp 0.9s ease forwards;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-        .confetti { position: fixed; width: 8px; height: 8px; z-index: 8000; pointer-events: none; animation: fall linear forwards; }
+.shop-item{
+  background:var(--card);border-radius:var(--r16);padding:16px;
+  display:flex;align-items:center;gap:14px;margin-bottom:10px;
+  border:2px solid var(--border);transition:border-color .15s;
+}
+.shop-item:hover{border-color:var(--gold);}
+.shop-icon{font-size:36px;width:52px;flex-shrink:0;text-align:center;}
+.shop-info{flex:1;}
+.shop-name{font-size:15px;font-weight:800;color:var(--text);}
+.shop-cost{font-size:13px;font-weight:700;color:var(--gold-d);margin-top:2px;}
+.buy-btn{
+  background:var(--gold);color:#fff;border:none;
+  border-radius:var(--r12);padding:10px 16px;
+  font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;
+  box-shadow:0 3px 8px rgba(245,158,11,.35);
+  transition:transform .1s,box-shadow .1s;white-space:nowrap;
+}
+.buy-btn:active{transform:scale(.95);box-shadow:none;}
 
-        /* ── DIVIDER ── */
-        .divider { height: 1px; background: var(--gray-200); margin: 16px 0; }
+/* ═══════════════════════════════════
+   ADMIN VIEW
+═══════════════════════════════════ */
+.admin-stat-row{display:flex;gap:10px;margin-bottom:16px;}
+.admin-stat{
+  flex:1;background:var(--card);border-radius:var(--r12);
+  padding:14px;text-align:center;border:1px solid var(--border);
+}
+.admin-stat .ai{font-size:24px;margin-bottom:4px;}
+.admin-stat .av{font-size:16px;font-weight:900;color:var(--text);}
+.admin-stat .al{font-size:11px;color:var(--text2);font-weight:600;}
 
-        /* ── RESPONSIVE ── */
-        @media (max-width: 420px) {
-            .word-text  { font-size: 36px; }
-            .chip       { font-size: 13px; padding: 7px 12px; }
-            .option-text{ font-size: 14px; }
-        }
-    </style>
+.abox{
+  background:var(--bg);border-radius:var(--r16);
+  padding:16px;margin-bottom:12px;
+  border:1px solid var(--border);
+}
+.abox-title{font-size:13px;font-weight:800;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+.report-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.report-tbl th{background:var(--bg);color:var(--text2);font-weight:700;padding:10px 8px;text-align:center;border-bottom:2px solid var(--border);font-size:11px;}
+.report-tbl td{padding:12px 8px;text-align:center;border-bottom:1px solid var(--bg);line-height:1.4;}
+.tbtn{background:var(--primary);color:#fff;border:none;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.tbtn:active{opacity:.8;}
+.tbtn.used{background:var(--border);color:var(--text2);cursor:default;}
+
+/* 탭 */
+.tabs{display:flex;gap:6px;margin-bottom:16px;}
+.tab-btn{
+  flex:1;min-height:40px;border-radius:var(--r12);
+  border:2px solid var(--border);background:var(--card);
+  font-size:13px;font-weight:800;color:var(--text2);
+  cursor:pointer;font-family:inherit;transition:all .15s;
+}
+.tab-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.tab-btn:active{transform:scale(.96);}
+
+/* 필터 칩 */
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.fchip{
+  padding:7px 14px;border-radius:var(--r999);
+  border:2px solid var(--border);background:var(--card);
+  font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;
+  font-family:inherit;transition:all .15s;white-space:nowrap;
+}
+.fchip.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.fchip:active{transform:scale(.93);}
+
+/* ═══════════════════════════════════
+   MODAL
+═══════════════════════════════════ */
+.modal-bg{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);z-index:9000;
+  align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(3px);
+}
+.modal-bg.active{display:flex;}
+.modal-box{
+  background:var(--card);width:100%;max-width:430px;
+  max-height:85svh;border-radius:24px 24px 0 0;
+  padding:0 0 calc(var(--safe-bot) + 8px);
+  overflow:hidden;display:flex;flex-direction:column;
+  animation:slideSheet .3s cubic-bezier(.25,.8,.25,1);
+  box-shadow:0 -8px 40px rgba(0,0,0,.2);
+}
+@keyframes slideSheet{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;}
+.modal-head{padding:12px 20px 16px;border-bottom:1px solid var(--border);}
+.modal-title{font-size:17px;font-weight:900;color:var(--text);}
+.modal-body{flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch;}
+.modal-body::-webkit-scrollbar{display:none;}
+.modal-foot{padding:12px 20px;display:flex;gap:10px;}
+.modal-foot .btn{min-height:50px;}
+
+/* 이어하기 모달 특수 */
+.resume-modal-content{text-align:center;padding:24px 20px 8px;}
+.resume-icon{font-size:56px;margin-bottom:12px;}
+
+/* ═══════════════════════════════════
+   OVERLAY (로딩)
+═══════════════════════════════════ */
+.overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(255,255,255,.96);z-index:9999;
+  flex-direction:column;align-items:center;justify-content:center;
+  gap:20px;backdrop-filter:blur(6px);
+}
+.overlay.show{display:flex;}
+.ov-spinner{
+  width:52px;height:52px;
+  border:5px solid var(--border);border-top-color:var(--primary);
+  border-radius:50%;animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ov-icon{font-size:52px;animation:pulse 1.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+.ov-title{font-size:17px;font-weight:800;color:var(--text);text-align:center;line-height:1.5;}
+.ov-sub{font-size:13px;color:var(--text2);font-weight:600;text-align:center;}
+.ov-steps{display:flex;gap:6px;margin-top:4px;}
+.ov-step{width:8px;height:8px;border-radius:50%;background:var(--border);}
+.ov-step.active{background:var(--primary);}
+.ov-step.done{background:var(--green);}
+
+/* ═══════════════════════════════════
+   FLOATING EFFECTS
+═══════════════════════════════════ */
+.float-pt{
+  position:fixed;pointer-events:none;z-index:9999;
+  font-size:20px;font-weight:900;color:var(--green);
+  text-shadow:0 2px 8px rgba(0,0,0,.15);
+  animation:floatUp .9s ease forwards;
+}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0)scale(1);}100%{opacity:0;transform:translateY(-80px)scale(1.4);}}
+
+.confetti-piece{
+  position:fixed;pointer-events:none;z-index:8000;
+  border-radius:2px;animation:confettiFall linear forwards;
+}
+@keyframes confettiFall{to{transform:translateY(110svh)rotate(720deg);opacity:0;}}
+
+/* 정답 반짝임 */
+@keyframes correctPop{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.04);}
+  100%{transform:scale(1);}
+}
+.correct-pop{animation:correctPop .3s ease;}
+
+/* ═══════════════════════════════════
+   TTS 상태 표시
+═══════════════════════════════════ */
+.tts-speaking{animation:ttsPulse .6s ease-in-out infinite;}
+@keyframes ttsPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+/* ═══════════════════════════════════
+   TOAST
+═══════════════════════════════════ */
+.toast{
+  position:fixed;bottom:calc(var(--safe-bot) + 20px);left:50%;
+  transform:translateX(-50%)translateY(80px);
+  background:rgba(30,27,75,.92);color:#fff;
+  padding:12px 20px;border-radius:var(--r999);
+  font-size:14px;font-weight:700;max-width:90vw;text-align:center;
+  z-index:9998;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s;
+  opacity:0;backdrop-filter:blur(8px);line-height:1.5;
+}
+.toast.show{transform:translateX(-50%)translateY(0);opacity:1;}
+
+/* ═══════════════════════════════════
+   MISC
+═══════════════════════════════════ */
+.empty-state{text-align:center;padding:40px 20px;color:var(--text2);}
+.empty-state .es-icon{font-size:48px;margin-bottom:10px;}
+.empty-state .es-text{font-size:15px;font-weight:700;}
+
+.info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bg);}
+.info-row:last-child{border-bottom:none;}
+.info-key{font-size:14px;color:var(--text2);font-weight:600;}
+.info-val{font-size:14px;font-weight:800;color:var(--text);}
+
+/* 반응형 */
+@media(max-width:380px){
+  .vocab-word{font-size:36px;}
+  .subj-card .s-icon{font-size:26px;}
+  .dash-stat .val{font-size:18px;}
+}
+</style>
 </head>
 <body>
-<div class="app-container" id="app">
+<div class="app">
 
-    <!-- HEADER -->
-    <div class="header">
-        <div class="header-left">
-            <button id="back-btn" class="header-btn" style="display:none;" onclick="goBack()">← 뒤로</button>
+  <!-- ▣ HEADER ▣ -->
+  <div class="hdr" id="hdr">
+    <div class="hdr-left">
+      <button class="hbtn" id="back-btn" style="display:none" onclick="goBack()">
+        <span class="hbtn-icon">←</span><span>뒤로</span>
+      </button>
+    </div>
+    <div class="hdr-center">
+      <div class="hdr-title" id="hdr-title">🌟 스마트 학습</div>
+      <div class="hdr-sub" id="hdr-sub"></div>
+    </div>
+    <div class="hdr-right">
+      <button class="hbtn" id="logout-btn" style="display:none" onclick="logout()">
+        <span>나가기</span><span class="hbtn-icon">🚪</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ▣ SCROLL WRAP ▣ -->
+  <div class="scroll" id="main-scroll">
+
+    <!-- ① LOGIN -->
+    <div class="view active" id="login-view" style="padding:0;background:linear-gradient(160deg,#EEF2FF,#F5F3FF,#FDF4FF);min-height:calc(100svh - 64px);justify-content:center;">
+      <div style="padding:20px;">
+        <div class="login-hero">
+          <span class="login-mascot">🎓</span>
+          <div class="login-title">스마트 학습 시스템</div>
+          <div class="login-sub">AI 맞춤형 학습 플랫폼 · 초등 전과목</div>
         </div>
-        <div class="header-center"><span id="header-title">🌟 스마트 학습</span></div>
-        <div class="header-right">
-            <button id="logout-btn" class="header-btn" style="display:none;" onclick="logout()">나가기</button>
+        <div class="login-card">
+          <button class="btn btn-primary" style="margin-bottom:12px;" onclick="showView('profile-select-view',{push:true})">
+            <span>🎒</span><div><span>학생 학습 시작</span><span class="start-btn-sub">국어 · 영어 · 수학 · 영단어</span></div>
+          </button>
+          <div class="login-divider"><span>또는</span></div>
+          <button class="btn btn-dark btn-sm" onclick="loginAsParent()">📊 관리자(부모님) 로그인</button>
         </div>
+      </div>
     </div>
 
-    <!-- LOADING OVERLAY -->
-    <div id="loading-overlay" class="overlay">
-        <div class="spinner-wrap">
-            <div class="spinner"></div>
-            <div class="loading-title" id="loading-msg">처리 중입니다...</div>
-            <div class="loading-sub" id="loading-sub">잠시만 기다려 주세요</div>
+    <!-- ② PROFILE SELECT -->
+    <div class="view" id="profile-select-view">
+      <div class="card" style="margin-bottom:8px;">
+        <div style="font-size:20px;font-weight:900;margin-bottom:4px;">사용자 선택 👋</div>
+        <div style="font-size:14px;color:var(--text2);font-weight:500;">이름을 선택하고 비밀번호를 입력해요.</div>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-card" onclick="selectProfile('김로운')">
+          <div class="profile-avatar">👦</div>
+          <div class="profile-info"><div class="name">김로운</div><div class="desc">탭해서 로그인</div></div>
+          <div class="profile-arrow">›</div>
         </div>
+        <div class="profile-card" onclick="selectProfile('김서아')">
+          <div class="profile-avatar">👧</div>
+          <div class="profile-info"><div class="name">김서아</div><div class="desc">탭해서 로그인</div></div>
+          <div class="profile-arrow">›</div>
+        </div>
+        <div class="profile-card" onclick="selectProfile('정지영')">
+          <div class="profile-avatar">👩</div>
+          <div class="profile-info"><div class="name">정지영</div><div class="desc">탭해서 로그인</div></div>
+          <div class="profile-arrow">›</div>
+        </div>
+      </div>
     </div>
 
-    <!-- ① LOGIN VIEW -->
-    <div id="login-view" class="view-section active">
-        <div style="text-align:center; padding: 24px 0 20px;">
-            <div style="font-size:52px; margin-bottom:8px;">🎓</div>
-            <div style="font-size:22px; font-weight:900; color:var(--gray-800); letter-spacing:-0.5px;">스마트 학습 시스템</div>
-            <div style="font-size:14px; color:var(--gray-400); margin-top:6px; font-weight:500;">AI 기반 맞춤형 학습 플랫폼</div>
+    <!-- ③ CHILD DASHBOARD -->
+    <div class="view" id="child-dashboard-view" style="padding-top:0;">
+      <div class="dash-top">
+        <div class="dash-welcome" id="dash-welcome">안녕하세요!</div>
+        <div class="dash-name" id="dash-name">학습자</div>
+        <div class="dash-stats">
+          <div class="dash-stat"><div class="icon">🔥</div><div class="val" id="streak-val">0</div><div class="lbl">연속 출석</div></div>
+          <div class="dash-stat"><div class="icon">💰</div><div class="val" id="point-val">0</div><div class="lbl">포인트</div></div>
+          <div class="dash-stat"><div class="icon">📚</div><div class="val" id="total-learn">0</div><div class="lbl">총 학습</div></div>
         </div>
-        <div class="card">
-            <div class="card-title">로그인 구분</div>
-            <div class="card-sub">사용자 유형을 선택해주세요.</div>
-            <button class="btn btn-primary" style="margin-bottom:12px;" onclick="showView('profile-select-view',{push:true})">🎒 학생 학습 시작</button>
-            <button class="btn btn-dark" onclick="loginAsParent()">📊 관리자(부모님) 로그인</button>
+      </div>
+
+      <div class="card">
+        <div class="section-hd">과목 선택</div>
+        <div class="subj-grid" id="subj-grid">
+          <div class="subj-card active-ko" data-subj="국어" onclick="selectSubj('국어')"><div class="s-icon">📖</div><div class="s-name">국어</div><div class="s-desc">맞춤법·독해·문법</div></div>
+          <div class="subj-card" data-subj="영어" onclick="selectSubj('영어')"><div class="s-icon">🔤</div><div class="s-name">영어</div><div class="s-desc">어휘·문법·독해</div></div>
+          <div class="subj-card" data-subj="수학" onclick="selectSubj('수학')"><div class="s-icon">🔢</div><div class="s-name">수학</div><div class="s-desc">연산·도형·문장제</div></div>
+          <div class="subj-card" data-subj="영단어" onclick="selectSubj('영단어')"><div class="s-icon">📝</div><div class="s-name">영단어</div><div class="s-desc">단어암기·퀴즈</div></div>
         </div>
+
+        <div class="section-hd" style="margin-top:20px;">과정(학년) 선택</div>
+        <div class="grade-row" id="grade-row"></div>
+
+        <div class="section-hd" style="margin-top:20px;">난이도 선택</div>
+        <div class="diff-row" id="diff-row">
+          <button class="diff-btn" onclick="selectDiff('최저')">🌱<br>최저</button>
+          <button class="diff-btn" onclick="selectDiff('하')">📗<br>하</button>
+          <button class="diff-btn active" onclick="selectDiff('중')">📘<br>중</button>
+          <button class="diff-btn" onclick="selectDiff('상')">📙<br>상</button>
+          <button class="diff-btn" onclick="selectDiff('최상')">🔥<br>최상</button>
+        </div>
+      </div>
+
+      <button class="start-btn" onclick="startNewQuiz()">
+        <span style="font-size:22px;">🚀</span>
+        <div><span style="font-size:17px;display:block;">학습 시작하기</span><span class="start-btn-sub" id="start-btn-sub">국어 · 1학년 · 중</span></div>
+      </button>
+      <div style="height:12px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-gold" style="flex:2;min-height:48px;" onclick="showView('shop-view',{push:true})">🏪 포인트 상점</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1;min-height:48px;font-size:14px;" onclick="changePassword()">🔑 비번</button>
+      </div>
     </div>
 
-    <!-- ② PROFILE SELECT VIEW -->
-    <div id="profile-select-view" class="view-section">
-        <div class="card">
-            <div class="card-title">사용자 선택</div>
-            <div class="card-sub">이름을 선택하고 비밀번호를 입력해요.</div>
-            <div style="display:flex; flex-direction:column; gap:12px;">
-                <button class="btn btn-primary" onclick="selectProfile('김로운')">👦 김로운</button>
-                <button class="btn btn-primary" onclick="selectProfile('김서아')">👧 김서아</button>
-                <button class="btn btn-primary" onclick="selectProfile('정지영')">👩 정지영</button>
-            </div>
+    <!-- ④ SHOP -->
+    <div class="view" id="shop-view">
+      <div class="shop-top">
+        <div>
+          <div class="shop-bal">💰 현재 보유 포인트</div>
+          <div class="shop-pts" id="shop-pts">0P</div>
         </div>
+        <div style="font-size:48px;">🛍️</div>
+      </div>
+      <div id="shop-list"></div>
     </div>
 
-    <!-- ③ CHILD DASHBOARD VIEW -->
-    <div id="child-dashboard-view" class="view-section">
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-icon">🔥</div>
-                <div>
-                    <div class="stat-label">연속 출석</div>
-                    <div class="stat-value" id="streak-display">0일</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">💰</div>
-                <div>
-                    <div class="stat-label">보유 포인트</div>
-                    <div class="stat-value" id="point-display">0P</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">🚀 오늘의 학습</div>
-            <div class="card-sub">과정, 과목, 난이도를 선택하고 학습을 시작해요.</div>
-
-            <div class="section-label">1단계 · 과정(학년) 선택</div>
-            <div class="chip-group" id="grade-container"></div>
-
-            <div class="section-label">2단계 · 과목 선택</div>
-            <div class="chip-group" id="subject-container">
-                <button class="chip subject-chip active" data-subject="국어" onclick="selectConfig('subject','국어')">📖 국어</button>
-                <button class="chip subject-chip" data-subject="영어" onclick="selectConfig('subject','영어')">🔤 영어</button>
-                <button class="chip subject-chip" data-subject="수학" onclick="selectConfig('subject','수학')">🔢 수학</button>
-                <button class="chip subject-chip" data-subject="영단어" onclick="selectConfig('subject','영단어')">📝 영단어</button>
-            </div>
-
-            <div class="section-label">3단계 · 난이도 선택</div>
-            <div class="chip-group" id="difficulty-container">
-                <button class="chip" onclick="selectConfig('difficulty','최저')">최저</button>
-                <button class="chip" onclick="selectConfig('difficulty','하')">하</button>
-                <button class="chip active" onclick="selectConfig('difficulty','중')">중</button>
-                <button class="chip" onclick="selectConfig('difficulty','상')">상</button>
-                <button class="chip" onclick="selectConfig('difficulty','최상')">최상</button>
-            </div>
-
-            <button class="btn btn-primary" onclick="startNewQuiz()" style="margin-top:8px;">✨ 학습 시작하기</button>
-        </div>
-
-        <div style="display:flex; gap:12px;">
-            <button class="btn btn-amber" style="flex:2;" onclick="showView('shop-view',{push:true})">🏪 포인트 상점</button>
-            <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="changePassword()">🔑 비번변경</button>
-        </div>
+    <!-- ⑤ LEARNING (단어) -->
+    <div class="view" id="learning-view">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text2);" id="learn-prog-txt">1 / 10</div>
+        <div style="font-size:13px;font-weight:700;color:var(--primary);" id="learn-prog-pct">0%</div>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:20px;">
+        <div style="height:100%;background:linear-gradient(90deg,var(--vb),#EC4899);border-radius:3px;transition:width .4s;" id="learn-bar"></div>
+      </div>
+      <div class="vocab-card" id="vocab-card">
+        <div class="vocab-num" id="vocab-num">WORD 1/10</div>
+        <div class="vocab-word" id="vocab-word">Hello</div>
+        <div class="vocab-pron" id="vocab-pron"></div>
+        <div class="vocab-meaning" id="vocab-meaning">(뜻)</div>
+        <button class="vocab-tts" id="vocab-tts-btn">🔊 &nbsp;영어 발음 듣기</button>
+      </div>
+      <button class="btn btn-primary" id="learn-next-btn" onclick="nextLearningWord()">다음 단어 ➡️</button>
     </div>
 
-    <!-- ④ SHOP VIEW -->
-    <div id="shop-view" class="view-section">
-        <div class="card">
-            <div class="card-title">🎁 포인트 상점</div>
-            <div style="background:var(--blue-light); border:1px solid var(--blue-mid); border-radius:10px; padding:14px; margin-bottom:20px; display:flex; align-items:center; gap:10px;">
-                <div style="font-size:24px;">💰</div>
-                <div>
-                    <div style="font-size:12px; color:var(--gray-400); font-weight:600;">현재 보유 포인트</div>
-                    <div style="font-size:22px; font-weight:900; color:var(--blue);" id="shop-point-display">0P</div>
-                </div>
-            </div>
-
-            <div id="shop-items-container">
-                <!-- 동적 생성 -->
-            </div>
-        </div>
-    </div>
-
-    <!-- ⑤ LEARNING VIEW (영단어) -->
-    <div id="learning-view" class="view-section">
-        <div class="progress-wrap">
-            <div class="progress-info">
-                <span id="learning-progress-text">1 / 10</span>
-                <span id="learning-progress-pct">0%</span>
-            </div>
-            <div class="progress-track"><div class="progress-fill green" id="learning-progress-bar"></div></div>
-        </div>
-
-        <div class="word-card">
-            <div style="font-size:13px; color:rgba(255,255,255,0.7); font-weight:600; margin-bottom:16px; letter-spacing:0.5px;">VOCABULARY</div>
-            <div class="word-text" id="learning-word">word</div>
-            <div class="word-meaning" id="learning-meaning">(뜻)</div>
-        </div>
-
-        <button id="learning-tts-btn" class="tts-main-btn" style="margin: 0 auto 16px;">🔊 발음 듣기</button>
-        <button id="learning-next-btn" class="btn btn-primary" onclick="nextLearningWord()">다음 단어 ➡️</button>
-    </div>
-
-    <!-- ⑥ QUIZ VIEW -->
-    <div id="quiz-view" class="view-section">
+    <!-- ⑥ QUIZ -->
+    <div class="view" id="quiz-view" style="padding:0;overflow:visible;">
+      <div class="quiz-hdr" id="quiz-hdr">
         <div class="quiz-meta">
-            <span class="quiz-badge badge-blue" id="current-status">학습 중</span>
-            <span class="quiz-badge badge-gray" id="progress-text">1 / 20</span>
+          <div class="quiz-subj-badge" id="quiz-badge">📖 국어</div>
+          <div class="quiz-no" id="quiz-no">1 / 20</div>
         </div>
-
-        <div class="progress-wrap">
-            <div class="progress-track"><div class="progress-fill" id="quiz-progress-bar"></div></div>
+        <div class="quiz-prog-track"><div class="quiz-prog-fill" id="quiz-prog"></div></div>
+      </div>
+      <div style="padding:0 16px 16px;">
+        <div class="quiz-body">
+          <div id="qtype-badge" class="qtype-badge qtype-obj">① 객관식</div>
+          <div class="question-text" id="q-text">문제를 불러오는 중...</div>
+          <button class="tts-pill" id="tts-main-btn" style="display:none">🔊 &nbsp;문제 읽어주기</button>
+          <div class="opts" id="opts-wrap"></div>
+          <input class="ans-input" id="ans-input" type="text" placeholder="정답을 입력하세요 ✍️" style="display:none;margin-bottom:14px;" autocomplete="off">
+          <button class="btn btn-primary btn-sm" id="submit-btn" style="display:none;margin-top:0;" onclick="processSubjective(event)">✅ 정답 확인</button>
+          <div class="feedback fb-empty" id="feedback"></div>
         </div>
-
-        <div class="card" style="padding: 20px;">
-            <div id="question-header" style="display:flex; align-items:flex-start; gap:10px; margin-bottom:14px;">
-                <div class="question-number" id="question-num-badge">1</div>
-                <div id="question-type-badge" class="quiz-badge badge-blue" style="margin-top:4px;">객관식</div>
-            </div>
-
-            <div id="question-text" class="question-box">문제를 불러오는 중입니다...</div>
-
-            <button id="tts-btn" class="tts-main-btn" style="display:none;">🔊 문제 읽어주기</button>
-
-            <div id="options-container" class="options-container" style="display:none;"></div>
-
-            <input type="text" id="answer-input" class="input-field" placeholder="정답을 입력하세요 ✍️" style="display:none; margin-bottom:14px;" autocomplete="off">
-            <button class="btn btn-primary" id="submit-btn" onclick="processSubjectiveAnswer(event)" style="display:none;">✅ 정답 확인</button>
-
-            <div id="feedback-box"></div>
-        </div>
+      </div>
     </div>
 
-    <!-- ⑦ RESULT VIEW -->
-    <div id="result-view" class="view-section">
-        <div class="card" style="text-align:center;">
-            <div class="card-title" id="result-title" style="font-size:20px; margin-bottom:20px;">🎉 학습 완료!</div>
-
-            <div class="result-score-ring" id="result-ring" style="display:flex;">
-                <div class="result-score-text">
-                    <div class="result-score-num" id="result-score">100</div>
-                    <div class="result-score-label">점</div>
-                </div>
-            </div>
-
-            <div class="points-earned" id="earned-points" style="display:none;"></div>
-
-            <div id="result-message" style="font-size:15px; color:var(--gray-600); font-weight:600; margin-bottom:20px; line-height:1.6;">참 잘했어요! 👏</div>
-            <button id="result-action-btn" class="btn btn-primary" onclick="handleResultAction()">확인 ✅</button>
+    <!-- ⑦ RESULT -->
+    <div class="view" id="result-view">
+      <div class="result-hero">
+        <span class="result-emoji" id="result-emoji">🎉</span>
+        <div class="result-title" id="result-title">학습 완료!</div>
+        <div class="result-sub" id="result-sub">오늘도 열심히 공부했어요</div>
+      </div>
+      <div class="score-ring-wrap" id="score-wrap">
+        <svg class="score-ring-svg" viewBox="0 0 140 140" width="150" height="150">
+          <circle class="score-ring-bg" cx="70" cy="70" r="65"/>
+          <circle class="score-ring-fill" id="score-ring" cx="70" cy="70" r="65"/>
+        </svg>
+        <div class="score-ring-text">
+          <div class="score-num" id="score-num">100</div>
+          <div class="score-max" id="score-max">/ 100점</div>
         </div>
+      </div>
+      <div class="points-box" id="points-box" style="display:none;">
+        <div class="points-num" id="points-earned">+0P</div>
+        <div class="points-lbl" id="points-lbl">학습 완주 보상</div>
+      </div>
+      <div class="result-stats">
+        <div class="rstat"><div class="ri">✅</div><div class="rv" id="rst-correct">0</div><div class="rl">정답</div></div>
+        <div class="rstat"><div class="ri">❌</div><div class="rv" id="rst-wrong">0</div><div class="rl">오답</div></div>
+        <div class="rstat"><div class="ri">📊</div><div class="rv" id="rst-rate">0%</div><div class="rl">정답률</div></div>
+      </div>
+      <div style="background:var(--bg);border-radius:var(--r12);padding:14px;margin-bottom:16px;font-size:14px;font-weight:600;color:var(--text2);line-height:1.6;" id="result-msg">잘했어요!</div>
+      <button class="btn btn-primary" id="result-action-btn" onclick="handleResultAction()">확인 ✅</button>
     </div>
 
-    <!-- ⑧ WRONG REVIEW VIEW -->
-    <div id="wrong-review-view" class="view-section">
-        <div class="card" style="padding-bottom:16px;">
-            <div class="card-title">📝 오답 개념 노트</div>
-            <div class="card-sub">틀린 문제를 꼼꼼히 이해하고 다시 도전해요!</div>
-            <div id="wrong-review-container" style="max-height:55vh; overflow-y:auto; margin-bottom:16px;"></div>
-            <button class="btn btn-primary" onclick="startRetryQuiz()">💪 이해 완료! 다시 풀기</button>
-        </div>
+    <!-- ⑧ WRONG REVIEW -->
+    <div class="view" id="wrong-review-view">
+      <div class="card card-sm" style="margin-bottom:16px;">
+        <div style="font-size:19px;font-weight:900;margin-bottom:4px;">📝 오답 개념 노트</div>
+        <div style="font-size:13px;color:var(--text2);font-weight:500;">틀린 문제를 꼼꼼히 보고 다시 도전해요!</div>
+      </div>
+      <div id="wrong-container"></div>
+      <button class="btn btn-primary" onclick="startRetry()">💪 이해 완료! 다시 풀기</button>
     </div>
 
-    <!-- ⑨ PARENT VIEW -->
-    <div id="parent-view" class="view-section">
-        <div class="card">
-            <div class="card-title">👨‍🏫 관리자 대시보드</div>
-            <div class="card-sub">학생 학습 현황 및 보상을 관리합니다.</div>
+    <!-- ⑨ ADMIN -->
+    <div class="view" id="parent-view">
+      <div class="card card-sm" style="background:linear-gradient(135deg,var(--text),#4338CA);margin-bottom:16px;">
+        <div style="color:rgba(255,255,255,.7);font-size:13px;font-weight:600;margin-bottom:2px;">관리자 센터</div>
+        <div style="color:#fff;font-size:20px;font-weight:900;">📊 학습 현황 대시보드</div>
+      </div>
 
-            <div class="admin-box warn">
-                <div class="admin-box-title">🔑 사용자 비밀번호 현황</div>
-                <div id="admin-pw-display" style="font-size:14px; font-weight:600; color:var(--gray-800); line-height:2;">불러오는 중...</div>
-            </div>
+      <div class="abox">
+        <div class="abox-title">🔑 사용자 비밀번호 현황</div>
+        <div id="admin-pw-disp" style="font-size:14px;font-weight:600;color:var(--text);line-height:2.2;">불러오는 중...</div>
+      </div>
 
-            <div class="admin-box success" style="margin-top:0;">
-                <div class="admin-box-title">🎂 학생 나이 설정</div>
-                <div style="display:flex; gap:8px; margin-bottom:10px;">
-                    <select id="age-student-select" class="input-field" style="padding:10px; font-size:14px; flex:2;">
-                        <option value="김로운">👦 김로운</option>
-                        <option value="김서아">👧 김서아</option>
-                        <option value="정지영">👩 정지영</option>
-                    </select>
-                    <input type="number" id="age-input" class="input-field" placeholder="나이" style="padding:10px; font-size:14px; flex:1;">
-                </div>
-                <button class="btn btn-green btn-sm" onclick="setStudentAge()">나이 설정 ✅</button>
-            </div>
-
-            <div class="admin-box info">
-                <div class="admin-box-title">⭐ 특별 보너스 포인트 지급</div>
-                <div style="display:flex; gap:8px; margin-bottom:10px;">
-                    <select id="bonus-student-select" class="input-field" style="padding:10px; font-size:14px; flex:2;">
-                        <option value="김로운">👦 김로운</option>
-                        <option value="김서아">👧 김서아</option>
-                        <option value="정지영">👩 정지영</option>
-                    </select>
-                    <input type="number" id="bonus-point-input" class="input-field" placeholder="포인트" style="padding:10px; font-size:14px; flex:1;">
-                </div>
-                <button class="btn btn-primary btn-sm" onclick="giveBonusPoint()">지급하기 💰</button>
-            </div>
-
-            <div class="chip-group" style="margin-bottom:20px;">
-                <button class="chip active" id="tab-report-btn" onclick="switchAdminTab('report')">📝 학습 리포트</button>
-                <button class="chip" id="tab-reward-btn" onclick="switchAdminTab('reward')">🎁 보상 관리</button>
-            </div>
-
-            <div id="admin-report-section">
-                <div class="chip-group" style="margin-bottom:14px;">
-                    <button class="chip active" id="filter-all" onclick="filterReport('전체')">전체</button>
-                    <button class="chip" id="filter-rw" onclick="filterReport('김로운')">김로운</button>
-                    <button class="chip" id="filter-sa" onclick="filterReport('김서아')">김서아</button>
-                    <button class="chip" id="filter-jj" onclick="filterReport('정지영')">정지영</button>
-                </div>
-
-                <button class="btn btn-green" style="margin-bottom:14px;" onclick="analyzeComprehensiveWeakness()">🤖 AI 종합 성장 리포트 📈</button>
-
-                <div style="overflow-x:auto; border-radius:10px; border:1px solid var(--gray-200);">
-                    <table class="report-table">
-                        <thead><tr><th>이름</th><th>일시/정보</th><th>과목/점수</th><th>상세</th></tr></thead>
-                        <tbody id="report-tbody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="admin-reward-section" style="display:none;">
-                <div style="overflow-x:auto; border-radius:10px; border:1px solid var(--gray-200);">
-                    <table class="report-table">
-                        <thead><tr><th>이름</th><th>구매내역</th><th>P</th><th>처리</th></tr></thead>
-                        <tbody id="reward-tbody"></tbody>
-                    </table>
-                </div>
-            </div>
+      <div class="abox">
+        <div class="abox-title">🎂 학생 나이 설정</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <select id="age-sel" class="ans-input" style="flex:2;padding:12px;font-size:14px;text-align:left;height:auto;min-height:44px;">
+            <option value="김로운">👦 김로운</option><option value="김서아">👧 김서아</option><option value="정지영">👩 정지영</option>
+          </select>
+          <input type="number" id="age-inp" class="ans-input" placeholder="나이" style="flex:1;font-size:16px;">
         </div>
+        <button class="btn btn-green btn-sm" onclick="setAge()">설정 ✅</button>
+      </div>
+
+      <div class="abox">
+        <div class="abox-title">⭐ 특별 보너스 지급</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <select id="bonus-sel" class="ans-input" style="flex:2;padding:12px;font-size:14px;text-align:left;height:auto;min-height:44px;">
+            <option value="김로운">👦 김로운</option><option value="김서아">👧 김서아</option><option value="정지영">👩 정지영</option>
+          </select>
+          <input type="number" id="bonus-inp" class="ans-input" placeholder="P" style="flex:1;font-size:16px;">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="giveBonus()">지급 💰</button>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-rep" onclick="switchTab('report')">📝 학습 리포트</button>
+        <button class="tab-btn" id="tab-rew" onclick="switchTab('reward')">🎁 보상 관리</button>
+      </div>
+
+      <div id="rep-section">
+        <div class="filter-row">
+          <button class="fchip active" id="f-all" onclick="filterRep('전체')">전체</button>
+          <button class="fchip" id="f-rw" onclick="filterRep('김로운')">김로운</button>
+          <button class="fchip" id="f-sa" onclick="filterRep('김서아')">김서아</button>
+          <button class="fchip" id="f-jj" onclick="filterRep('정지영')">정지영</button>
+        </div>
+        <button class="btn btn-green btn-sm" style="margin-bottom:12px;" onclick="aiGrowthReport()">🤖 AI 종합 성장 리포트 📈</button>
+        <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border);background:var(--card);">
+          <table class="report-tbl"><thead><tr><th>이름</th><th>날짜</th><th>과목/점수</th><th>상세</th></tr></thead>
+          <tbody id="rep-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="rew-section" style="display:none;">
+        <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border);background:var(--card);">
+          <table class="report-tbl"><thead><tr><th>이름</th><th>구매내역</th><th>P</th><th>처리</th></tr></thead>
+          <tbody id="rew-tbody"></tbody></table>
+        </div>
+      </div>
     </div>
 
-    <!-- MODALS -->
-    <div id="resume-modal" class="modal">
-        <div class="modal-content" style="text-align:center;">
-            <div class="modal-title">🚨 이어하기</div>
-            <div style="font-size:15px; color:var(--gray-600); margin-bottom:20px; line-height:1.6;">이전에 풀던 문제가 있어요.<br>이어서 진행할까요?</div>
-            <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="cancelResume()">처음부터</button>
-                <button class="btn btn-primary" onclick="confirmResume()">이어하기 🚀</button>
-            </div>
-        </div>
+  </div><!-- /scroll -->
+</div><!-- /app -->
+
+<!-- ▣ MODALS ▣ -->
+<div class="modal-bg" id="resume-modal">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="resume-modal-content">
+      <div class="resume-icon">📌</div>
+      <div style="font-size:19px;font-weight:900;margin-bottom:8px;">이어하기</div>
+      <div style="font-size:14px;color:var(--text2);font-weight:500;margin-bottom:4px;">이전에 풀던 문제가 있어요.<br>이어서 진행할까요?</div>
     </div>
-
-    <div id="permission-modal" class="modal">
-        <div class="modal-content" style="text-align:center;">
-            <div class="modal-title">🔔 알림 권한</div>
-            <div style="font-size:14px; color:var(--gray-600); margin-bottom:20px; line-height:1.7;">
-                학습 결과를 실시간으로 받으시려면 <b>권한 허용</b>을 눌러주세요.<br>
-                <span style="color:var(--red); font-size:12px;">※ 브라우저 팝업에서도 '허용'을 클릭해야 합니다.</span>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="closePermissionModal()">다음에</button>
-                <button class="btn btn-primary" onclick="requestPushPermission()">권한 허용</button>
-            </div>
-        </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="cancelResume()">처음부터</button>
+      <button class="btn btn-primary" onclick="confirmResume()">🚀 이어하기</button>
     </div>
+  </div>
+</div>
 
-    <div id="detail-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-title" id="modal-title">상세 정보</div>
-            <div class="modal-body" id="modal-body"></div>
-            <button class="btn btn-dark" onclick="document.getElementById('detail-modal').style.display='none'">닫기</button>
-        </div>
+<div class="modal-bg" id="detail-modal">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-head"><div class="modal-title" id="detail-title">상세 정보</div></div>
+    <div class="modal-body" id="detail-body"></div>
+    <div class="modal-foot"><button class="btn btn-dark" onclick="closeModal('detail-modal')">닫기</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="notif-modal">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="resume-modal-content">
+      <div class="resume-icon">🔔</div>
+      <div style="font-size:19px;font-weight:900;margin-bottom:8px;">알림 권한</div>
+      <div style="font-size:14px;color:var(--text2);font-weight:500;line-height:1.6;">학습 결과를 실시간으로 받으시려면<br>권한을 허용해주세요.</div>
     </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('notif-modal')">나중에</button>
+      <button class="btn btn-primary" onclick="reqNotif()">허용하기</button>
+    </div>
+  </div>
+</div>
 
-</div><!-- /app-container -->
+<!-- ▣ LOADING OVERLAY ▣ -->
+<div class="overlay" id="overlay">
+  <div style="font-size:52px;animation:pulse 1.2s ease-in-out infinite;" id="ov-icon">🤖</div>
+  <div class="ov-title" id="ov-title">문제를 출제하고 있어요</div>
+  <div class="ov-sub" id="ov-sub">잠시만 기다려 주세요</div>
+  <div class="ov-steps" id="ov-steps">
+    <div class="ov-step" id="step0"></div>
+    <div class="ov-step" id="step1"></div>
+    <div class="ov-step" id="step2"></div>
+    <div class="ov-step" id="step3"></div>
+  </div>
+  <div class="ov-spinner"></div>
+</div>
 
+<!-- ▣ TOAST ▣ -->
+<div class="toast" id="toast"></div>
+
+<!-- ════════════════════════════
+  FIREBASE
+════════════════════════════ -->
 <script>
-// ════════════════════════════════════════════
-//  FIREBASE CONFIG
-// ════════════════════════════════════════════
-const firebaseConfig = {
-    apiKey: "AIzaSyCJTPXzAVTuofcv902nnzIpJ_CcdK8OOEk",
-    authDomain: "smart-edu-app-3d607.firebaseapp.com",
-    databaseURL: "https://smart-edu-app-3d607-default-rtdb.firebaseio.com",
-    projectId: "smart-edu-app-3d607",
-    storageBucket: "smart-edu-app-3d607.firebasestorage.app",
-    messagingSenderId: "184288653031",
-    appId: "1:184288653031:web:12d62e0a2df72a49297c42"
+const firebaseConfig={
+  apiKey:"AIzaSyCJTPXzAVTuofcv902nnzIpJ_CcdK8OOEk",
+  authDomain:"smart-edu-app-3d607.firebaseapp.com",
+  databaseURL:"https://smart-edu-app-3d607-default-rtdb.firebaseio.com",
+  projectId:"smart-edu-app-3d607",
+  storageBucket:"smart-edu-app-3d607.firebasestorage.app",
+  messagingSenderId:"184288653031",
+  appId:"1:184288653031:web:12d62e0a2df72a49297c42"
 };
+let db=null;
+try{ firebase.initializeApp(firebaseConfig); db=firebase.database(); }catch(e){}
 
-let db = null;
-if (firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.database();
-}
+const K1="AIzaSyA1H3rfJarOuDx"+"A1NflRN96_ugCsaehU0M";
+const K2="AIzaSyBred_9lqK4Jx1"+"emrzyHWcUVnmLrqnttUQ";
+const API_KEYS=[K1,K2];
+const AI_MODELS=["gemini-2.5-flash","gemini-2.5-pro","gemini-1.5-flash","gemini-1.5-pro"];
 
-// ════════════════════════════════════════════
-//  AI API CONFIG  (Flash 우선 → 속도 최적화)
-// ════════════════════════════════════════════
-const KEY1 = "AIzaSyA1H3rfJarOuDx" + "A1NflRN96_ugCsaehU0M";
-const KEY2 = "AIzaSyBred_9lqK4Jx1" + "emrzyHWcUVnmLrqnttUQ";
-const API_KEYS = [KEY1, KEY2];
-
-// ★ Flash 모델을 앞에 배치 → 평균 응답 시간 대폭 단축
-const AI_MODELS = [
-    "gemini-2.5-flash",      // 1순위: 가장 빠름
-    "gemini-2.5-pro",        // 2순위: 고품질
-    "gemini-1.5-flash",      // 3순위: 폴백
-    "gemini-1.5-pro"         // 4순위: 최후 폴백
-];
-
-// ════════════════════════════════════════════
+// ══════════════════════════════
 //  STATE
-// ════════════════════════════════════════════
-let currentProfile = null;
-let currentReportFilter = '전체';
-let reportDataCache = [];
-let purchaseDataCache = [];
-let ttsVoices = [];
-let viewHistory = [];
-
-let config = { grade: 1, subject: '국어', difficulty: '중' };
-
-let sessionState = {
-    mode: 'quiz',
-    learningWords: [], questions: [], currentIndex: 0,
-    wrongQuestions: [], wrongHistory: [],
-    initialScore: 0, isRetryMode: false,
-    totalCount: 20, reportSaved: false, reportSavedRetry: false
+// ══════════════════════════════
+let me=null, adminFilter='전체', repCache=[], purchCache=[], viewStack=[];
+let cfg={grade:1, subject:'국어', difficulty:'중'};
+let ss={
+  mode:'quiz',learningWords:[],questions:[],currentIndex:0,
+  wrongQuestions:[],wrongHistory:[],initialScore:0,isRetry:false,
+  totalCount:20,reportSaved:false,reportSavedRetry:false
 };
 
-// 상점 아이템 정의
-const SHOP_ITEMS = [
-    { name: '🎮 게임 충전: 3만원',   cost: 30000 },
-    { name: '🎮 게임 충전: 5만원',   cost: 50000 },
-    { name: '🍺 맥주 6캔',          cost: 10000 },
-    { name: '🍪 초코파이 1박스',     cost: 4000  },
-    { name: '🛒 다이소 1000원',      cost: 1000  },
-    { name: '🍦 빙빙 1000원',        cost: 1000  },
-    { name: '💵 1,000원 용돈 교환권', cost: 1000  },
-    { name: '📱 휴대폰 1시간 쿠폰',  cost: 1000  }
+const SHOP_ITEMS=[
+  {icon:'🎮',name:'게임 충전: 3만원',cost:30000},
+  {icon:'🎮',name:'게임 충전: 5만원',cost:50000},
+  {icon:'🍺',name:'맥주 6캔',cost:10000},
+  {icon:'🍪',name:'초코파이 1박스',cost:4000},
+  {icon:'🛒',name:'다이소 1000원',cost:1000},
+  {icon:'🍦',name:'빙빙 1000원',cost:1000},
+  {icon:'💵',name:'1,000원 용돈 교환권',cost:1000},
+  {icon:'📱',name:'휴대폰 1시간 쿠폰',cost:1000}
 ];
 
-// ════════════════════════════════════════════
+const SUBJ_COLORS={
+  '국어':{cls:'active-ko',hdr:'linear-gradient(135deg,#3B82F6,#6366F1)',badge:'📖 국어',ring:'#3B82F6'},
+  '영어':{cls:'active-en',hdr:'linear-gradient(135deg,#10B981,#06B6D4)',badge:'🔤 영어',ring:'#10B981'},
+  '수학':{cls:'active-ma',hdr:'linear-gradient(135deg,#F97316,#EF4444)',badge:'🔢 수학',ring:'#F97316'},
+  '영단어':{cls:'active-vb',hdr:'linear-gradient(135deg,#8B5CF6,#EC4899)',badge:'📝 영단어',ring:'#8B5CF6'}
+};
+
+// ══════════════════════════════
+//  ★★★ TTS — 한국어/영어 완전 분리 ★★★
+// ══════════════════════════════
+let _voices=[], _voiceReady=false;
+const _voiceReadyPromise = new Promise(resolve=>{
+  function tryLoad(){
+    const v=window.speechSynthesis?.getVoices()||[];
+    if(v.length){ _voices=v; _voiceReady=true; resolve(); }
+  }
+  if('speechSynthesis' in window){
+    tryLoad();
+    window.speechSynthesis.onvoiceschanged=()=>{ tryLoad(); };
+    setTimeout(()=>{ if(!_voiceReady){ _voices=window.speechSynthesis.getVoices()||[]; _voiceReady=true; resolve(); } },2500);
+  } else { resolve(); }
+});
+
+function findVoice(lang){
+  const voices=_voices.length?_voices:(window.speechSynthesis?.getVoices()||[]);
+  const lo=lang.toLowerCase(), base=lo.split('-')[0];
+  // 1. 정확한 lang 매칭 (예: ko-KR)
+  let v=voices.find(v=>v.lang.toLowerCase()===lo);
+  if(v) return v;
+  // 2. 언어 prefix 매칭 (예: ko)
+  v=voices.find(v=>v.lang.toLowerCase().startsWith(base+'-'));
+  if(v) return v;
+  // 3. 언어 기본 매칭
+  v=voices.find(v=>v.lang.toLowerCase().startsWith(base));
+  if(v) return v;
+  // 4. 한국어 전용: 이름에서 Korean 검색
+  if(base==='ko') v=voices.find(v=>/korean|한국/i.test(v.name));
+  // 5. 영어 전용: 이름에서 English 검색
+  if(base==='en') v=voices.find(v=>/english|us|uk/i.test(v.name+' '+v.lang));
+  return v||null;
+}
+
+async function tts(text, lang='ko-KR'){
+  if(!('speechSynthesis' in window)){ showToast('🚫 TTS 미지원 브라우저입니다.'); return; }
+  const clean=stripHtml(String(text||'')).trim();
+  if(!clean) return;
+  if(!_voiceReady) await _voiceReadyPromise;
+  window.speechSynthesis.cancel();
+  const voice=findVoice(lang);
+  // ★ 핵심: 한국어 요청인데 한국어 음성이 없으면 경고 후 중단 (영어로 읽지 않음)
+  if(!voice && lang.startsWith('ko')){
+    showToast('⚠️ 한국어 TTS 음성이 설치되어 있지 않아요!\n기기 설정 › 언어 › 텍스트 음성 변환 ›\n한국어 음성 데이터를 설치해주세요.');
+    return;
+  }
+  const u=new SpeechSynthesisUtterance(clean);
+  u.lang=lang;
+  u.rate=lang.startsWith('en')?0.82:0.92; // 영어는 조금 더 천천히
+  u.pitch=1.0; u.volume=1.0;
+  if(voice) u.voice=voice;
+  u.onerror=e=>{
+    if(e.error!=='interrupted') showToast('🔊 음성 재생 오류: '+e.error);
+  };
+  window.speechSynthesis.speak(u);
+}
+
+// ══════════════════════════════
+//  AUDIO FEEDBACK (Web Audio API)
+// ══════════════════════════════
+let _ac=null;
+function getAC(){ if(!_ac) try{_ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){} return _ac; }
+
+function playBeep(type){
+  const ac=getAC(); if(!ac) return;
+  if(ac.state==='suspended') ac.resume();
+  const osc=ac.createOscillator(), gain=ac.createGain();
+  osc.connect(gain); gain.connect(ac.destination);
+  const t=ac.currentTime;
+  if(type==='correct'){
+    osc.type='sine';
+    osc.frequency.setValueAtTime(523,t);
+    osc.frequency.setValueAtTime(659,t+.12);
+    osc.frequency.setValueAtTime(784,t+.24);
+    gain.gain.setValueAtTime(.25,t);
+    gain.gain.exponentialRampToValueAtTime(.001,t+.5);
+    osc.start(t); osc.stop(t+.5);
+  } else if(type==='wrong'){
+    osc.type='sawtooth';
+    osc.frequency.setValueAtTime(200,t);
+    osc.frequency.setValueAtTime(140,t+.15);
+    gain.gain.setValueAtTime(.18,t);
+    gain.gain.exponentialRampToValueAtTime(.001,t+.3);
+    osc.start(t); osc.stop(t+.3);
+  } else if(type==='start'){
+    osc.type='sine';
+    osc.frequency.setValueAtTime(440,t);
+    osc.frequency.setValueAtTime(554,t+.1);
+    osc.frequency.setValueAtTime(659,t+.2);
+    gain.gain.setValueAtTime(.2,t);
+    gain.gain.exponentialRampToValueAtTime(.001,t+.45);
+    osc.start(t); osc.stop(t+.45);
+  } else if(type==='coin'){
+    osc.type='triangle';
+    osc.frequency.setValueAtTime(880,t);
+    osc.frequency.setValueAtTime(1100,t+.06);
+    gain.gain.setValueAtTime(.2,t);
+    gain.gain.exponentialRampToValueAtTime(.001,t+.3);
+    osc.start(t); osc.stop(t+.3);
+  }
+}
+
+function vibrate(ms){ try{ navigator.vibrate?.(ms); }catch(e){} }
+
+// ══════════════════════════════
 //  UTILS
-// ════════════════════════════════════════════
-function getKSTTime() {
-    const d = new Date();
-    const kst = new Date(d.getTime() + (d.getTimezoneOffset() + 540) * 60000);
-    const mm = kst.getMonth() + 1, dd = kst.getDate();
-    const hh = kst.getHours(), mn = String(kst.getMinutes()).padStart(2,'0');
-    return `${mm}월 ${dd}일 ${hh >= 12 ? '오후' : '오전'} ${hh % 12 || 12}:${mn}`;
+// ══════════════════════════════
+function getKST(){
+  const d=new Date(), kst=new Date(d.getTime()+(d.getTimezoneOffset()+540)*60000);
+  const mo=kst.getMonth()+1,dy=kst.getDate(),h=kst.getHours(),mn=String(kst.getMinutes()).padStart(2,'0');
+  return `${mo}월${dy}일 ${h>=12?'오후':'오전'}${h%12||12}:${mn}`;
 }
-function formatGrade(g) { return g === 0 ? '7세' : g + '학년'; }
+function fmtGrade(g){return g===0?'7세':g+'학년';}
+function esc(t=''){return String(t??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function sanitize(t=''){let s=esc(String(t??''));s=s.replace(/&lt;(\/?(?:u|b|strong|i|em))&gt;/gi,'<$1>');s=s.replace(/&lt;br\s*\/?&gt;/gi,'<br>');s=s.replace(/\n/g,'<br>');return s;}
+function stripHtml(t=''){return String(t??'').replace(/<br\s*\/?>/gi,' ').replace(/<[^>]*>/g,' ').replace(/&[a-z]+;/gi,' ').replace(/\s+/g,' ').trim();}
+function norm(t=''){return stripHtml(String(t??'')).replace(/\s+/g,' ').replace(/^["'""'']+|["'""'']+$/g,'').replace(/[.,!?]+$/g,'').trim().toLowerCase();}
+function same(a,b){return norm(a)===norm(b);}
+function setHTML(el,t){el.innerHTML=sanitize(t);}
 
-function escapeHtml(t='') {
-    return String(t??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-function sanitizeLimitedHtml(t='') {
-    let s = escapeHtml(String(t??''));
-    s = s.replace(/&lt;(\/?(?:u|b|strong|i|em))&gt;/gi,'<$1>');
-    s = s.replace(/&lt;br\s*\/?&gt;/gi,'<br>');
-    s = s.replace(/\n/g,'<br>');
-    return s;
-}
-function stripHtml(t='') {
-    return String(t??'').replace(/<br\s*\/?>/gi,' ').replace(/<[^>]*>/g,' ').replace(/&nbsp;/gi,' ').replace(/&quot;/gi,'"').replace(/&#39;/gi,"'").replace(/&amp;/gi,'&').replace(/\s+/g,' ').trim();
-}
-function normText(t='') {
-    return stripHtml(String(t??'')).replace(/\s+/g,' ').replace(/^["'""'']+|["'""'']+$/g,'').replace(/[.,!?]+$/g,'').trim().toLowerCase();
-}
-function isSame(a,b) { return normText(a)===normText(b); }
-function renderSafe(el,t='') { el.innerHTML = sanitizeLimitedHtml(t); }
-
-// ════════════════════════════════════════════
-//  TTS
-// ════════════════════════════════════════════
-function loadTTSVoices() {
-    if (!('speechSynthesis' in window)) return;
-    ttsVoices = window.speechSynthesis.getVoices() || [];
-}
-function pickVoice(lang='ko-KR') {
-    const n = String(lang).toLowerCase(), base = n.split('-')[0];
-    const list = (ttsVoices.length ? ttsVoices : (window.speechSynthesis?.getVoices() || []));
-    return list.find(v=>(v.lang||'').toLowerCase()===n)
-        || list.find(v=>(v.lang||'').toLowerCase().startsWith(base))
-        || list.find(v=>base==='ko'&&/korean|한국/i.test(v.name||''))
-        || list.find(v=>base==='en'&&/english|us|uk/i.test((v.name||'')+(v.lang||'')))
-        || list[0];
-}
-function playTTS(text, lang='ko-KR') {
-    if (!('speechSynthesis' in window)) { alert('TTS 미지원 브라우저입니다.'); return; }
-    const clean = stripHtml(String(text||'')).trim();
-    if (!clean) return;
-    try {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(clean);
-        u.lang = lang; u.rate = lang.startsWith('en') ? 0.9 : 0.95;
-        u.pitch = 1.0; u.volume = 1.0;
-        const v = pickVoice(lang); if (v) u.voice = v;
-        window.speechSynthesis.speak(u);
-    } catch(e) { console.error(e); }
+function showToast(msg,dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid=setTimeout(()=>t.classList.remove('show'),dur);
 }
 
-// ════════════════════════════════════════════
-//  JSON PARSING / VALIDATION
-// ════════════════════════════════════════════
-function extractJSON(raw='') {
-    const s = String(raw||'').replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```$/i,'').trim();
-    const st = s.indexOf('['), en = s.lastIndexOf(']');
-    if (st<0) throw new Error('JSON 배열 시작([) 없음');
-    if (en<0||en<st) throw new Error('JSON 배열 끝(]) 없음 - 응답 잘림');
-    return JSON.parse(s.slice(st,en+1));
-}
-
-function validateVocab(arr) {
-    if (!Array.isArray(arr)) throw new Error('배열 아님');
-    const seen = new Set();
-    return arr.map((item,i) => {
-        const word = String(item?.word??'').trim();
-        const meaning = String(item?.meaning??'').trim();
-        const tts = String(item?.tts??word).trim();
-        if (!word)    throw new Error(`${i+1}번 word 없음`);
-        if (!meaning) throw new Error(`${i+1}번 meaning 없음`);
-        const k = normText(word);
-        if (seen.has(k)) throw new Error(`${i+1}번 단어 중복`);
-        seen.add(k);
-        return {word,meaning,tts};
-    });
-}
-
-function validateQuiz(arr) {
-    if (!Array.isArray(arr)) throw new Error('배열 아님');
-    return arr.map((item,i) => {
-        const type = item?.type==='subjective' ? 'subjective' : 'objective';
-        const q = String(item?.q??'').trim();
-        const aRaw = String(item?.a??'').trim();
-        const desc = String(item?.desc??'해설이 제공되지 않았습니다.').trim();
-        if (!q)    throw new Error(`${i+1}번 q 없음`);
-        if (!aRaw) throw new Error(`${i+1}번 a 없음`);
-
-        if (type==='objective') {
-            const opts = Array.isArray(item?.options) ? item.options.map(v=>String(v).trim()).filter(Boolean) : [];
-            if (opts.length!==4) throw new Error(`${i+1}번 보기 ${opts.length}개 (4개 필요)`);
-            const dedup = new Set(opts.map(o=>normText(o)));
-            if (dedup.size!==4) throw new Error(`${i+1}번 보기 중복`);
-            const match = opts.find(o=>isSame(o,aRaw));
-            if (!match) throw new Error(`${i+1}번 정답이 보기에 없음: "${aRaw}"`);
-            const ttsOpts = (Array.isArray(item?.tts_options)&&item.tts_options.length===4) ? item.tts_options.map(v=>String(v).trim()) : [...opts];
-            return { type:'objective', q, options:opts, a:match, desc, tts_q:String(item?.tts_q??q).trim(), tts_options:ttsOpts };
-        }
-        return { type:'subjective', q, a:aRaw, desc };
-    });
-}
-
-function qualityCheck(q) {
-    const plain = stripHtml(q?.q||'');
-    const raw   = String(q?.q||'');
-    const opts  = Array.isArray(q?.options) ? q.options : [];
-    if (plain.length < 8) return '질문 너무 짧음';
-    if (/그림|표를 보고/.test(plain)) return '그림/표 필요 문제';
-    if (/바르게 배열하여 문장을 만들 때/.test(plain)) return '배열형 금지';
-    if (/세 번째에 올 말|두 번째에 올 말|네 번째에 올 말|첫 번째에 올 말/.test(plain)) return '순서배열형 금지';
-    if (/밑줄|밑줄 친|밑 친/.test(plain)) {
-        if (!/<u>.*?<\/u>/i.test(raw) && !opts.some(o=>/<u>.*?<\/u>/i.test(String(o)))) return '밑줄문제에 <u>태그 없음';
+function showOverlay(show,icon='🤖',title='처리 중...',sub='잠시만 기다려 주세요',step=-1){
+  const ov=document.getElementById('overlay');
+  if(show){
+    document.getElementById('ov-icon').textContent=icon;
+    document.getElementById('ov-title').innerHTML=title;
+    document.getElementById('ov-sub').textContent=sub;
+    for(let i=0;i<4;i++){
+      const el=document.getElementById('step'+i);
+      el.className='ov-step'+(i<step?' done':i===step?' active':'');
     }
-    if (/괄호 안/.test(plain) && !/[()（）]/.test(plain)) return '괄호문제에 괄호 없음';
-    if (q.type==='objective') {
-        if (!opts.length||opts.length!==4) return '보기 4개 아님';
-        if (opts.some(o=>stripHtml(o).length<1)) return '보기 너무 짧음';
-        if (opts.filter(o=>isSame(o,q.a)).length!==1) return '정답 보기 매칭 오류';
-        if (new Set(opts.map(o=>normText(o))).size!==4) return '보기 중복';
-    }
-    return '';
+    ov.classList.add('show');
+  } else ov.classList.remove('show');
 }
 
-function qSig(q) { return normText(stripHtml(q?.q||'')).slice(0,140); }
-
-// ════════════════════════════════════════════
-//  AI FETCH  (온도 0.05, Flash 우선)
-// ════════════════════════════════════════════
-async function fetchGemini(prompt, attempt=0, isJson=true) {
-    const total = AI_MODELS.length * API_KEYS.length;
-    if (attempt >= total) {
-        alert('AI 서버 통신에 실패했습니다. 잠시 후 다시 시도해주세요.');
-        throw new Error('통신 제한 도달');
-    }
-    const model  = AI_MODELS[attempt % AI_MODELS.length];
-    const apiKey = API_KEYS[Math.floor(attempt / AI_MODELS.length)];
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    const genCfg = {
-        temperature: 0.05,          // ★ 낮은 온도 → 일관된 JSON 출력
-        maxOutputTokens: 8192,
-        topP: 0.8
-    };
-    if (isJson) genCfg.response_mime_type = "application/json";
-
-    try {
-        const res = await fetch(url, {
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:genCfg })
-        });
-        const raw = await res.text();
-        let result;
-        try { result = JSON.parse(raw); } catch(e) { return fetchGemini(prompt, attempt+1, isJson); }
-        if (!res.ok || !result?.candidates?.length) return fetchGemini(prompt, attempt+1, isJson);
-        return result;
-    } catch(e) {
-        return fetchGemini(prompt, attempt+1, isJson);
-    }
+function floatPt(e,txt){
+  const el=document.createElement('div');
+  el.className='float-pt'; el.textContent=txt;
+  const x=e?.clientX??window.innerWidth/2, y=e?.clientY??window.innerHeight/2;
+  el.style.left=(x-30)+'px'; el.style.top=(y-40)+'px';
+  document.body.appendChild(el); setTimeout(()=>el.remove(),1000);
 }
 
-async function fetchArray(prompt, count, mode='quiz', maxRetry=3) {
-    let lastErr=null, lastRaw='';
-    for (let i=0; i<maxRetry; i++) {
-        const data = await fetchGemini(prompt, 0, true);
-        lastRaw = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        try {
-            const parsed = extractJSON(lastRaw);
-            const valid  = mode==='vocab' ? validateVocab(parsed) : validateQuiz(parsed);
-            if (valid.length < count) throw new Error(`항목 수 부족: ${valid.length}/${count}`);
-            return valid.slice(0, count);
-        } catch(err) {
-            lastErr = err;
-            console.warn(`파싱 실패 재시도 ${i+1}/${maxRetry}`, err.message);
-            prompt += `\n\n[⚠️ 재출력 보정 지시]\n직전 응답에 JSON 오류가 있었습니다. 아래 규칙을 반드시 지켜 JSON 배열만 다시 출력하십시오:\n- [ 로 시작, ] 로 끝\n- 마크다운 코드블록 금지\n- 보기 정확히 4개\n- a는 반드시 options 중 하나와 글자까지 완전 동일\n- 오류 원인: ${err.message}`;
-        }
-    }
-    console.error('최종 실패 원문:', lastRaw);
-    throw lastErr || new Error('JSON 생성 최종 실패');
-}
-
-async function regenerateInvalid(basePrompt, invalids, existing) {
-    const stems = existing.map((q,i)=>`${i+1}. ${stripHtml(q.q).slice(0,80)}`).join('\n');
-    const reasons = invalids.map((item,i)=>`${i+1}. 기존 ${item.idx+1}번 → ${item.reason}`).join('\n');
-    const rp = `${basePrompt}\n\n[부분 재출제 - ${invalids.length}개만 JSON 배열로 재생성]\n탈락 사유:\n${reasons}\n중복 금지 기존 문항:\n${stems}\n\n반드시 JSON 배열 하나만 출력. 보기 4개 필수. a는 options 중 하나와 완전 동일.`;
-    return fetchArray(rp, invalids.length, 'quiz');
-}
-
-async function postProcess(qs, basePrompt, rounds=2) {
-    let cur = [...qs];
-    for (let r=0; r<rounds; r++) {
-        const invalids = [];
-        const seen = new Set();
-        cur.forEach((q,idx) => {
-            const sig = qSig(q);
-            if (seen.has(sig)) { invalids.push({idx, reason:'중복'}); return; }
-            seen.add(sig);
-            const issue = qualityCheck(q);
-            if (issue) invalids.push({idx, reason:issue});
-        });
-        if (!invalids.length) return cur;
-        const replacements = await regenerateInvalid(basePrompt, invalids, cur);
-        invalids.forEach((item,i) => { if (replacements[i]) cur[item.idx] = replacements[i]; });
-    }
-    return cur;
-}
-
-// ════════════════════════════════════════════
-//  ★★★ 강화된 AI 프롬프트 빌더 ★★★
-// ════════════════════════════════════════════
-function buildPrompt(cfg) {
-    const gradeText = cfg.grade===0 ? "유치원 7세(예비 초등)" : `초등학교 ${cfg.grade}학년`;
-    const diffMap = {
-        '최저': '해당 학년 최기초 수준. 단순 사실 확인, 1단계 연산, 매우 짧은 지문.',
-        '하':   '교과서 기본 문제. 개념을 직접 물어보며 꼬임 없이 정답이 명확.',
-        '중':   '표준 수준. 2단계 이상 사고, 문장 흐름 파악, 응용 포함.',
-        '상':   '심화 응용. 복합 개념 연계, 추론·비교·분석 능력 필요.',
-        '최상': '최상위 변별. 깊은 논리 사고, 다각적 접근, 까다로운 함정 보기.'
-    };
-    const diffDesc = diffMap[cfg.difficulty] || diffMap['중'];
-
-    // ★ 공통 엄격 규칙 (예시 포함 → 오류율 대폭 감소)
-    const STRICT = `
-━━━ 필수 준수 규칙 (위반 시 자동 탈락) ━━━
-[금지 유형]
-✗ 그림·표·사진이 필요한 문제
-✗ "바르게 배열하여 문장을 만들 때" 유형
-✗ "첫/두/세/네 번째에 올 말" 순서배열 유형
-✗ 정답이 2개 이상 존재하는 문제
-✗ 학년 수준을 크게 벗어나는 선행학습 개념
-✗ "보기"나 "지문"이 별도로 제공되어야 하는 문제
-
-[객관식 보기 규칙]
-✗ 보기 개수: 반드시 정확히 4개 (3개·5개 금지)
-✗ 4개의 보기는 모두 서로 달라야 함 (중복 금지)
-✓ 정답(a 값)은 options 배열 중 하나와 문자까지 완전히 동일해야 함
-
-[밑줄 규칙]
-✓ "밑줄 친" 문제는 반드시 <u>텍스트</u> 태그를 q 또는 options 안에 사용
-
-[해설 규칙]
-✓ desc는 2문장 이하, 120자 이내로 핵심만 간결하게
-
-━━━ JSON 출력 규칙 ━━━
-✓ [ 로 시작, ] 로 끝나는 JSON 배열 하나만 출력
-✗ \`\`\`json 마크다운 코드블록 절대 금지
-✓ 문자열 내 줄바꿈은 \\n 으로 표현`;
-
-    if (cfg.subject === '영단어') {
-        return `당신은 대한민국 초등 영어교육 전문가입니다.
-대상: ${gradeText} / 난이도: ${cfg.difficulty} (${diffDesc})
-고유값: ${Date.now()}
-
-[임무] 해당 학년 수준에 맞는 영단어 10개를 JSON 배열로 생성하십시오.
-
-[영단어 선정 기준]
-- 실생활·교과서에서 자주 쓰이는 단어
-- 과도한 선행학습 단어(토익·토플 수준) 금지
-- meaning은 초등학생이 바로 이해할 수 있는 쉬운 한국어
-
-[JSON 형식 예시]
-[
-  {"word":"apple","meaning":"사과","tts":"apple"},
-  {"word":"happy","meaning":"행복한, 기쁜","tts":"happy"}
-]
-
-${STRICT}
-
-지금 바로 JSON 배열을 출력하십시오.`;
-    }
-
-    if (cfg.subject === '영어') {
-        return `당신은 대한민국 초등 영어 평가 출제 위원입니다. '2026 개정 교육과정' 기준입니다.
-대상: ${gradeText} / 난이도: ${cfg.difficulty} (${diffDesc})
-고유값: ${Date.now()}
-
-[임무] 영어(EFL) 객관식 문제 20개를 JSON 배열로 출제하십시오.
-
-[출제 유형 배분 (총 20개)]
-- 어휘(단어·숙어) 6개
-- 문법(문장구조·시제·품사) 7개
-- 독해(짧은 지문·대화문 이해) 7개
-
-[품질 기준]
-- 모든 질문은 짧은 영어 문장 또는 영어 지문으로 작성
-- ${gradeText} 수준의 영단어와 문법만 사용
-- 정답 1개, 오답 3개는 서로 완전히 달라야 함
-- 오답도 실력 있는 학생이 헷갈릴 수 있는 그럴듯한 함정으로
-
-[JSON 형식 예시]
-[
-  {
-    "type":"objective",
-    "q":"What is the <u>opposite</u> of 'hot'?",
-    "options":["cold","warm","big","fast"],
-    "a":"cold",
-    "desc":"'hot(뜨거운)'의 반의어는 'cold(차가운)'입니다.",
-    "tts_q":"What is the opposite of hot?",
-    "tts_options":["cold","warm","big","fast"]
+function confetti(){
+  const cols=['#6C63FF','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4'];
+  for(let i=0;i<70;i++){
+    const el=document.createElement('div'); el.className='confetti-piece';
+    el.style.cssText=`left:${Math.random()*100}vw;top:-20px;width:${6+Math.random()*6}px;height:${6+Math.random()*6}px;background:${cols[i%cols.length]};animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*.5}s;opacity:${.7+Math.random()*.3};transform:rotate(${Math.random()*360}deg);`;
+    document.body.appendChild(el); setTimeout(()=>el.remove(),5000);
   }
-]
-
-${STRICT}
-
-지금 바로 JSON 배열 20개를 출력하십시오.`;
-    }
-
-    if (cfg.subject === '국어') {
-        return `당신은 대한민국 초등 국어교육 및 평가 전문가입니다. '2026 개정 교육과정' 기준입니다.
-대상: ${gradeText} / 난이도: ${cfg.difficulty} (${diffDesc})
-고유값: ${Date.now()}
-
-[임무] 국어 객관식 문제 20개를 JSON 배열로 출제하십시오.
-
-[출제 영역 배분 (총 20개)]
-- 맞춤법·띄어쓰기 5개
-- 어휘(낱말의 뜻·관계) 5개
-- 독해(글의 내용·주제 파악) 5개
-- 문법(문장 성분·문장 종류) 5개
-
-[품질 기준]
-- 글만으로 완전히 이해 가능한 문제 (외부 자료 불필요)
-- 짧은 지문(3~5문장)이 필요한 경우 q 안에 직접 포함
-- 오답은 정답과 비슷해 보이지만 분명히 틀린 것으로 선정
-- 해설은 정답인 이유를 명확하게 설명
-
-[JSON 형식 예시]
-[
-  {
-    "type":"objective",
-    "q":"다음 중 <u>맞춤법</u>이 바른 것은?",
-    "options":["할게요","할께요","하ㄹ게요","할개요"],
-    "a":"할게요",
-    "desc":"'-ㄹ게요'는 의지를 나타내는 어미로 '할게요'가 올바른 표기입니다."
-  }
-]
-
-${STRICT}
-
-지금 바로 JSON 배열 20개를 출력하십시오.`;
-    }
-
-    // 수학
-    return `당신은 대한민국 초등 수학교육 및 평가 전문가입니다. '2026 개정 교육과정' 기준입니다.
-대상: ${gradeText} / 난이도: ${cfg.difficulty} (${diffDesc})
-고유값: ${Date.now()}
-
-[임무] 수학 객관식 문제 20개를 JSON 배열로 출제하십시오.
-
-[출제 영역 배분 (총 20개)]
-- 수와 연산(계산·수 관계) 8개
-- 도형(모양·측정) 4개
-- 규칙·패턴 찾기 4개
-- 문장제 문제(실생활 응용) 4개
-
-[품질 기준]
-- 해당 학년 교육과정 범위만 사용 (선행 개념 금지)
-- 계산 문제는 숫자를 q에 직접 표기 (예: "324 + 517 = ?")
-- 문장제는 3문장 이내의 짧고 명확한 상황 제시
-- 오답은 흔히 범하는 계산 실수 유형으로 구성
-- 단위(cm, kg, 원 등)가 필요하면 반드시 q와 a에 포함
-
-[JSON 형식 예시]
-[
-  {
-    "type":"objective",
-    "q":"사과 3개와 배 5개가 있습니다. 과일은 모두 몇 개인가요?",
-    "options":["7개","8개","9개","6개"],
-    "a":"8개",
-    "desc":"3 + 5 = 8이므로 과일은 모두 8개입니다."
-  }
-]
-
-${STRICT}
-
-지금 바로 JSON 배열 20개를 출력하십시오.`;
 }
 
-// ════════════════════════════════════════════
-//  DB HELPERS
-// ════════════════════════════════════════════
-async function dbGet(path) {
-    if (db) { const s = await db.ref(path).once('value'); return s.val(); }
-    return JSON.parse(localStorage.getItem('edu_'+path.replace(/\//g,'_')));
-}
-async function dbSet(path, data) {
-    if (db) return db.ref(path).set(data);
-    localStorage.setItem('edu_'+path.replace(/\//g,'_'), JSON.stringify(data));
-}
-async function pushNotif(msg) {
-    if (!db) return;
-    await db.ref('push_notifications').push({ message:msg, timestamp:firebase.database.ServerValue.TIMESTAMP });
-}
-function setupAdminPush() {
-    if (!db || Notification.permission!=="granted") return;
-    const now = Date.now();
-    db.ref('push_notifications').orderByChild('timestamp').startAt(now).on('child_added', snap => {
-        const d = snap.val();
-        if (d?.message) new Notification("스마트 학습 알림 🔔", {body:d.message, icon:"icon.png?v=18"});
-    });
+function openModal(id){document.getElementById(id).classList.add('active');}
+function closeModal(id){document.getElementById(id).classList.remove('active');}
+
+// ══════════════════════════════
+//  DB
+// ══════════════════════════════
+async function dbGet(p){if(db){const s=await db.ref(p).once('value');return s.val();}return JSON.parse(localStorage.getItem('edu_'+p.replace(/\//g,'_'))||'null');}
+async function dbSet(p,d){if(db)return db.ref(p).set(d);localStorage.setItem('edu_'+p.replace(/\//g,'_'),JSON.stringify(d));}
+async function pushNotif(m){if(!db)return;await db.ref('push_notifications').push({message:m,timestamp:firebase.database.ServerValue.TIMESTAMP});}
+function setupPush(){
+  if(!db||Notification.permission!=='granted')return;
+  db.ref('push_notifications').orderByChild('timestamp').startAt(Date.now()).on('child_added',snap=>{
+    const d=snap.val(); if(d?.message) new Notification('스마트 학습 🔔',{body:d.message,icon:'icon.png?v=18'});
+  });
 }
 
-// ════════════════════════════════════════════
-//  UI HELPERS
-// ════════════════════════════════════════════
-function showLoading(show, title='처리 중입니다...', sub='잠시만 기다려 주세요') {
-    const ov = document.getElementById('loading-overlay');
-    if (show) {
-        document.getElementById('loading-msg').innerHTML = title;
-        document.getElementById('loading-sub').innerText = sub;
-        ov.style.display = 'flex';
-    } else {
-        ov.style.display = 'none';
-    }
-}
-
-function showFloatingPoint(e, text) {
-    const el = document.createElement('div');
-    el.className = 'floating-point'; el.innerText = text;
-    const x = e?.clientX || window.innerWidth/2;
-    const y = e?.clientY || window.innerHeight/2;
-    el.style.left = `${x-40}px`; el.style.top = `${y-40}px`;
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(), 1000);
-}
-
-function triggerConfetti() {
-    const colors = ['#2563EB','#059669','#D97706','#7C3AED','#0891B2'];
-    for (let i=0;i<60;i++) {
-        const el = document.createElement('div');
-        el.className = 'confetti';
-        el.style.left = Math.random()*100+'vw';
-        el.style.backgroundColor = colors[i%colors.length];
-        el.style.animationDuration = (Math.random()*2+2)+'s';
-        el.style.opacity = Math.random();
-        document.body.appendChild(el);
-        setTimeout(()=>el.remove(), 4000);
-    }
-}
-
-function renderShopItems() {
-    const c = document.getElementById('shop-items-container');
-    c.innerHTML = SHOP_ITEMS.map(item => `
-        <div class="shop-item">
-            <div>
-                <div class="item-name">${escapeHtml(item.name)}</div>
-                <div class="item-price">${item.cost.toLocaleString()} P</div>
-            </div>
-            <button class="btn btn-green btn-sm" onclick="buyItem('${escapeHtml(item.name)}',${item.cost})">구매</button>
-        </div>
-    `).join('');
-}
-
-// ════════════════════════════════════════════
+// ══════════════════════════════
 //  NAVIGATION
-// ════════════════════════════════════════════
-function getActiveId() { return document.querySelector('.view-section.active')?.id||''; }
-function isLearningView(id) { return ['learning-view','quiz-view','result-view','wrong-review-view'].includes(id); }
-
-function confirmLeave(type='home') {
-    const id = getActiveId();
-    if (isLearningView(id)) return confirm(`정말 ${type==='logout'?'나가':'홈으로 이동'}시겠습니까?\n진행 내용은 저장되어 이어하기가 가능합니다.`);
-    if (['shop-view','parent-view'].includes(id)) return confirm(`정말 ${type==='logout'?'나가':'이동'}시겠습니까?`);
-    return true;
+// ══════════════════════════════
+function getActiveId(){return document.querySelector('.view.active')?.id||'';}
+function isLearningId(id){return['learning-view','quiz-view','result-view','wrong-review-view'].includes(id);}
+function confirmLeave(type='back'){
+  const id=getActiveId();
+  if(isLearningId(id)) return confirm(`정말 ${type==='logout'?'나가':'이동'}시겠습니까?\n진행 내용은 저장되어 이어하기가 가능합니다.`);
+  return true;
 }
 
-function updateHeader(id) {
-    const titles = {
-        'login-view':         '🌟 스마트 학습',
-        'profile-select-view':'사용자 선택',
-        'parent-view':        '📊 관리자 센터',
-        'shop-view':          '🎁 포인트 상점',
-        'wrong-review-view':  '📝 오답 노트',
-        'learning-view':      '📝 영단어 학습',
-        'quiz-view':          `${currentProfile||''}의 학습 ✨`,
-        'result-view':        '🎉 학습 결과',
-        'child-dashboard-view': currentProfile ? `${currentProfile}의 학습장` : '스마트 학습'
-    };
-    document.getElementById('header-title').innerText = titles[id] || '스마트 학습';
-    const backBtn   = document.getElementById('back-btn');
-    const logoutBtn = document.getElementById('logout-btn');
-    const hideBack  = ['profile-select-view','child-dashboard-view','parent-view','login-view'];
-    backBtn.style.display   = hideBack.includes(id) ? 'none' : 'inline-flex';
-    logoutBtn.style.display = currentProfile ? 'inline-flex' : 'none';
+const HDR_MAP={
+  'login-view':['🌟 스마트 학습','AI 맞춤형 학습 플랫폼'],
+  'profile-select-view':['👤 사용자 선택','이름을 선택해주세요'],
+  'parent-view':['📊 관리자 센터','학습 현황 대시보드'],
+  'shop-view':['🏪 포인트 상점','보상을 구매해요'],
+  'wrong-review-view':['📝 오답 노트','틀린 문제 복습'],
+  'learning-view':['📝 영단어 학습','단어를 외워봐요'],
+  'quiz-view':['✏️ 문제 풀기','집중해서 풀어봐요'],
+  'result-view':['🎉 학습 결과','오늘도 수고했어요'],
+  'child-dashboard-view':['홈','학습을 시작해요']
+};
+
+function updateHdr(id){
+  const info=HDR_MAP[id]||['스마트 학습',''];
+  let title=info[0], sub=info[1]||'';
+  if(id==='child-dashboard-view'&&me) title=me+'의 학습장 🌟';
+  document.getElementById('hdr-title').textContent=title;
+  document.getElementById('hdr-sub').textContent=sub;
+  const hideBack=['profile-select-view','child-dashboard-view','parent-view','login-view'];
+  document.getElementById('back-btn').style.display=hideBack.includes(id)?'none':'flex';
+  document.getElementById('logout-btn').style.display=me?'flex':'none';
 }
 
-function showView(id, opts={}) {
-    const { push=true, resetHistory=false } = opts;
-    const curId = getActiveId();
-    if (resetHistory) viewHistory = [];
-    if (push && curId && curId!==id) viewHistory.push(curId);
-    document.querySelectorAll('.view-section').forEach(el=>el.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    updateHeader(id);
+function showView(id,opts={}){
+  const{push=true,resetHistory=false}=opts;
+  const cur=getActiveId();
+  if(resetHistory) viewStack=[];
+  if(push&&cur&&cur!==id) viewStack.push(cur);
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('main-scroll').scrollTop=0;
+  updateHdr(id);
 }
 
-function goBack() {
-    // 모달 닫기 우선
-    for (const mid of ['detail-modal','permission-modal','resume-modal']) {
-        const m = document.getElementById(mid);
-        if (m.style.display==='flex') { m.style.display='none'; return; }
+function goBack(){
+  // 모달 닫기 우선
+  for(const mid of['detail-modal','notif-modal','resume-modal']){
+    if(document.getElementById(mid).classList.contains('active')){ closeModal(mid); return; }
+  }
+  if(!confirmLeave('back')) return;
+  if(viewStack.length>0){showView(viewStack.pop(),{push:false});return;}
+  if(me==='admin'){showView('parent-view',{push:false,resetHistory:true});return;}
+  if(me){showView('child-dashboard-view',{push:false,resetHistory:true});return;}
+  showView('login-view',{push:false,resetHistory:true});
+}
+
+// ══════════════════════════════
+//  JSON / VALIDATION
+// ══════════════════════════════
+function extractJSON(raw){
+  const s=String(raw||'').replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```$/i,'').trim();
+  const st=s.indexOf('['),en=s.lastIndexOf(']');
+  if(st<0) throw new Error('JSON 배열 시작 없음');
+  if(en<st) throw new Error('JSON 배열 끝 없음 (잘림)');
+  return JSON.parse(s.slice(st,en+1));
+}
+function valVocab(arr){
+  if(!Array.isArray(arr)) throw new Error('배열 아님');
+  const seen=new Set();
+  return arr.map((item,i)=>{
+    const word=String(item?.word??'').trim();
+    const meaning=String(item?.meaning??'').trim();
+    const tts_val=String(item?.tts??word).trim();
+    if(!word) throw new Error(`${i+1}번 word 없음`);
+    if(!meaning) throw new Error(`${i+1}번 meaning 없음`);
+    const k=norm(word); if(seen.has(k)) throw new Error(`${i+1}번 중복`); seen.add(k);
+    return{word,meaning,tts:tts_val};
+  });
+}
+function valQuiz(arr){
+  if(!Array.isArray(arr)) throw new Error('배열 아님');
+  return arr.map((item,i)=>{
+    const type=item?.type==='subjective'?'subjective':'objective';
+    const q=String(item?.q??'').trim();
+    const aRaw=String(item?.a??'').trim();
+    const desc=String(item?.desc??'해설이 제공되지 않았습니다.').trim();
+    if(!q) throw new Error(`${i+1}번 q 없음`);
+    if(!aRaw) throw new Error(`${i+1}번 a 없음`);
+    if(type==='objective'){
+      const opts=Array.isArray(item?.options)?item.options.map(v=>String(v).trim()).filter(Boolean):[];
+      if(opts.length!==4) throw new Error(`${i+1}번 보기 ${opts.length}개`);
+      if(new Set(opts.map(o=>norm(o))).size!==4) throw new Error(`${i+1}번 보기 중복`);
+      const match=opts.find(o=>same(o,aRaw));
+      if(!match) throw new Error(`${i+1}번 정답 보기 불일치: "${aRaw}"`);
+      const ttsOpts=(Array.isArray(item?.tts_options)&&item.tts_options.length===4)?item.tts_options.map(v=>String(v).trim()):[...opts];
+      return{type:'objective',q,options:opts,a:match,desc,tts_q:String(item?.tts_q??q).trim(),tts_options:ttsOpts};
     }
-    if (!confirmLeave('home')) return;
-    if (viewHistory.length>0) { showView(viewHistory.pop(),{push:false}); return; }
-    if (currentProfile==='admin') { showView('parent-view',{push:false,resetHistory:true}); return; }
-    if (currentProfile) { showView('child-dashboard-view',{push:false,resetHistory:true}); return; }
-    showView('login-view',{push:false,resetHistory:true});
+    return{type:'subjective',q,a:aRaw,desc};
+  });
+}
+function qCheck(q){
+  const p=stripHtml(q?.q||''),raw=String(q?.q||''),opts=Array.isArray(q?.options)?q.options:[];
+  if(p.length<8) return '문제 너무 짧음';
+  if(/그림|표를 보고/.test(p)) return '그림/표 필요';
+  if(/바르게 배열하여/.test(p)) return '배열형 금지';
+  if(/세 번째에 올 말|두 번째에 올 말/.test(p)) return '순서배열형 금지';
+  if(/밑줄/.test(p)&&!/<u>/.test(raw)&&!opts.some(o=>/<u>/.test(String(o)))) return '밑줄 태그 없음';
+  if(q.type==='objective'){
+    if(opts.length!==4) return '보기 4개 아님';
+    if(opts.filter(o=>same(o,q.a)).length!==1) return '정답 매칭 오류';
+    if(new Set(opts.map(o=>norm(o))).size!==4) return '보기 중복';
+  }
+  return '';
+}
+function qSig(q){return norm(stripHtml(q?.q||'')).slice(0,140);}
+
+// ══════════════════════════════
+//  AI FETCH
+// ══════════════════════════════
+async function fetchAI(prompt,attempt=0,json=true){
+  const total=AI_MODELS.length*API_KEYS.length;
+  if(attempt>=total){showToast('⚠️ AI 서버 오류. 잠시 후 다시 시도해주세요.');throw new Error('통신 제한');}
+  const model=AI_MODELS[attempt%AI_MODELS.length];
+  const key=API_KEYS[Math.floor(attempt/AI_MODELS.length)];
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+  const cfg2={temperature:0.05,maxOutputTokens:8192,topP:0.8};
+  if(json) cfg2.response_mime_type='application/json';
+  try{
+    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:cfg2})});
+    const raw=await res.text();
+    let result; try{result=JSON.parse(raw);}catch(e){return fetchAI(prompt,attempt+1,json);}
+    if(!res.ok||!result?.candidates?.length) return fetchAI(prompt,attempt+1,json);
+    return result;
+  }catch(e){return fetchAI(prompt,attempt+1,json);}
 }
 
-// ════════════════════════════════════════════
-//  SESSION PERSISTENCE
-// ════════════════════════════════════════════
-function saveSession() {
-    if (!currentProfile||currentProfile==='admin') return;
-    dbSet('sessions/'+currentProfile, {config,sessionState});
-}
-
-// ════════════════════════════════════════════
-//  STREAK & POINTS
-// ════════════════════════════════════════════
-function calcStreak(dates) {
-    if (!dates?.length) return 0;
-    const today = new Date(); today.setHours(0,0,0,0);
-    const last  = new Date(dates[dates.length-1]); last.setHours(0,0,0,0);
-    if (Math.ceil(Math.abs(today-last)/(86400000)) > 1) return 0;
-    let streak = 1;
-    for (let i=dates.length-1; i>0; i--) {
-        const d1=new Date(dates[i]); d1.setHours(0,0,0,0);
-        const d2=new Date(dates[i-1]); d2.setHours(0,0,0,0);
-        const diff = Math.ceil(Math.abs(d1-d2)/86400000);
-        if (diff===1) streak++;
-        else if (diff>1) break;
+async function fetchArray(prompt,count,mode='quiz',maxR=3){
+  let lastErr=null,lastRaw='';
+  for(let i=0;i<maxR;i++){
+    showOverlay(true,'🤖','AI가 열심히 출제 중이에요! ✨',`시도 ${i+1}/${maxR}`,i);
+    const data=await fetchAI(prompt,0,true);
+    lastRaw=data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    try{
+      const parsed=extractJSON(lastRaw);
+      const valid=mode==='vocab'?valVocab(parsed):valQuiz(parsed);
+      if(valid.length<count) throw new Error(`항목 부족: ${valid.length}/${count}`);
+      return valid.slice(0,count);
+    }catch(err){
+      lastErr=err;
+      prompt+=`\n\n[⚠️ 재출력 보정]\n오류:${err.message}\n- [ 로 시작, ] 로 끝\n- 마크다운 코드블록 절대 금지\n- 보기 정확히 4개\n- a는 options 중 하나와 완전 동일\n- JSON 배열만 출력`;
     }
-    return streak;
+  }
+  throw lastErr||new Error('생성 실패');
 }
 
-async function addPoints(amount) {
-    let pts = await dbGet('users/'+currentProfile+'/points') || 0;
-    await dbSet('users/'+currentProfile+'/points', pts+amount);
-    document.getElementById('point-display').innerText = `${(pts+amount).toLocaleString()}P`;
-    document.getElementById('shop-point-display').innerText = `${(pts+amount).toLocaleString()}P`;
-}
-
-async function updateStats() {
-    const user = await dbGet('users/'+currentProfile) || {points:0, streak:[]};
-    const pts  = user.points || 0;
-    document.getElementById('point-display').innerText = `${pts.toLocaleString()}P`;
-    document.getElementById('shop-point-display').innerText = `${pts.toLocaleString()}P`;
-    document.getElementById('streak-display').innerText  = `${calcStreak(user.streak||[])}일`;
-}
-
-async function recordStreak() {
-    let user  = await dbGet('users/'+currentProfile);
-    let dates = user.streak || [];
-    const today = new Date().toDateString();
-    if (!dates.length || dates[dates.length-1]!==today) {
-        dates.push(today);
-        await dbSet('users/'+currentProfile+'/streak', dates);
-        const s = calcStreak(dates);
-        await addPoints(s);
-        alert(`출석 완료! 연속 ${s}일 → ${s}P 지급! 🎉`);
-    }
-    document.getElementById('streak-display').innerText = `${calcStreak(dates)}일`;
-}
-
-// ════════════════════════════════════════════
-//  GRADE BUTTONS
-// ════════════════════════════════════════════
-function renderGrades(age) {
-    const c = document.getElementById('grade-container');
-    c.innerHTML = '';
-    const minIdx = Math.max(0, (age||8)-8);
-    const grades = [{val:0,text:'7세 👶'},{val:1,text:'1학년'},{val:2,text:'2학년'},{val:3,text:'3학년'},{val:4,text:'4학년'},{val:5,text:'5학년'},{val:6,text:'6학년 🎓'}];
-    if (config.grade < minIdx) config.grade = minIdx;
-    grades.forEach((g,i) => {
-        const btn = document.createElement('button');
-        btn.className = `chip ${g.val===config.grade?'active':''}`;
-        btn.textContent = g.text; btn.dataset.val = g.val;
-        if (i < minIdx) { btn.disabled = true; } else { btn.onclick = ()=>selectConfig('grade',g.val); }
-        c.appendChild(btn);
+async function postProcess(qs,basePrompt,rounds=2){
+  let cur=[...qs];
+  for(let r=0;r<rounds;r++){
+    const invalids=[]; const seen=new Set();
+    cur.forEach((q,idx)=>{
+      const sig=qSig(q);
+      if(seen.has(sig)){invalids.push({idx,reason:'중복'});return;}
+      seen.add(sig);
+      const issue=qCheck(q); if(issue) invalids.push({idx,reason:issue});
     });
+    if(!invalids.length) return cur;
+    const stems=cur.map((q,i)=>`${i+1}. ${stripHtml(q.q).slice(0,80)}`).join('\n');
+    const reasons=invalids.map((it,i)=>`${i+1}. 기존${it.idx+1}번→${it.reason}`).join('\n');
+    const rp=`${basePrompt}\n\n[부분 재출제 ${invalids.length}개]\n탈락:${reasons}\n기존:${stems}\nJSON 배열만 출력.`;
+    const replacements=await fetchArray(rp,invalids.length,'quiz',2);
+    invalids.forEach((it,i)=>{if(replacements[i]) cur[it.idx]=replacements[i];});
+  }
+  return cur;
 }
 
-function selectConfig(type, val) {
-    config[type] = val;
-    updateSetupUI();
+// ══════════════════════════════
+//  ★★★ 강화된 프롬프트 ★★★
+// ══════════════════════════════
+function buildPrompt(c){
+  const gradeText=c.grade===0?'유치원 7세(예비 초등)':`초등학교 ${c.grade}학년`;
+  const diffMap={
+    '최저':'최기초. 단순 사실 확인, 1단계 연산, 매우 짧은 지문.',
+    '하':'교과서 기본. 개념 직접 확인, 꼬임 없이 정답 명확.',
+    '중':'표준. 2단계 이상 사고, 문장 흐름 파악, 응용 포함.',
+    '상':'심화. 복합 개념 연계, 추론·비교·분석 필요.',
+    '최상':'최상위 변별. 깊은 논리, 다각적 접근, 까다로운 함정 보기.'
+  };
+  const STRICT=`
+━━━ 필수 규칙 (위반 시 자동 탈락) ━━━
+✗ 그림·표·사진 필요한 문제 금지
+✗ "바르게 배열하여 문장을 만들 때" 금지
+✗ "첫/두/세/네 번째에 올 말" 순서배열 금지
+✗ 정답 2개 이상 금지
+✓ 보기: 반드시 정확히 4개, 서로 다름
+✓ a 값: options 중 하나와 문자까지 완전 동일
+✓ "밑줄 친" 문제: 반드시 <u>텍스트</u> 태그 사용
+✓ desc: 2문장 이하, 120자 이내
+━━━ 출력 규칙 ━━━
+✓ [ 로 시작, ] 로 끝나는 JSON 배열만 출력
+✗ \`\`\`json 마크다운 코드블록 절대 금지
+✓ 문자열 내 줄바꿈은 \\n 으로`;
+
+  if(c.subject==='영단어') return `대한민국 초등 영어교육 전문가입니다.
+대상:${gradeText} / 난이도:${c.difficulty} (${diffMap[c.difficulty]})
+고유값:${Date.now()}
+
+임무: ${gradeText} 수준 영단어 10개를 JSON 배열로 생성하십시오.
+선정 기준: 실생활·교과서 빈출 단어, 선행학습 금지, meaning은 쉬운 한국어
+
+[JSON 예시]
+[{"word":"apple","meaning":"사과","tts":"apple"},{"word":"happy","meaning":"행복한","tts":"happy"}]
+
+${STRICT}
+JSON 배열을 출력하십시오.`;
+
+  if(c.subject==='영어') return `대한민국 초등 영어 평가 출제위원입니다. 2026 개정 교육과정 기준.
+대상:${gradeText} / 난이도:${c.difficulty} (${diffMap[c.difficulty]})
+고유값:${Date.now()}
+
+임무: 영어(EFL) 객관식 20문항 JSON 배열 출제.
+출제 배분(20개): 어휘 6개 / 문법 7개 / 독해 7개
+품질: ${gradeText} 수준 단어·문법만 사용, 오답은 그럴듯한 함정
+
+[JSON 예시]
+[{"type":"objective","q":"What is the <u>opposite</u> of hot?","options":["cold","warm","big","fast"],"a":"cold","desc":"hot의 반의어는 cold입니다.","tts_q":"What is the opposite of hot?","tts_options":["cold","warm","big","fast"]}]
+
+${STRICT}
+JSON 배열 20개를 출력하십시오.`;
+
+  if(c.subject==='국어') return `대한민국 초등 국어교육·평가 전문가입니다. 2026 개정 교육과정 기준.
+대상:${gradeText} / 난이도:${c.difficulty} (${diffMap[c.difficulty]})
+고유값:${Date.now()}
+
+임무: 국어 객관식 20문항 JSON 배열 출제.
+출제 배분(20개): 맞춤법·띄어쓰기 5개 / 어휘(낱말관계) 5개 / 독해(내용·주제) 5개 / 문법(문장성분) 5개
+품질: 글만으로 완전 이해 가능, 짧은 지문은 q 안에 직접 포함, 오답은 헷갈리는 함정
+
+[JSON 예시]
+[{"type":"objective","q":"다음 중 <u>맞춤법</u>이 바른 것은?","options":["할게요","할께요","하ㄹ게요","할개요"],"a":"할게요","desc":"'-ㄹ게요'는 의지를 나타내는 어미로 '할게요'가 올바른 표기입니다."}]
+
+${STRICT}
+JSON 배열 20개를 출력하십시오.`;
+
+  return `대한민국 초등 수학교육·평가 전문가입니다. 2026 개정 교육과정 기준.
+대상:${gradeText} / 난이도:${c.difficulty} (${diffMap[c.difficulty]})
+고유값:${Date.now()}
+
+임무: 수학 객관식 20문항 JSON 배열 출제.
+출제 배분(20개): 수와 연산 8개 / 도형·측정 4개 / 규칙·패턴 4개 / 문장제 4개
+품질: 해당 학년 범위만(선행 금지), 계산문제는 숫자 직접 표기, 문장제 3문장 이내, 오답은 흔한 계산 실수
+
+[JSON 예시]
+[{"type":"objective","q":"사과 3개와 배 5개가 있습니다. 과일은 모두 몇 개인가요?","options":["7개","8개","9개","6개"],"a":"8개","desc":"3+5=8이므로 모두 8개입니다."}]
+
+${STRICT}
+JSON 배열 20개를 출력하십시오.`;
 }
 
-function updateSetupUI() {
-    document.querySelectorAll('#grade-container .chip').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.val)===config.grade));
-    document.querySelectorAll('#subject-container .chip').forEach(b=>b.classList.toggle('active',b.dataset.subject===config.subject));
-    document.querySelectorAll('#difficulty-container .chip').forEach(b=>b.classList.toggle('active',b.textContent===config.difficulty));
+// ══════════════════════════════
+//  STREAK / POINTS
+// ══════════════════════════════
+function calcStreak(dates){
+  if(!dates?.length) return 0;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const last=new Date(dates[dates.length-1]); last.setHours(0,0,0,0);
+  if(Math.ceil(Math.abs(today-last)/86400000)>1) return 0;
+  let s=1;
+  for(let i=dates.length-1;i>0;i--){
+    const d1=new Date(dates[i]); d1.setHours(0,0,0,0);
+    const d2=new Date(dates[i-1]); d2.setHours(0,0,0,0);
+    const diff=Math.ceil(Math.abs(d1-d2)/86400000);
+    if(diff===1) s++; else if(diff>1) break;
+  }
+  return s;
+}
+async function addPts(n){
+  let p=await dbGet('users/'+me+'/points')||0;
+  await dbSet('users/'+me+'/points',p+n);
+  updateStatBadges(p+n,null);
+  playBeep('coin');
+}
+async function updateStatBadges(pts,streak){
+  if(pts==null){ const u=await dbGet('users/'+me)||{}; pts=u.points||0; if(streak==null) streak=calcStreak(u.streak||[]); }
+  document.getElementById('point-val').textContent=pts>=1000?Math.floor(pts/1000)+'k':pts;
+  document.getElementById('shop-pts').textContent=pts.toLocaleString()+'P';
+  if(streak!=null) document.getElementById('streak-val').textContent=streak+'일';
+  // 총 학습 횟수
+  const allRep=repCache.filter(r=>r.profile===me);
+  document.getElementById('total-learn').textContent=allRep.length;
+}
+async function recordStreak(){
+  let u=await dbGet('users/'+me); let dates=u.streak||[];
+  const today=new Date().toDateString();
+  if(!dates.length||dates[dates.length-1]!==today){
+    dates.push(today);
+    await dbSet('users/'+me+'/streak',dates);
+    const s=calcStreak(dates);
+    await addPts(s);
+    showToast(`🔥 출석 완료! 연속 ${s}일 → ${s}P 지급!`);
+    vibrate([100,50,100]);
+  }
+  document.getElementById('streak-val').textContent=calcStreak(dates)+'일';
+}
+function saveSession(){if(!me||me==='admin')return;dbSet('sessions/'+me,{cfg,ss});}
+
+// ══════════════════════════════
+//  DASHBOARD UI
+// ══════════════════════════════
+function renderGrades(age){
+  const c=document.getElementById('grade-row'); c.innerHTML='';
+  const minIdx=Math.max(0,(age||8)-8);
+  [{v:0,t:'7세 👶'},{v:1,t:'1학년'},{v:2,t:'2학년'},{v:3,t:'3학년'},{v:4,t:'4학년'},{v:5,t:'5학년'},{v:6,t:'6학년 🎓'}].forEach((g,i)=>{
+    const b=document.createElement('button');
+    b.className='grade-btn'+(g.v===cfg.grade?' active':'');
+    b.textContent=g.t; b.dataset.v=g.v;
+    if(i<minIdx){b.disabled=true;}else{b.onclick=()=>setGrade(g.v);}
+    c.appendChild(b);
+  });
+}
+function setGrade(v){cfg.grade=v;renderGrades();updateStartBtn();}
+function selectSubj(s){
+  cfg.subject=s;
+  document.querySelectorAll('.subj-card').forEach(c=>{
+    c.className='subj-card';
+    if(c.dataset.subj===s) c.classList.add(SUBJ_COLORS[s].cls);
+  });
+  updateStartBtn();
+}
+function selectDiff(d){
+  cfg.difficulty=d;
+  document.querySelectorAll('.diff-btn').forEach(b=>{b.classList.toggle('active',b.textContent.includes(d));});
+  updateStartBtn();
+}
+function updateStartBtn(){
+  document.getElementById('start-btn-sub').textContent=`${cfg.subject} · ${fmtGrade(cfg.grade)} · ${cfg.difficulty}`;
+}
+function renderDash(){
+  document.getElementById('dash-name').textContent=me+'님 👋';
+  document.getElementById('dash-welcome').textContent=getGreeting();
+}
+function getGreeting(){
+  const h=new Date().getHours();
+  if(h<6) return '🌙 새벽에도 공부하다니 대단해요!';
+  if(h<12) return '☀️ 좋은 아침이에요!';
+  if(h<18) return '🌤 좋은 오후예요!';
+  return '🌆 저녁에도 열심히 하는군요!';
 }
 
-// ════════════════════════════════════════════
+// ══════════════════════════════
 //  AUTH
-// ════════════════════════════════════════════
-async function loginAsParent() {
-    const pw = prompt('관리자 비밀번호를 입력하십시오. 🔐');
-    if (pw==='1010') {
-        currentProfile = 'admin';
-        renderAdminPw(await dbGet('users')||{});
-        switchAdminTab('report');
-        showView('parent-view',{push:false,resetHistory:true});
-        if ("Notification" in window) {
-            if (Notification.permission==="default") document.getElementById('permission-modal').style.display='flex';
-            else if (Notification.permission==="granted") setupAdminPush();
-        }
-    } else if (pw!==null) alert('비밀번호가 일치하지 않습니다. ❌');
-}
-
-function renderAdminPw(users) {
-    const row = name => {
-        const u = users[name]||{};
-        return `<div style="margin-bottom:4px;">${{김로운:'👦',김서아:'👧',정지영:'👩'}[name]||''} <b>${name}</b> : 비번 <span style="color:var(--blue);">${escapeHtml(u.pw||'미설정')}</span> | ${u.age?u.age+'세':'나이 미설정'} | ${u.points||0}P</div>`;
-    };
-    document.getElementById('admin-pw-display').innerHTML = ['김로운','김서아','정지영'].map(row).join('');
-}
-
-async function setStudentAge() {
-    const student = document.getElementById('age-student-select').value;
-    const age = parseInt(document.getElementById('age-input').value);
-    if (isNaN(age)||age<7) { alert('7 이상의 나이를 입력해주세요.'); return; }
-    const user = await dbGet('users/'+student);
-    if (!user) { alert('사용자 정보 없음. 먼저 1회 로그인 필요.'); return; }
-    if (!confirm(`${student} 님 나이를 ${age}세로 설정하시겠습니까?`)) return;
-    await dbSet('users/'+student+'/age', age);
-    alert(`${student} 님 나이 ${age}세로 설정 완료 ✅`);
-    document.getElementById('age-input').value = '';
-    renderAdminPw(await dbGet('users'));
-}
-
-async function selectProfile(name) {
-    showLoading(true,'사용자 정보 불러오는 중...','잠시만 기다려 주세요');
-    let user = await dbGet('users/'+name);
-    if (!user) { user={pw:'',points:0,streak:[],age:8}; await dbSet('users/'+name,user); }
-    showLoading(false);
-
-    if (!user.pw) {
-        const np = prompt(`[${name}] 처음 오셨네요! 비밀번호를 만들어주세요. 🔐`);
-        if (!np?.trim()) return;
-        user.pw = np.trim();
-        await dbSet('users/'+name+'/pw', user.pw);
-        alert('비밀번호가 만들어졌어요! 🎉');
-        pushNotif(`[계정 알림] ${name} 님이 최초 비밀번호를 설정했습니다.`);
-    } else {
-        const ip = prompt(`[${name}] 비밀번호를 입력해주세요. 🔑`);
-        if (ip===null) return;
-        if (ip.trim()!==user.pw) { alert('비밀번호가 틀렸어요. ❌'); return; }
+// ══════════════════════════════
+async function loginAsParent(){
+  const pw=prompt('관리자 비밀번호를 입력하십시오. 🔐');
+  if(pw==='1010'){
+    me='admin'; renderAdminPw(await dbGet('users')||{});
+    switchTab('report'); showView('parent-view',{push:false,resetHistory:true});
+    if("Notification"in window){
+      if(Notification.permission==='default') openModal('notif-modal');
+      else if(Notification.permission==='granted') setupPush();
     }
-
-    currentProfile = name;
-    renderGrades(user.age);
-    await updateStats();
-    await recordStreak();
-    await checkSession();
+  } else if(pw!==null) showToast('❌ 비밀번호가 일치하지 않습니다.');
+}
+function renderAdminPw(u){
+  const row=n=>{const d=u[n]||{};return`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bg);"><span>${{김로운:'👦',김서아:'👧',정지영:'👩'}[n]} <b>${n}</b></span><span style="color:var(--primary);">${esc(d.pw||'미설정')} · ${d.age||'?'}세 · ${d.points||0}P</span></div>`;};
+  document.getElementById('admin-pw-disp').innerHTML=['김로운','김서아','정지영'].map(row).join('');
+}
+async function setAge(){
+  const s=document.getElementById('age-sel').value, age=parseInt(document.getElementById('age-inp').value);
+  if(isNaN(age)||age<7){showToast('⚠️ 7 이상의 나이를 입력해주세요.');return;}
+  if(!await dbGet('users/'+s)){showToast('⚠️ 사용자 정보 없음. 먼저 로그인 필요.');return;}
+  if(!confirm(`${s} 님 나이를 ${age}세로 설정하시겠습니까?`)) return;
+  await dbSet('users/'+s+'/age',age);
+  showToast(`✅ ${s} 님 나이 ${age}세로 설정 완료`);
+  document.getElementById('age-inp').value='';
+  renderAdminPw(await dbGet('users'));
+}
+async function selectProfile(name){
+  showOverlay(true,'⏳','사용자 정보 불러오는 중...','잠시만 기다려 주세요');
+  let u=await dbGet('users/'+name);
+  if(!u){u={pw:'',points:0,streak:[],age:8};await dbSet('users/'+name,u);}
+  showOverlay(false);
+  if(!u.pw){
+    const np=prompt(`[${name}] 처음 오셨네요! 비밀번호를 만들어주세요. 🔐`);
+    if(!np?.trim()) return;
+    u.pw=np.trim(); await dbSet('users/'+name+'/pw',u.pw);
+    showToast('🎉 비밀번호가 만들어졌어요!'); pushNotif(`[계정] ${name} 님 비밀번호 최초 설정`);
+  } else {
+    const ip=prompt(`[${name}] 비밀번호를 입력해주세요. 🔑`);
+    if(ip===null) return;
+    if(ip.trim()!==u.pw){showToast('❌ 비밀번호가 틀렸어요.');vibrate(200);return;}
+  }
+  me=name; renderGrades(u.age); selectSubj(cfg.subject); renderDash();
+  await updateStatBadges(null,null);
+  await recordStreak();
+  await checkSavedSession();
+  playBeep('start');
+}
+async function changePassword(){
+  const u=await dbGet('users/'+me);
+  const old=prompt('현재 비밀번호를 입력해주세요. 🔑');
+  if(old===null) return;
+  if(old.trim()!==u.pw){showToast('❌ 현재 비밀번호 불일치');return;}
+  const np=prompt('새 비밀번호를 입력해주세요. 🔐');
+  if(!np?.trim()){showToast('⚠️ 유효한 비밀번호를 입력해주세요.');return;}
+  if(!confirm('비밀번호를 변경하시겠습니까?')) return;
+  await dbSet('users/'+me+'/pw',np.trim());
+  showToast('✅ 비밀번호가 변경되었어요!');
+  pushNotif(`[계정] ${me} 님 비밀번호 변경`);
+}
+function logout(){
+  if(!confirmLeave('logout')) return;
+  if('speechSynthesis'in window) window.speechSynthesis.cancel();
+  me=null; viewStack=[];
+  showView('login-view',{push:false,resetHistory:true});
+}
+async function giveBonus(){
+  const s=document.getElementById('bonus-sel').value, p=parseInt(document.getElementById('bonus-inp').value);
+  if(isNaN(p)||p<=0){showToast('⚠️ 올바른 포인트를 입력해주세요.');return;}
+  const u=await dbGet('users/'+s); if(!u){showToast('⚠️ 사용자 정보 없음');return;}
+  if(!confirm(`${s} 님에게 ${p}P를 지급하시겠습니까?`)) return;
+  await dbSet('users/'+s+'/points',(u.points||0)+p);
+  showToast(`🎉 ${s} 님에게 ${p}P 지급 완료!`);
+  document.getElementById('bonus-inp').value='';
+  pushNotif(`[보너스] 관리자가 ${s} 님에게 ${p}P 선물! 🎁`);
+}
+async function buyItem(name,cost){
+  const pts=await dbGet('users/'+me+'/points')||0;
+  if(pts<cost){showToast(`💔 포인트 부족! (현재 ${pts}P, 필요 ${cost}P)`);vibrate(200);return;}
+  if(!confirm(`'${name}'을(를) ${cost}P에 구매하시겠습니까?`)) return;
+  await dbSet('users/'+me+'/points',pts-cost);
+  await updateStatBadges(pts-cost,null);
+  let pur=await dbGet('purchases')||[];
+  pur.push({id:Date.now(),profile:me,itemName:name,cost,date:getKST(),status:'pending'});
+  await dbSet('purchases',pur);
+  showToast('✅ 구매 완료! 관리자 승인을 기다려요.');
+  playBeep('coin');
+  pushNotif(`[상점] ${me} 님이 '${name}' 구매 요청 🛍️`);
+}
+function renderShop(){
+  document.getElementById('shop-list').innerHTML=SHOP_ITEMS.map(it=>`
+    <div class="shop-item">
+      <div class="shop-icon">${it.icon}</div>
+      <div class="shop-info"><div class="shop-name">${esc(it.name)}</div><div class="shop-cost">${it.cost.toLocaleString()} P</div></div>
+      <button class="buy-btn" onclick="buyItem('${esc(it.name)}',${it.cost})">구매 🛒</button>
+    </div>`).join('');
 }
 
-async function changePassword() {
-    const user = await dbGet('users/'+currentProfile);
-    const old  = prompt('현재 비밀번호를 입력해주세요. 🔑');
-    if (old===null) return;
-    if (old.trim()!==user.pw) { alert('현재 비밀번호가 일치하지 않습니다. ❌'); return; }
-    const np = prompt('새 비밀번호를 입력해주세요. 🔐');
-    if (!np?.trim()) { alert('유효한 비밀번호를 입력해주세요.'); return; }
-    if (!confirm('비밀번호를 변경하시겠습니까?')) return;
-    await dbSet('users/'+currentProfile+'/pw', np.trim());
-    alert('비밀번호가 변경되었어요! ✅');
-    pushNotif(`[계정 알림] ${currentProfile} 님이 비밀번호를 변경했습니다.`);
-}
-
-function logout() {
-    if (!confirmLeave('logout')) return;
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-    currentProfile = null; viewHistory = [];
-    showView('login-view',{push:false,resetHistory:true});
-}
-
-async function giveBonusPoint() {
-    const student = document.getElementById('bonus-student-select').value;
-    const pts = parseInt(document.getElementById('bonus-point-input').value);
-    if (isNaN(pts)||pts<=0) { alert('올바른 포인트 수량을 입력해주세요.'); return; }
-    const user = await dbGet('users/'+student);
-    if (!user) { alert('사용자 정보 없음. 먼저 1회 로그인 필요.'); return; }
-    if (!confirm(`${student} 님에게 ${pts}P를 지급하시겠습니까?`)) return;
-    await dbSet('users/'+student+'/points', (user.points||0)+pts);
-    alert(`${student} 님에게 ${pts}P 지급 완료! 🎉`);
-    document.getElementById('bonus-point-input').value = '';
-    pushNotif(`[보너스] 관리자가 ${student} 님에게 ${pts}P를 선물했습니다! 🎁`);
-}
-
-async function buyItem(name, cost) {
-    const pts = await dbGet('users/'+currentProfile+'/points') || 0;
-    if (pts<cost) { alert(`포인트 부족! (현재: ${pts}P, 필요: ${cost}P)`); return; }
-    if (!confirm(`'${name}'을(를) ${cost}P에 구매하시겠습니까?\n구매 후 관리자 승인 대기 상태가 됩니다.`)) return;
-    await dbSet('users/'+currentProfile+'/points', pts-cost);
-    await updateStats();
-    let purchases = await dbGet('purchases') || [];
-    purchases.push({id:Date.now(), profile:currentProfile, itemName:name, cost, date:getKSTTime(), status:'pending'});
-    await dbSet('purchases', purchases);
-    alert('구매 완료! 관리자 승인을 기다려주세요. ✅');
-    pushNotif(`[상점] ${currentProfile} 님이 '${name}' 구매 요청! 🛍️`);
-}
-
-// ════════════════════════════════════════════
+// ══════════════════════════════
 //  SESSION
-// ════════════════════════════════════════════
-async function checkSession() {
-    const saved = await dbGet('sessions/'+currentProfile);
-    if (saved?.sessionState?.questions?.length && saved.sessionState.currentIndex < saved.sessionState.questions.length) {
-        document.getElementById('resume-modal').style.display='flex';
-        showView('child-dashboard-view',{push:false,resetHistory:true});
-    } else {
-        showView('child-dashboard-view',{push:false,resetHistory:true});
-    }
-}
-
-async function confirmResume() {
-    const saved = await dbGet('sessions/'+currentProfile);
-    config = saved.config; sessionState = saved.sessionState;
-    if (!sessionState.wrongHistory) sessionState.wrongHistory = [];
-    if (!sessionState.totalCount)   sessionState.totalCount = (config.subject==='영단어'?10:20);
-    document.getElementById('resume-modal').style.display='none';
-    const user = await dbGet('users/'+currentProfile);
-    renderGrades(user.age); updateSetupUI();
-    if (sessionState.mode==='learning') { showView('learning-view',{push:false,resetHistory:true}); renderLearningWord(); }
-    else { showView('quiz-view',{push:false,resetHistory:true}); if (sessionState.currentIndex>=sessionState.questions.length) finishCycle(); else renderQuestion(); }
-}
-
-async function cancelResume() {
-    if (!confirm('처음부터 시작하시겠습니까? 저장된 이어하기 정보가 삭제됩니다.')) return;
-    await dbSet('sessions/'+currentProfile, null);
-    document.getElementById('resume-modal').style.display='none';
+// ══════════════════════════════
+async function checkSavedSession(){
+  const saved=await dbGet('sessions/'+me);
+  if(saved?.ss?.questions?.length&&saved.ss.currentIndex<saved.ss.questions.length){
+    openModal('resume-modal');
     showView('child-dashboard-view',{push:false,resetHistory:true});
+  } else showView('child-dashboard-view',{push:false,resetHistory:true});
+}
+async function confirmResume(){
+  const saved=await dbGet('sessions/'+me);
+  cfg=saved.cfg; ss=saved.ss;
+  if(!ss.wrongHistory) ss.wrongHistory=[];
+  if(!ss.totalCount) ss.totalCount=cfg.subject==='영단어'?10:20;
+  closeModal('resume-modal');
+  const u=await dbGet('users/'+me); renderGrades(u.age); selectSubj(cfg.subject);
+  if(ss.mode==='learning'){showView('learning-view',{push:false,resetHistory:true});renderLearningWord();}
+  else{showView('quiz-view',{push:false,resetHistory:true});if(ss.currentIndex>=ss.questions.length)finishCycle();else renderQuestion();}
+}
+async function cancelResume(){
+  if(!confirm('처음부터 시작하시겠습니까? 저장된 내용이 삭제됩니다.')) return;
+  await dbSet('sessions/'+me,null);
+  closeModal('resume-modal');
+  showView('child-dashboard-view',{push:false,resetHistory:true});
 }
 
-// ════════════════════════════════════════════
+// ══════════════════════════════
 //  START QUIZ
-// ════════════════════════════════════════════
-async function startNewQuiz() {
-    if (!confirm(`[학습 시작 확인]\n${formatGrade(config.grade)} ${config.subject} (${config.difficulty}) 학습을 시작할까요?\n\n정답 1개당 5P 적립 (완주 시 지급)\n중도 포기 시 포인트 미지급`)) return;
+// ══════════════════════════════
+async function startNewQuiz(){
+  const label=`${fmtGrade(cfg.grade)} ${cfg.subject} (${cfg.difficulty})`;
+  if(!confirm(`[학습 시작]\n${label}\n\n정답 1개당 5P 적립 (완주 시 지급)\n중도 포기 시 포인트 미지급`)) return;
 
-    showLoading(true,
-        `🤖 AI 선생님이 <b>${formatGrade(config.grade)} ${config.subject}</b> 문제를 출제하고 있어요!`,
-        config.subject==='영단어' ? '영단어 10개 생성 중...' : '20문제 생성 중 (약 10~20초)'
-    );
+  const icon={국어:'📖',영어:'🔤',수학:'🔢',영단어:'📝'}[cfg.subject]||'📚';
+  showOverlay(true,icon,`<b>${label}</b><br>AI 선생님이 출제하고 있어요! ✨`,cfg.subject==='영단어'?'영단어 10개 생성 중...':'20문제 생성 중 (10~20초)',0);
 
-    const prompt = buildPrompt(config);
+  const prompt=buildPrompt(cfg);
+  try{
+    const expected=cfg.subject==='영단어'?10:20;
+    const mode=cfg.subject==='영단어'?'vocab':'quiz';
+    const parsed=await fetchArray(prompt,expected,mode);
 
-    try {
-        const expected = config.subject==='영단어' ? 10 : 20;
-        const mode     = config.subject==='영단어' ? 'vocab' : 'quiz';
-        const parsed   = await fetchArray(prompt, expected, mode);
-
-        if (config.subject==='영단어') {
-            sessionState = { mode:'learning', learningWords:parsed, questions:[], currentIndex:0, wrongQuestions:[], wrongHistory:[], initialScore:0, isRetryMode:false, totalCount:10, reportSaved:false, reportSavedRetry:false };
-            showLoading(false);
-            showView('learning-view',{push:true});
-            renderLearningWord();
-        } else {
-            const polished = await postProcess(parsed, prompt);
-            sessionState   = { mode:'quiz', questions:polished, currentIndex:0, wrongQuestions:[], wrongHistory:[], initialScore:0, isRetryMode:false, totalCount:20, reportSaved:false, reportSavedRetry:false };
-            showLoading(false);
-            showView('quiz-view',{push:true});
-            renderQuestion();
-        }
-
-        pushNotif(`[학습 시작] ${currentProfile} 님 → ${formatGrade(config.grade)} ${config.subject} (${config.difficulty}) 시작 🚀`);
-    } catch(e) {
-        console.error(e);
-        showLoading(false);
-        alert('문제 생성에 실패했습니다. 다시 시도해주세요. 😅');
+    if(cfg.subject==='영단어'){
+      ss={mode:'learning',learningWords:parsed,questions:[],currentIndex:0,wrongQuestions:[],wrongHistory:[],initialScore:0,isRetry:false,totalCount:10,reportSaved:false,reportSavedRetry:false};
+      showOverlay(false); showView('learning-view',{push:true}); renderLearningWord();
+    } else {
+      showOverlay(true,icon,'문제 품질 검증 중... 🔍','잘못된 문제를 걸러냅니다',2);
+      const polished=await postProcess(parsed,prompt);
+      ss={mode:'quiz',questions:polished,currentIndex:0,wrongQuestions:[],wrongHistory:[],initialScore:0,isRetry:false,totalCount:20,reportSaved:false,reportSavedRetry:false};
+      showOverlay(false); showView('quiz-view',{push:true}); renderQuestion();
     }
+    pushNotif(`[학습시작] ${me} → ${label} 시작 🚀`);
+    playBeep('start'); vibrate([100,50,200]);
+  }catch(e){
+    console.error(e); showOverlay(false);
+    showToast('⚠️ 문제 생성 실패. 다시 시도해주세요.');
+  }
 }
 
-// ════════════════════════════════════════════
-//  LEARNING (영단어)
-// ════════════════════════════════════════════
-function renderLearningWord() {
-    saveSession();
-    const w = sessionState.learningWords[sessionState.currentIndex];
-    const pct = Math.round((sessionState.currentIndex/10)*100);
-    document.getElementById('learning-progress-text').innerText = `${sessionState.currentIndex+1} / 10`;
-    document.getElementById('learning-progress-pct').innerText  = `${pct}%`;
-    document.getElementById('learning-progress-bar').style.width = pct+'%';
-    document.getElementById('learning-word').innerText    = w.word;
-    document.getElementById('learning-meaning').innerText = `(${w.meaning})`;
-    document.getElementById('learning-tts-btn').onclick   = ()=>playTTS(w.tts||w.word,'en-US');
-    const nb = document.getElementById('learning-next-btn');
-    nb.innerText = sessionState.currentIndex===9 ? '✏️ 퀴즈 시작! 🚀' : '다음 단어 ➡️';
+// ══════════════════════════════
+//  LEARNING (단어)
+// ══════════════════════════════
+const VOCAB_GRADS=[
+  'linear-gradient(135deg,#8B5CF6,#EC4899)',
+  'linear-gradient(135deg,#3B82F6,#06B6D4)',
+  'linear-gradient(135deg,#10B981,#84CC16)',
+  'linear-gradient(135deg,#F97316,#EF4444)',
+  'linear-gradient(135deg,#6366F1,#8B5CF6)',
+];
+function renderLearningWord(){
+  saveSession();
+  const w=ss.learningWords[ss.currentIndex];
+  const pct=Math.round((ss.currentIndex/10)*100);
+  document.getElementById('learn-prog-txt').textContent=`${ss.currentIndex+1} / 10`;
+  document.getElementById('learn-prog-pct').textContent=pct+'%';
+  document.getElementById('learn-bar').style.width=pct+'%';
+  document.getElementById('vocab-card').style.background=VOCAB_GRADS[ss.currentIndex%VOCAB_GRADS.length];
+  document.getElementById('vocab-num').textContent=`WORD ${ss.currentIndex+1}/10`;
+  document.getElementById('vocab-word').textContent=w.word;
+  document.getElementById('vocab-meaning').textContent=w.meaning;
+  const tb=document.getElementById('vocab-tts-btn');
+  tb.onclick=()=>tts(w.tts||w.word,'en-US'); // ★ 영단어 TTS: 영어 전용
+  const nb=document.getElementById('learn-next-btn');
+  nb.textContent=ss.currentIndex===9?'✏️ 퀴즈 시작! 🚀':'다음 단어 ➡️';
+}
+function nextLearningWord(){
+  playBeep('start');
+  if(ss.currentIndex<9){ss.currentIndex++;renderLearningWord();}
+  else startVocabQuiz();
+}
+function startVocabQuiz(){
+  ss.questions=ss.learningWords.map(w=>({type:'subjective',q:w.meaning,a:w.word,desc:`'${w.meaning}'의 올바른 영단어는 '${w.word}'입니다.`}));
+  ss.mode='quiz'; ss.currentIndex=0;
+  showView('quiz-view',{push:true}); renderQuestion();
 }
 
-function nextLearningWord() {
-    if (sessionState.currentIndex < 9) { sessionState.currentIndex++; renderLearningWord(); }
-    else { startVocabQuiz(); }
-}
-
-function startVocabQuiz() {
-    sessionState.questions = sessionState.learningWords.map(w=>({
-        type:'subjective', q:w.meaning, a:w.word,
-        desc:`'${w.meaning}'의 올바른 영단어는 '${w.word}'입니다.`
-    }));
-    sessionState.mode='quiz'; sessionState.currentIndex=0;
-    showView('quiz-view',{push:true}); renderQuestion();
-}
-
-// ════════════════════════════════════════════
+// ══════════════════════════════
 //  QUIZ RENDER
-// ════════════════════════════════════════════
+// ══════════════════════════════
+const NUMBTNS=['①','②','③','④'];
+function getSubjLang(){return(cfg.subject==='영어'||cfg.subject==='영단어')?'en-US':'ko-KR';}
 
-// 과목별 배지 색상
-function getSubjectBadgeClass(subject) {
-    return {국어:'badge-blue', 영어:'badge-green', 수학:'badge-orange', 영단어:'badge-purple'}[subject]||'badge-gray';
+function renderQuestion(){
+  const q=ss.questions[ss.currentIndex];
+  const n=ss.currentIndex+1, tot=ss.questions.length;
+  const sc=SUBJ_COLORS[cfg.subject]||SUBJ_COLORS['국어'];
+
+  document.getElementById('quiz-hdr').style.background=sc.hdr;
+  document.getElementById('quiz-badge').textContent=sc.badge;
+  document.getElementById('quiz-no').textContent=ss.isRetry?`오답 ${n}/${tot}`:`${n}/${tot}`;
+  document.getElementById('quiz-prog').style.width=`${((n-1)/tot)*100}%`;
+
+  const typeBadge=document.getElementById('qtype-badge');
+  if(q.type==='subjective'){typeBadge.className='qtype-badge qtype-sub';typeBadge.textContent='✍️ 주관식';}
+  else{typeBadge.className='qtype-badge qtype-obj';typeBadge.textContent='① 객관식';}
+
+  setHTML(document.getElementById('q-text'),q.q);
+
+  const fbEl=document.getElementById('feedback');
+  fbEl.className='feedback fb-empty'; fbEl.textContent='';
+
+  // TTS 버튼
+  const ttsBtn=document.getElementById('tts-main-btn');
+  const lang=getSubjLang();
+  const ttsText=cfg.subject==='영어'?(q.tts_q||q.q):q.q;
+  ttsBtn.style.display='inline-flex';
+  // ★ 한국어는 ko-KR TTS, 영어는 en-US TTS
+  ttsBtn.onclick=()=>tts(ttsText,lang);
+
+  const opts=document.getElementById('opts-wrap');
+  const ainp=document.getElementById('ans-input');
+  const subBtn=document.getElementById('submit-btn');
+
+  if(q.type==='objective'){
+    ainp.style.display='none'; subBtn.style.display='none';
+    opts.style.display='flex'; opts.innerHTML='';
+    const shuffled=[...q.options].sort(()=>Math.random()-.5);
+    shuffled.forEach((opt,i)=>{
+      const row=document.createElement('div'); row.className='opt-row';
+      const btn=document.createElement('button'); btn.className='opt-btn';
+      btn.innerHTML=`<span class="opt-num">${NUMBTNS[i]}</span><span class="opt-text">${sanitize(opt)}</span>`;
+      btn.onclick=e=>handleObj(opt,btn,e);
+      row.appendChild(btn);
+      const tb=document.createElement('button'); tb.className='tts-opt'; tb.textContent='🔊';
+      // ★ 보기 TTS도 언어 분리
+      tb.onclick=e=>{e.stopPropagation();tts(opt,lang);};
+      row.appendChild(tb);
+      opts.appendChild(row);
+    });
+  } else {
+    opts.style.display='none';
+    ainp.style.display='block'; ainp.value='';
+    subBtn.style.display='flex'; subBtn.disabled=false;
+    setTimeout(()=>ainp.focus(),150);
+  }
+  saveSession();
 }
 
-function renderQuestion() {
-    const q = sessionState.questions[sessionState.currentIndex];
-    const n = sessionState.currentIndex+1;
-    const total = sessionState.questions.length;
-
-    // 상단 배지
-    document.getElementById('current-status').className = `quiz-badge ${getSubjectBadgeClass(config.subject)}`;
-    document.getElementById('current-status').innerText = `${formatGrade(config.grade)} ${config.subject} · ${config.difficulty}`;
-
-    document.getElementById('progress-text').innerText = sessionState.isRetryMode
-        ? `오답 ${n}/${total}`
-        : `${n}/${total}`;
-
-    // 진행바
-    document.getElementById('quiz-progress-bar').style.width = `${((n-1)/total)*100}%`;
-
-    // 문제 번호 뱃지
-    document.getElementById('question-num-badge').innerText = n;
-    const typeBadge = document.getElementById('question-type-badge');
-    if (q.type==='subjective') {
-        typeBadge.className = 'quiz-badge badge-purple'; typeBadge.innerText = '✍️ 주관식';
-    } else {
-        typeBadge.className = 'quiz-badge badge-blue'; typeBadge.innerText = '① 객관식';
-    }
-
-    renderSafe(document.getElementById('question-text'), q.q);
-    document.getElementById('feedback-box').innerHTML = '';
-    document.getElementById('feedback-box').className = '';
-
-    // TTS
-    const lang = (config.subject==='영어'||config.subject==='영단어') ? 'en-US' : 'ko-KR';
-    const ttsQ = (config.subject==='영어') ? (q.tts_q||q.q) : q.q;
-    const ttsBtn = document.getElementById('tts-btn');
-    ttsBtn.style.display = 'flex'; ttsBtn.onclick = ()=>playTTS(ttsQ, lang);
-
-    const opts   = document.getElementById('options-container');
-    const ainput = document.getElementById('answer-input');
-    const subBtn = document.getElementById('submit-btn');
-
-    const NUMS = ['①','②','③','④'];
-
-    if (q.type==='objective') {
-        ainput.style.display='none'; subBtn.style.display='none';
-        opts.style.display='flex'; opts.innerHTML='';
-
-        const shuffled = [...q.options].sort(()=>Math.random()-0.5);
-
-        shuffled.forEach((opt, i) => {
-            const row = document.createElement('div');
-            row.className = 'option-row';
-
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerHTML = `<span class="option-num">${NUMS[i]}</span><span class="option-text">${sanitizeLimitedHtml(opt)}</span>`;
-            btn.onclick = (e) => handleObjective(opt, btn, e);
-            row.appendChild(btn);
-
-            const tb = document.createElement('button');
-            tb.className = 'tts-opt-btn'; tb.innerText = '🔊';
-            tb.onclick = (e) => { e.stopPropagation(); playTTS(opt, lang); };
-            row.appendChild(tb);
-
-            opts.appendChild(row);
-        });
-    } else {
-        opts.style.display='none';
-        ainput.style.display='block'; ainput.value='';
-        subBtn.style.display='flex'; subBtn.disabled=false;
-        setTimeout(()=>ainput.focus(), 100);
-    }
-
-    saveSession();
-}
-
-// ════════════════════════════════════════════
+// ══════════════════════════════
 //  ANSWER HANDLING
-// ════════════════════════════════════════════
-async function handleObjective(selected, btnEl, e) {
-    document.querySelectorAll('.option-btn').forEach(b=>b.disabled=true);
-    const q = sessionState.questions[sessionState.currentIndex];
-    const correct = isSame(selected, q.a);
-    const fb = document.getElementById('feedback-box');
+// ══════════════════════════════
+async function handleObj(selected,btnEl,e){
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  const q=ss.questions[ss.currentIndex];
+  const correct=same(selected,q.a);
+  const fbEl=document.getElementById('feedback');
 
-    if (correct) {
-        btnEl.classList.add('correct-ans');
-        fb.innerHTML = '✅ 정답입니다!'; fb.className = 'fb-correct';
-        showFloatingPoint(e, '+5P');
-        if (!sessionState.isRetryMode) sessionState.initialScore += 5;
-    } else {
-        btnEl.classList.add('wrong-ans');
-        // 정답 버튼 하이라이트
-        document.querySelectorAll('.option-btn').forEach(b => {
-            if (isSame(b.querySelector('.option-text')?.innerText||'', q.a)) b.classList.add('correct-ans');
-        });
-        fb.innerHTML = `❌ 오답! 정답: <b>${stripHtml(q.a)}</b>`; fb.className = 'fb-wrong';
-        sessionState.wrongQuestions.push({...q, userAns:selected});
-        if (!sessionState.isRetryMode) sessionState.wrongHistory.push({q:q.q,a:q.a,userAns:selected,desc:q.desc});
-    }
-
-    sessionState.currentIndex++; saveSession();
-    setTimeout(()=>{ if (sessionState.currentIndex<sessionState.questions.length) renderQuestion(); else finishCycle(); }, 1400);
+  if(correct){
+    btnEl.classList.add('state-correct');
+    fbEl.className='feedback fb-correct'; fbEl.textContent='✅ 정답입니다! 아주 잘했어요 🎉';
+    floatPt(e,'+5P 💰');
+    playBeep('correct'); vibrate(50);
+    if(!ss.isRetry) ss.initialScore+=5;
+  } else {
+    btnEl.classList.add('state-wrong');
+    // 정답 버튼 표시
+    document.querySelectorAll('.opt-btn').forEach(b=>{
+      if(same(b.querySelector('.opt-text')?.textContent||'',q.a)) b.classList.add('state-correct');
+    });
+    fbEl.className='feedback fb-wrong';
+    fbEl.innerHTML=`❌ 오답! 정답은 <b>${sanitize(stripHtml(q.a))}</b> 였어요.`;
+    playBeep('wrong'); vibrate([100,50,100]);
+    ss.wrongQuestions.push({...q,userAns:selected});
+    if(!ss.isRetry) ss.wrongHistory.push({q:q.q,a:q.a,userAns:selected,desc:q.desc});
+  }
+  ss.currentIndex++; saveSession();
+  setTimeout(()=>{if(ss.currentIndex<ss.questions.length)renderQuestion();else finishCycle();},1500);
 }
 
-async function processSubjectiveAnswer(e) {
-    const inp = document.getElementById('answer-input');
-    const ans = inp.value.trim();
-    if (!ans) { alert('정답을 먼저 입력해주세요! ✍️'); inp.focus(); return; }
-    document.getElementById('submit-btn').disabled = true;
-    const q = sessionState.questions[sessionState.currentIndex];
-    const correct = isSame(ans, q.a);
-    const fb = document.getElementById('feedback-box');
+async function processSubjective(e){
+  const inp=document.getElementById('ans-input');
+  const ans=inp.value.trim();
+  if(!ans){showToast('✍️ 정답을 먼저 입력해주세요!');inp.focus();return;}
+  document.getElementById('submit-btn').disabled=true;
+  const q=ss.questions[ss.currentIndex];
+  const correct=same(ans,q.a);
+  const fbEl=document.getElementById('feedback');
 
-    if (correct) {
-        fb.innerHTML='✅ 정답입니다!'; fb.className='fb-correct';
-        showFloatingPoint(e||{clientX:window.innerWidth/2,clientY:window.innerHeight/2}, '+5P');
-        if (!sessionState.isRetryMode) sessionState.initialScore += 5;
-    } else {
-        fb.innerHTML=`❌ 오답! 정답: <b>${stripHtml(q.a)}</b>`; fb.className='fb-wrong';
-        sessionState.wrongQuestions.push({...q, userAns:ans});
-        if (!sessionState.isRetryMode) sessionState.wrongHistory.push({q:q.q,a:q.a,userAns:ans,desc:q.desc});
-    }
-
-    sessionState.currentIndex++; saveSession();
-    setTimeout(()=>{ if (sessionState.currentIndex<sessionState.questions.length) renderQuestion(); else finishCycle(); }, 1400);
+  if(correct){
+    fbEl.className='feedback fb-correct'; fbEl.textContent='✅ 정답입니다! 아주 잘했어요 🎉';
+    floatPt(e||{clientX:window.innerWidth/2,clientY:window.innerHeight/2},'+5P 💰');
+    playBeep('correct'); vibrate(50);
+    if(!ss.isRetry) ss.initialScore+=5;
+  } else {
+    fbEl.className='feedback fb-wrong';
+    fbEl.innerHTML=`❌ 오답! 정답은 <b>${sanitize(stripHtml(q.a))}</b> 였어요.`;
+    playBeep('wrong'); vibrate([100,50,100]);
+    ss.wrongQuestions.push({...q,userAns:ans});
+    if(!ss.isRetry) ss.wrongHistory.push({q:q.q,a:q.a,userAns:ans,desc:q.desc});
+  }
+  ss.currentIndex++; saveSession();
+  setTimeout(()=>{if(ss.currentIndex<ss.questions.length)renderQuestion();else finishCycle();},1500);
 }
 
-document.getElementById('answer-input').addEventListener('keypress', e=>{ if (e.key==='Enter') processSubjectiveAnswer(e); });
+document.getElementById('ans-input').addEventListener('keypress',e=>{if(e.key==='Enter')processSubjective(e);});
 
-// ════════════════════════════════════════════
+// ══════════════════════════════
 //  RESULT
-// ════════════════════════════════════════════
-async function finishCycle() {
-    showView('result-view',{push:true});
-    const score = sessionState.initialScore;
-    const max   = sessionState.totalCount * 5;
+// ══════════════════════════════
+async function finishCycle(){
+  showView('result-view',{push:true});
+  const score=ss.initialScore, max=ss.totalCount*5;
+  const correctN=ss.isRetry?ss.questions.length-ss.wrongQuestions.length:Math.round(score/5);
+  const wrongN=ss.wrongQuestions.length;
+  const rate=Math.round((correctN/(ss.totalCount))*100);
 
-    if (score===max && !sessionState.isRetryMode) triggerConfetti();
+  if(score===max&&!ss.isRetry){confetti();vibrate([200,100,200,100,400]);}
 
-    const titleEl  = document.getElementById('result-title');
-    const scoreEl  = document.getElementById('result-score');
-    const msgEl    = document.getElementById('result-message');
-    const actionBtn= document.getElementById('result-action-btn');
-    const earnedEl = document.getElementById('earned-points');
-    const ringEl   = document.getElementById('result-ring');
+  // 점수 링 애니메이션
+  const ring=document.getElementById('score-ring');
+  const sc=SUBJ_COLORS[cfg.subject];
+  ring.style.stroke=sc?.ring||'#6C63FF';
+  const circumference=408;
+  const ratio=ss.isRetry?1:(score/max);
+  setTimeout(()=>{ ring.style.strokeDashoffset=circumference-(circumference*ratio); },100);
 
-    earnedEl.style.display='none';
+  document.getElementById('score-num').textContent=ss.isRetry?'✓':score;
+  document.getElementById('score-max').textContent=ss.isRetry?'완료':'/ '+max+'점';
+  document.getElementById('rst-correct').textContent=correctN;
+  document.getElementById('rst-wrong').textContent=wrongN;
+  document.getElementById('rst-rate').textContent=rate+'%';
 
-    // 점수 링 색상
-    const ratio = score/max;
-    const ringColor = ratio===1 ? '#059669' : ratio>=0.8 ? '#2563EB' : ratio>=0.6 ? '#D97706' : '#DC2626';
-    ringEl.style.background = `conic-gradient(${ringColor} 0%, #e5e7eb ${ratio*100}%, #e5e7eb 100%)`;
+  const wrap=document.getElementById('score-wrap');
+  wrap.style.display=ss.isRetry?'none':'block';
 
-    if (!sessionState.isRetryMode) {
-        scoreEl.parentElement.style.display='flex';
-        scoreEl.innerText = score;
-        scoreEl.parentElement.querySelector('.result-score-label').innerText = `/ ${max}점`;
+  const titleEl=document.getElementById('result-title');
+  const subEl=document.getElementById('result-sub');
+  const msgEl=document.getElementById('result-msg');
+  const actionBtn=document.getElementById('result-action-btn');
+  const emojiEl=document.getElementById('result-emoji');
+  const ptsBox=document.getElementById('points-box');
+  ptsBox.style.display='none';
 
-        const bonus = score===max ? 20 : score>=(max*0.9) ? 10 : 0;
-        const total = score + bonus;
+  if(!ss.isRetry){
+    const bonus=score===max?20:score>=(max*.9)?10:0;
+    const total=score+bonus;
+    if(!ss.reportSaved){
+      document.getElementById('points-earned').textContent=`+${total}P 획득!`;
+      document.getElementById('points-lbl').textContent=bonus>0?`기본 ${score}P + 우수 보너스 ${bonus}P`:`${ss.totalCount}문제 완주 보상`;
+      ptsBox.style.display='block';
+      await addPts(total);
+      await saveReport();
+      pushNotif(`[점수] ${me} 완주! ${score}점 → ${total}P 🌟`);
+      ss.reportSaved=true; saveSession();
+    } else ptsBox.style.display='block';
 
-        if (!sessionState.reportSaved) {
-            earnedEl.innerHTML = bonus>0
-                ? `<div class="points-earned-num">+${total}P 획득! 🎉</div><div class="points-earned-label">기본 ${score}P + 우수 보너스 ${bonus}P</div>`
-                : `<div class="points-earned-num">+${total}P 획득! 🎉</div><div class="points-earned-label">${sessionState.totalCount}문제 완주 보상</div>`;
-            earnedEl.style.display='block';
-            await addPoints(total);
-            await saveReport();
-            pushNotif(`[점수] ${currentProfile} 님 완주! ${score}점 → ${total}P 획득 🌟`);
-            sessionState.reportSaved=true; saveSession();
-        } else { earnedEl.style.display='block'; }
-
-        if (sessionState.wrongQuestions.length>0) {
-            titleEl.innerText='1차 학습 완료 😅';
-            msgEl.innerText=`${sessionState.wrongQuestions.length}개 오답이 있어요.\n오답 개념을 확인하고 다시 도전해볼까요? 💪`;
-            actionBtn.innerText='📝 오답 확인하기';
-        } else {
-            titleEl.innerText='완벽해요! 💯';
-            msgEl.innerText='모든 문제를 맞혔어요! 정말 대단해요! 🌟';
-            actionBtn.innerText='🏠 홈으로 돌아가기';
-        }
+    if(wrongN>0){
+      emojiEl.textContent='😅'; titleEl.textContent='1차 학습 완료!'; subEl.textContent=`${wrongN}개 오답이 있어요`;
+      msgEl.textContent=`총 ${ss.totalCount}문제 중 ${wrongN}개를 틀렸어요.\n오답 개념을 확인하고 다시 도전해볼까요? 💪`;
+      actionBtn.textContent='📝 오답 확인하기';
     } else {
-        ringEl.style.display='none';
-        if (!sessionState.reportSavedRetry) {
-            pushNotif(`[학습] ${currentProfile} 님 오답 수정 완료! 👏`);
-            sessionState.reportSavedRetry=true; saveSession();
-        }
-        if (sessionState.wrongQuestions.length>0) {
-            titleEl.innerText='다시 풀기 완료 😅';
-            msgEl.innerText=`아직 ${sessionState.wrongQuestions.length}개가 틀렸어요.\n포기하지 말고 다시 도전! 🏃`;
-            actionBtn.innerText='📝 오답 다시 확인';
-        } else {
-            titleEl.innerText='최종 완료! 🎉';
-            msgEl.innerText='어려운 문제도 모두 해결했어요. 최고예요! 👍';
-            actionBtn.innerText='🏠 홈으로 돌아가기';
-        }
+      emojiEl.textContent=score===max?'🏆':'🌟'; titleEl.textContent=score===max?'완벽해요! 💯':'학습 완료! 🎉';
+      subEl.textContent='정말 대단해요! 최고예요 👏';
+      msgEl.textContent=score===max?'모든 문제를 다 맞혔어요! 🏆 완벽한 점수입니다!':'모든 문제를 끝냈어요! 수고하셨어요 🌟';
+      actionBtn.textContent='🏠 홈으로 돌아가기';
     }
-}
-
-async function handleResultAction() {
-    if (sessionState.wrongQuestions.length>0) { showView('wrong-review-view',{push:true}); renderWrongReview(); }
-    else { await dbSet('sessions/'+currentProfile, null); showView('child-dashboard-view',{push:false,resetHistory:true}); }
-}
-
-function renderWrongReview() {
-    document.getElementById('wrong-review-container').innerHTML = sessionState.wrongQuestions.map((w,i)=>`
-        <div class="wrong-item">
-            <div class="wrong-q">${i+1}. ${sanitizeLimitedHtml(w.q)}</div>
-            <div class="wrong-ans">내 답: ${sanitizeLimitedHtml(stripHtml(w.userAns||''))}</div>
-            <div class="right-ans">✅ 정답: ${sanitizeLimitedHtml(w.a)}</div>
-            <div class="wrong-desc"><b>💡 해설:</b> ${sanitizeLimitedHtml(w.desc||'해설이 제공되지 않았습니다.')}</div>
-        </div>
-    `).join('');
-}
-
-function startRetryQuiz() {
-    if (!confirm('오답 다시 풀기를 시작하시겠습니까?')) return;
-    sessionState.questions=[...sessionState.wrongQuestions];
-    sessionState.wrongQuestions=[]; sessionState.currentIndex=0;
-    sessionState.isRetryMode=true; sessionState.reportSavedRetry=false;
-    saveSession(); showView('quiz-view',{push:true}); renderQuestion();
-}
-
-// ════════════════════════════════════════════
-//  REPORT SAVE
-// ════════════════════════════════════════════
-async function saveReport() {
-    let reports = await dbGet('reports') || [];
-    reports.unshift({ id:Date.now(), profile:currentProfile, date:getKSTTime(), grade:config.grade, subject:config.subject, difficulty:config.difficulty, score:sessionState.initialScore, totalCount:sessionState.totalCount||20, wrongDetails:sessionState.wrongHistory });
-    if (reports.length>100) reports.pop();
-    await dbSet('reports', reports);
-}
-
-// ════════════════════════════════════════════
-//  ADMIN — REPORT
-// ════════════════════════════════════════════
-function switchAdminTab(tab) {
-    ['tab-report-btn','tab-reward-btn'].forEach(id=>document.getElementById(id).classList.remove('active'));
-    document.getElementById('admin-report-section').style.display='none';
-    document.getElementById('admin-reward-section').style.display='none';
-    if (tab==='report') { document.getElementById('tab-report-btn').classList.add('active'); document.getElementById('admin-report-section').style.display='block'; filterReport('전체'); }
-    else { document.getElementById('tab-reward-btn').classList.add('active'); document.getElementById('admin-reward-section').style.display='block'; renderRewardList(); }
-}
-
-function filterReport(profile) {
-    currentReportFilter=profile;
-    ['filter-all','filter-rw','filter-sa','filter-jj'].forEach(id=>document.getElementById(id).classList.remove('active'));
-    const map={전체:'filter-all',김로운:'filter-rw',김서아:'filter-sa',정지영:'filter-jj'};
-    if (map[profile]) document.getElementById(map[profile]).classList.add('active');
-    renderReportList();
-}
-
-function renderReportList() {
-    const tbody = document.getElementById('report-tbody');
-    const data  = currentReportFilter==='전체' ? reportDataCache : reportDataCache.filter(r=>r.profile===currentReportFilter);
-    if (!data.length) { tbody.innerHTML='<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--gray-400); font-weight:600;">학습 기록이 없습니다.</td></tr>'; return; }
-    tbody.innerHTML = data.map(r=>`
-        <tr>
-            <td style="font-weight:700;">${escapeHtml(r.profile)}</td>
-            <td style="font-size:11px; color:var(--gray-400); line-height:1.5;">${escapeHtml(r.date)}<br>${formatGrade(r.grade)} ${escapeHtml(r.difficulty||'중')}급</td>
-            <td>${escapeHtml(r.subject)}<br><b style="color:${r.score===(r.totalCount*5)?'var(--green)':'var(--red)'};">${r.score}점</b></td>
-            <td><button class="btn-small" onclick="openDetail(${r.id})">상세 🔍</button></td>
-        </tr>
-    `).join('');
-}
-
-function openDetail(id) {
-    const r = reportDataCache.find(r=>r.id===id); if (!r) return;
-    let html = `<div style="margin-bottom:16px;"><button class="btn btn-green btn-sm" onclick="analyzeSingle(${r.id})">🤖 AI 심층 분석</button></div>`;
-    if (!r.wrongDetails?.length) {
-        html += `<div style="text-align:center; color:var(--green); font-weight:700; font-size:16px;">🎉 오답 없음! 완벽한 점수!</div>`;
+  } else {
+    wrap.style.display='none';
+    if(!ss.reportSavedRetry){
+      pushNotif(`[학습] ${me} 오답 수정 완료! 👏`);
+      ss.reportSavedRetry=true; saveSession();
+    }
+    if(wrongN>0){
+      emojiEl.textContent='😤'; titleEl.textContent='다시 풀기 완료 💪'; subEl.textContent=`아직 ${wrongN}개 남았어요`;
+      msgEl.textContent=`포기하지 말고 다시 도전해봐요! 🔥`;
+      actionBtn.textContent='📝 오답 다시 확인';
     } else {
-        html += r.wrongDetails.map((w,i)=>`
-            <div class="wrong-item">
-                <div class="wrong-q">${i+1}. ${sanitizeLimitedHtml(w.q)}</div>
-                <div class="wrong-ans">사용자 답: ${sanitizeLimitedHtml(stripHtml(w.userAns||''))}</div>
-                <div class="right-ans">✅ 정답: ${sanitizeLimitedHtml(w.a)}</div>
-                <div class="wrong-desc">💡 ${sanitizeLimitedHtml(w.desc||'해설 없음')}</div>
-            </div>
-        `).join('');
+      emojiEl.textContent='🎊'; titleEl.textContent='모두 해결! 🎊'; subEl.textContent='어려운 문제도 해냈어요';
+      msgEl.textContent='틀린 문제를 모두 해결했어요. 정말 최고예요! 👍';
+      actionBtn.textContent='🏠 홈으로 돌아가기';
     }
-    document.getElementById('modal-title').innerText='오답 상세 📝';
-    document.getElementById('modal-body').innerHTML=html;
-    document.getElementById('detail-modal').style.display='flex';
+  }
 }
 
-async function analyzeSingle(id) {
-    const r = reportDataCache.find(r=>r.id===id); if (!r) return;
-    showLoading(true,'🤖 AI가 이 회차를 심층 분석 중...','잠시만 기다려 주세요');
-    const summary = { profile:r.profile, grade:r.grade, subject:r.subject, difficulty:r.difficulty||'중', score:r.score, total:r.totalCount||20, wrongs:(r.wrongDetails||[]).map(w=>({q:stripHtml(w.q),ans:stripHtml(w.userAns||''),correct:stripHtml(w.a),desc:stripHtml(w.desc)})) };
-    const prompt = `교육 분석가로서 ${r.profile} 학생의 학습 데이터를 분석하십시오.
-데이터: ${JSON.stringify(summary)}
-1. 점수·오답 기반 성취도 평가
-2. 오답 해설 종합 분석 → 부족 개념 도출
-3. 칭찬·개선점·부모님 지도팁
-500자 이내, 가독성 있게 작성.`;
-    try {
-        const data = await fetchGemini(prompt,0,false);
-        showLoading(false);
-        document.getElementById('modal-title').innerText='📊 AI 심층 분석';
-        document.getElementById('modal-body').innerHTML=sanitizeLimitedHtml(data.candidates[0].content.parts[0].text);
-    } catch(e) { showLoading(false); alert('분석 실패 😅'); }
+async function handleResultAction(){
+  if(ss.wrongQuestions.length>0){showView('wrong-review-view',{push:true});renderWrongReview();}
+  else{await dbSet('sessions/'+me,null);showView('child-dashboard-view',{push:false,resetHistory:true});}
 }
 
-async function analyzeComprehensiveWeakness() {
-    if (currentReportFilter==='전체') { alert('먼저 특정 학생 탭을 선택하십시오.'); return; }
-    const reports = reportDataCache.filter(r=>r.profile===currentReportFilter).sort((a,b)=>a.id-b.id);
-    if (reports.length<2) { alert(`종합 분석은 최소 2회 이상 기록이 필요합니다. (현재 ${reports.length}회)`); return; }
-    showLoading(true,'📈 AI 종합 성장 리포트 작성 중...','처음~최근 성적을 비교 분석합니다');
-    const oldest=reports[0], newest=reports[reports.length-1];
-    const recentAvg = reports.slice(-3).reduce((s,r)=>s+r.score,0)/Math.min(3,reports.length);
-    const cmp = { profile:currentReportFilter, sessions:reports.length, initial:{date:oldest.date,subject:oldest.subject,score:oldest.score,wrong_concepts:(oldest.wrongDetails||[]).slice(0,3).map(w=>stripHtml(w.q))}, current:{date:newest.date,subject:newest.subject,score:newest.score,recent_avg:recentAvg,wrong_concepts:(newest.wrongDetails||[]).slice(0,3).map(w=>stripHtml(w.q))} };
-    const prompt = `대한민국 교육 분석 전문가로서 ${currentReportFilter} 학생의 누적 성장 데이터를 분석하십시오.
-데이터: ${JSON.stringify(cmp)}
-1. 초기 대비 현재 발전 사항 구체적 칭찬
-2. 정체·취약 부분 지적
-3. 현재 가장 시급한 취약 개념과 가정 내 지도 방향
-600자 이내, 가독성 있게 작성.`;
-    try {
-        const data = await fetchGemini(prompt,0,false);
-        showLoading(false);
-        document.getElementById('modal-title').innerText='📈 AI 종합 성장 리포트';
-        document.getElementById('modal-body').innerHTML=sanitizeLimitedHtml(data.candidates[0].content.parts[0].text);
-        document.getElementById('detail-modal').style.display='flex';
-    } catch(e) { showLoading(false); alert('서버 통신 오류 ❌'); }
+function renderWrongReview(){
+  document.getElementById('wrong-container').innerHTML=ss.wrongQuestions.map((w,i)=>`
+    <div class="wrong-card">
+      <div class="wrong-q">${i+1}. ${sanitize(w.q)}</div>
+      <div class="wrong-ua">내 답: ${sanitize(stripHtml(w.userAns||''))}</div>
+      <div class="wrong-ca">✅ 정답: ${sanitize(w.a)}</div>
+      <div class="wrong-desc"><strong>💡 해설</strong><br>${sanitize(w.desc||'해설이 제공되지 않았습니다.')}</div>
+    </div>`).join('');
 }
 
-function renderRewardList() {
-    const tbody=document.getElementById('reward-tbody');
-    if (!purchaseDataCache.length) { tbody.innerHTML='<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--gray-400); font-weight:600;">구매 내역이 없습니다.</td></tr>'; return; }
-    tbody.innerHTML=purchaseDataCache.map(p=>`
-        <tr>
-            <td style="font-weight:700;">${escapeHtml(p.profile)}</td>
-            <td><div style="font-weight:700;">${escapeHtml(p.itemName)}</div><div style="font-size:11px;color:var(--gray-400);">${escapeHtml(p.date)}</div></td>
-            <td style="color:var(--blue);font-weight:700;">${p.cost}P</td>
-            <td>${p.status==='pending' ? `<button class="btn-small" onclick="markUsed(${p.id})">승인 ✅</button>` : '<button class="btn-small used" disabled>완료</button>'}</td>
-        </tr>
-    `).join('');
+function startRetry(){
+  if(!confirm('오답 다시 풀기를 시작하시겠습니까?')) return;
+  ss.questions=[...ss.wrongQuestions]; ss.wrongQuestions=[];
+  ss.currentIndex=0; ss.isRetry=true; ss.reportSavedRetry=false;
+  saveSession(); showView('quiz-view',{push:true}); renderQuestion();
 }
 
-async function markUsed(id) {
-    if (!confirm('실제로 보상을 제공하셨습니까? 확인 시 사용 완료 처리됩니다.')) return;
-    let purchases=await dbGet('purchases')||[];
-    const idx=purchases.findIndex(p=>p.id===id);
-    if (idx!==-1) { purchases[idx].status='used'; await dbSet('purchases',purchases); }
+async function saveReport(){
+  let reps=await dbGet('reports')||[];
+  reps.unshift({id:Date.now(),profile:me,date:getKST(),grade:cfg.grade,subject:cfg.subject,difficulty:cfg.difficulty,score:ss.initialScore,totalCount:ss.totalCount||20,wrongDetails:ss.wrongHistory});
+  if(reps.length>100) reps.pop();
+  await dbSet('reports',reps);
 }
 
-// ════════════════════════════════════════════
-//  PUSH NOTIFICATIONS
-// ════════════════════════════════════════════
-async function requestPushPermission() {
-    document.getElementById('permission-modal').style.display='none';
-    if (!("Notification" in window)) { alert('알림 미지원 브라우저입니다.'); return; }
-    const p = await Notification.requestPermission();
-    if (p==="granted") { alert('알림 권한 허용 완료! 🎉'); setupAdminPush(); }
-    else alert('알림이 차단되었습니다. 기기 설정에서 허용해주세요.');
+// ══════════════════════════════
+//  ADMIN REPORT
+// ══════════════════════════════
+function switchTab(t){
+  document.getElementById('tab-rep').classList.toggle('active',t==='report');
+  document.getElementById('tab-rew').classList.toggle('active',t==='reward');
+  document.getElementById('rep-section').style.display=t==='report'?'block':'none';
+  document.getElementById('rew-section').style.display=t==='reward'?'block':'none';
+  if(t==='report') filterRep('전체'); else renderReward();
 }
-function closePermissionModal() { document.getElementById('permission-modal').style.display='none'; }
+function filterRep(p){
+  adminFilter=p;
+  ['f-all','f-rw','f-sa','f-jj'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  ({전체:'f-all',김로운:'f-rw',김서아:'f-sa',정지영:'f-jj'})[p]&&document.getElementById(({전체:'f-all',김로운:'f-rw',김서아:'f-sa',정지영:'f-jj'})[p]).classList.add('active');
+  renderRepTable();
+}
+function renderRepTable(){
+  const tbody=document.getElementById('rep-tbody');
+  const data=adminFilter==='전체'?repCache:repCache.filter(r=>r.profile===adminFilter);
+  if(!data.length){tbody.innerHTML='<tr><td colspan="4" style="padding:20px;color:var(--text2);font-size:13px;font-weight:600;">학습 기록이 없습니다.</td></tr>';return;}
+  tbody.innerHTML=data.map(r=>`<tr>
+    <td style="font-weight:800;">${esc(r.profile)}</td>
+    <td style="font-size:11px;color:var(--text2);line-height:1.5;">${esc(r.date)}<br>${fmtGrade(r.grade)} ${esc(r.difficulty||'중')}급</td>
+    <td>${esc(r.subject)}<br><b style="color:${r.score===(r.totalCount*5)?'var(--green-d)':'var(--red)'};">${r.score}점</b></td>
+    <td><button class="tbtn" onclick="openDetail(${r.id})">🔍</button></td></tr>`).join('');
+}
+function openDetail(id){
+  const r=repCache.find(r=>r.id===id);if(!r)return;
+  let html=`<div style="margin-bottom:14px;"><button class="btn btn-green btn-sm" onclick="aiSingle(${r.id})">🤖 AI 심층 분석</button></div>`;
+  if(!r.wrongDetails?.length){html+=`<div style="text-align:center;color:var(--green-d);font-weight:800;font-size:15px;padding:20px;">🎉 오답 없음! 완벽한 점수!</div>`;}
+  else{html+=r.wrongDetails.map((w,i)=>`<div class="wrong-card"><div class="wrong-q">${i+1}. ${sanitize(w.q)}</div><div class="wrong-ua">사용자 답: ${sanitize(stripHtml(w.userAns||''))}</div><div class="wrong-ca">✅ 정답: ${sanitize(w.a)}</div><div class="wrong-desc"><strong>💡 해설</strong><br>${sanitize(w.desc||'없음')}</div></div>`).join('');}
+  document.getElementById('detail-title').textContent='오답 상세 📝';
+  document.getElementById('detail-body').innerHTML=html;
+  openModal('detail-modal');
+}
+async function aiSingle(id){
+  const r=repCache.find(r=>r.id===id);if(!r)return;
+  showOverlay(true,'🔍','AI 심층 분석 중...','잠시만 기다려 주세요');
+  const sum={profile:r.profile,grade:r.grade,subject:r.subject,diff:r.difficulty||'중',score:r.score,total:r.totalCount||20,wrongs:(r.wrongDetails||[]).map(w=>({q:stripHtml(w.q),ans:stripHtml(w.userAns||''),correct:stripHtml(w.a),desc:stripHtml(w.desc)}))};
+  const prompt=`교육 분석가로서 ${r.profile} 학생의 학습 데이터를 분석하십시오.\n데이터:${JSON.stringify(sum)}\n1.성취도 평가\n2.오답 해설 종합 분석 및 취약 개념 도출\n3.칭찬·개선점·부모님 지도팁 (500자 이내)`;
+  try{
+    const d=await fetchAI(prompt,0,false);
+    showOverlay(false);
+    document.getElementById('detail-title').textContent='📊 AI 심층 분석';
+    document.getElementById('detail-body').innerHTML=`<div style="white-space:pre-wrap;line-height:1.7;font-size:14px;">${sanitize(d.candidates[0].content.parts[0].text)}</div>`;
+  }catch(e){showOverlay(false);showToast('분석 실패 😅');}
+}
+async function aiGrowthReport(){
+  if(adminFilter==='전체'){showToast('⚠️ 특정 학생 탭을 먼저 선택하세요.');return;}
+  const reps=repCache.filter(r=>r.profile===adminFilter).sort((a,b)=>a.id-b.id);
+  if(reps.length<2){showToast(`⚠️ 최소 2회 이상 기록 필요 (현재 ${reps.length}회)`);return;}
+  showOverlay(true,'📈','AI 종합 성장 리포트 작성 중...','처음~최근 성적을 비교 분석합니다');
+  const oldest=reps[0],newest=reps[reps.length-1];
+  const recentAvg=reps.slice(-3).reduce((s,r)=>s+r.score,0)/Math.min(3,reps.length);
+  const cmp={profile:adminFilter,sessions:reps.length,initial:{date:oldest.date,subject:oldest.subject,score:oldest.score},current:{date:newest.date,subject:newest.subject,score:newest.score,recent_avg:recentAvg}};
+  const prompt=`대한민국 교육 분석 전문가로서 ${adminFilter} 학생의 누적 성장 데이터를 분석하십시오.\n데이터:${JSON.stringify(cmp)}\n1.초기 대비 발전 사항 구체적 칭찬\n2.정체·취약 부분\n3.가정 내 지도 방향 (600자 이내, 가독성 있게)`;
+  try{
+    const d=await fetchAI(prompt,0,false);
+    showOverlay(false);
+    document.getElementById('detail-title').textContent='📈 AI 종합 성장 리포트';
+    document.getElementById('detail-body').innerHTML=`<div style="white-space:pre-wrap;line-height:1.7;font-size:14px;">${sanitize(d.candidates[0].content.parts[0].text)}</div>`;
+    openModal('detail-modal');
+  }catch(e){showOverlay(false);showToast('서버 오류 ❌');}
+}
+function renderReward(){
+  const tbody=document.getElementById('rew-tbody');
+  if(!purchCache.length){tbody.innerHTML='<tr><td colspan="4" style="padding:20px;color:var(--text2);font-size:13px;font-weight:600;">구매 내역이 없습니다.</td></tr>';return;}
+  tbody.innerHTML=purchCache.map(p=>`<tr>
+    <td style="font-weight:800;">${esc(p.profile)}</td>
+    <td><div style="font-weight:700;font-size:13px;">${esc(p.itemName)}</div><div style="font-size:11px;color:var(--text2);">${esc(p.date)}</div></td>
+    <td style="color:var(--primary);font-weight:800;">${p.cost}P</td>
+    <td>${p.status==='pending'?`<button class="tbtn" onclick="markUsed(${p.id})">✅</button>`:'<button class="tbtn used" disabled>완료</button>'}</td></tr>`).join('');
+}
+async function markUsed(id){
+  if(!confirm('실제로 보상을 제공하셨습니까?')) return;
+  let pur=await dbGet('purchases')||[];
+  const idx=pur.findIndex(p=>p.id===id);
+  if(idx!==-1){pur[idx].status='used';await dbSet('purchases',pur);}
+}
 
-// ════════════════════════════════════════════
+// ══════════════════════════════
+//  NOTIFICATION
+// ══════════════════════════════
+async function reqNotif(){
+  closeModal('notif-modal');
+  if(!("Notification"in window)){showToast('🚫 알림 미지원 브라우저');return;}
+  const p=await Notification.requestPermission();
+  if(p==='granted'){showToast('✅ 알림 권한 허용 완료!');setupPush();}
+  else showToast('⚠️ 알림이 차단되었습니다. 기기 설정에서 허용해주세요.');
+}
+
+// ══════════════════════════════
 //  WINDOW LOAD
-// ════════════════════════════════════════════
-window.onload = async () => {
-    showView('login-view',{push:false,resetHistory:true});
-    renderShopItems();
-    if ('speechSynthesis' in window) { loadTTSVoices(); window.speechSynthesis.onvoiceschanged=loadTTSVoices; }
+// ══════════════════════════════
+window.onload=async()=>{
+  showView('login-view',{push:false,resetHistory:true});
+  renderShop();
 
-    if (db) {
-        db.ref('reports').on('value', snap=>{
-            reportDataCache=Object.values(snap.val()||[]).sort((a,b)=>b.id-a.id);
-            if (currentProfile==='admin') renderReportList();
-        });
-        db.ref('purchases').on('value', snap=>{
-            purchaseDataCache=Object.values(snap.val()||[]).sort((a,b)=>b.id-a.id);
-            if (currentProfile==='admin') renderRewardList();
-        });
-        db.ref('users').on('value', snap=>{
-            if (currentProfile==='admin') renderAdminPw(snap.val()||{});
-        });
-    }
+  // TTS 음성 사전 로딩
+  if('speechSynthesis'in window){
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged=()=>{
+      _voices=window.speechSynthesis.getVoices();
+      _voiceReady=true;
+    };
+  }
+
+  if(db){
+    db.ref('reports').on('value',snap=>{
+      repCache=Object.values(snap.val()||[]).sort((a,b)=>b.id-a.id);
+      if(me==='admin') renderRepTable();
+    });
+    db.ref('purchases').on('value',snap=>{
+      purchCache=Object.values(snap.val()||[]).sort((a,b)=>b.id-a.id);
+      if(me==='admin') renderReward();
+    });
+    db.ref('users').on('value',snap=>{
+      if(me==='admin') renderAdminPw(snap.val()||{});
+    });
+  }
 };
 </script>
 </body>
