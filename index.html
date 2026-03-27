@@ -6,878 +6,718 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#ff6b6b">
+    <meta name="theme-color" content="#2563EB">
     <title>🌟 스마트 학습 시스템 🌟</title>
-
     <link rel="icon" href="icon.png?v=18">
     <link rel="apple-touch-icon" href="icon.png?v=18">
-    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#fdfbfb","theme_color":"#ff6b6b","icons":[{"src":"icon.png?v=18","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=18","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="manifest" href='data:application/json,{"name":"스마트 학습","short_name":"스마트학습","display":"standalone","start_url":".","background_color":"#F0F4FF","theme_color":"#2563EB","icons":[{"src":"icon.png?v=18","sizes":"192x192","type":"image/png"},{"src":"icon.png?v=18","sizes":"512x512","type":"image/png"}]}'>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
         :root {
-            --primary: #ff6b6b;
-            --primary-dark: #ee5253;
-            --secondary: #4facfe;
-            --accent: #feca57;
-            --bg-color: #fdfbfb;
-            --surface: #ffffff;
-            --text-main: #2d3436;
-            --text-muted: #636e72;
-            --success: #1dd1a1;
-            --danger: #ff4757;
-            --shadow-sm: 0 4px 6px rgba(0,0,0,0.04);
-            --shadow-md: 0 10px 30px rgba(255, 107, 107, 0.15);
-            --radius: 24px;
+            --blue:       #2563EB;
+            --blue-dark:  #1D4ED8;
+            --blue-light: #EFF6FF;
+            --blue-mid:   #BFDBFE;
+            --green:      #059669;
+            --green-light:#D1FAE5;
+            --amber:      #D97706;
+            --amber-light:#FEF3C7;
+            --red:        #DC2626;
+            --red-light:  #FEE2E2;
+            --purple:     #7C3AED;
+            --purple-light:#EDE9FE;
+            --teal:       #0891B2;
+            --teal-light: #CFFAFE;
+            --gray-50:    #F9FAFB;
+            --gray-100:   #F3F4F6;
+            --gray-200:   #E5E7EB;
+            --gray-400:   #9CA3AF;
+            --gray-600:   #4B5563;
+            --gray-800:   #1F2937;
+            --white:      #FFFFFF;
+            --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md:  0 4px 12px rgba(37,99,235,0.10), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg:  0 10px 30px rgba(37,99,235,0.15), 0 4px 8px rgba(0,0,0,0.08);
+            --radius-sm:  10px;
+            --radius:     16px;
+            --radius-lg:  24px;
         }
 
-        * {
-            box-sizing: border-box;
-            font-family: 'Apple SD Gothic Neo', 'NanumSquareRound', 'Malgun Gothic', sans-serif;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
+            font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background: #EFF6FF;
+            color: var(--gray-800);
+            margin: 0; padding: 0;
+            display: flex; justify-content: center;
+            min-height: 100vh;
         }
 
         .app-container {
-            width: 100%;
-            max-width: 500px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow-x: hidden;
-            background: transparent;
+            width: 100%; max-width: 500px; min-height: 100vh;
+            display: flex; flex-direction: column;
+            background: var(--gray-50);
+            position: relative; overflow-x: hidden;
         }
 
+        /* ── HEADER ── */
         .header {
-            background: linear-gradient(135deg, var(--primary), #ff9f43);
+            background: var(--blue);
             color: white;
-            padding: 16px 18px;
-            font-size: 24px;
-            font-weight: 900;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-            border-bottom-left-radius: 30px;
-            border-bottom-right-radius: 30px;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            letter-spacing: -0.5px;
+            padding: 0 16px;
+            height: 56px;
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 10px;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+            position: sticky; top: 0; z-index: 50;
         }
-
-        .header-left,
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 80px;
-        }
-
-        .header-center {
-            flex: 1;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        .header-left, .header-right { display: flex; align-items: center; gap: 8px; min-width: 80px; }
+        .header-center { flex: 1; text-align: center; font-size: 17px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.3px; }
+        .header-right { justify-content: flex-end; }
 
         .header-btn {
-            background: rgba(255,255,255,0.25);
-            border: none;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 800;
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white; padding: 6px 12px;
+            border-radius: 8px; cursor: pointer;
+            font-size: 13px; font-weight: 700;
+            transition: background 0.15s;
             white-space: nowrap;
         }
+        .header-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.95); }
 
-        .header-btn:active {
-            transform: scale(0.9);
-            background: rgba(255,255,255,0.4);
-        }
-
-        .view-section {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            padding: 25px 20px;
-            animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
+        /* ── VIEW ── */
+        .view-section { display: none; flex: 1; flex-direction: column; padding: 20px 16px 32px; animation: fadeSlideIn 0.3s ease; }
         .view-section.active { display: flex; }
 
-        .glass-card {
-            background: var(--surface);
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--white);
             border-radius: var(--radius);
-            padding: 30px 20px;
+            padding: 24px 20px;
             box-shadow: var(--shadow-sm);
-            border: 2px solid rgba(255, 107, 107, 0.05);
-            margin-bottom: 25px;
+            border: 1px solid var(--gray-200);
+            margin-bottom: 16px;
+        }
+        .card-title {
+            font-size: 18px; font-weight: 900; color: var(--gray-800);
+            margin: 0 0 6px; letter-spacing: -0.5px;
+        }
+        .card-sub {
+            font-size: 13px; color: var(--gray-400);
+            font-weight: 500; margin-bottom: 20px; line-height: 1.5;
         }
 
-        .title-text {
-            font-size: 22px;
-            font-weight: 900;
-            margin-bottom: 10px;
-            color: var(--text-main);
-            text-align: center;
+        /* ── SECTION LABEL ── */
+        .section-label {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; font-weight: 700;
+            color: var(--blue); letter-spacing: 0.3px;
+            text-transform: uppercase; margin-bottom: 10px;
+        }
+        .section-label::before {
+            content: ''; display: block; width: 3px; height: 14px;
+            background: var(--blue); border-radius: 2px;
         }
 
-        .subtitle-text {
-            font-size: 15px;
-            color: var(--text-muted);
-            text-align: center;
-            margin-bottom: 30px;
-            font-weight: 600;
+        /* ── BUTTONS ── */
+        .btn {
+            width: 100%; padding: 15px;
+            font-size: 16px; font-weight: 700;
+            border: none; border-radius: var(--radius-sm);
+            cursor: pointer; transition: all 0.15s;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            letter-spacing: -0.3px;
         }
+        .btn:active { transform: translateY(2px); opacity: 0.9; }
 
-        .input-group { margin-bottom: 15px; }
+        .btn-primary   { background: var(--blue);   color: white; box-shadow: 0 4px 0 var(--blue-dark); }
+        .btn-primary:active { box-shadow: none; }
+        .btn-green     { background: var(--green);  color: white; box-shadow: 0 4px 0 #047857; }
+        .btn-green:active { box-shadow: none; }
+        .btn-amber     { background: var(--amber);  color: white; box-shadow: 0 4px 0 #B45309; }
+        .btn-amber:active { box-shadow: none; }
+        .btn-purple    { background: var(--purple); color: white; box-shadow: 0 4px 0 #6D28D9; }
+        .btn-purple:active { box-shadow: none; }
+        .btn-dark      { background: var(--gray-800); color: white; box-shadow: 0 4px 0 #111827; }
+        .btn-dark:active { box-shadow: none; }
+        .btn-outline   { background: white; color: var(--gray-600); border: 1.5px solid var(--gray-200); box-shadow: 0 2px 0 var(--gray-200); }
+        .btn-outline:active { box-shadow: none; }
+        .btn-ghost     { background: var(--gray-100); color: var(--gray-600); }
+        .btn-sm        { padding: 8px 14px; font-size: 13px; border-radius: 8px; }
 
+        /* ── CHIP/TAG BUTTONS ── */
+        .chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+        .chip {
+            padding: 8px 16px; border: 1.5px solid var(--gray-200);
+            border-radius: 100px; background: white;
+            color: var(--gray-600); font-size: 14px; font-weight: 700;
+            cursor: pointer; transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .chip:active { transform: scale(0.96); }
+        .chip.active { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+        .chip.active-green { background: var(--green-light); border-color: var(--green); color: var(--green); }
+        .chip.active-purple { background: var(--purple-light); border-color: var(--purple); color: var(--purple); }
+        .chip.active-amber { background: var(--amber-light); border-color: var(--amber); color: var(--amber); }
+        .chip.active-teal { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
+        .chip[disabled] { opacity: 0.3; cursor: not-allowed; }
+
+        /* ── SUBJECT CHIPS ── */
+        .subject-chip[data-subject="국어"].active  { background:#EFF6FF; border-color:#2563EB; color:#2563EB; }
+        .subject-chip[data-subject="영어"].active  { background:#F0FDF4; border-color:#059669; color:#059669; }
+        .subject-chip[data-subject="수학"].active  { background:#FFF7ED; border-color:#EA580C; color:#EA580C; }
+        .subject-chip[data-subject="영단어"].active{ background:#FAF5FF; border-color:#7C3AED; color:#7C3AED; }
+
+        /* ── INPUT ── */
         .input-field {
-            width: 100%;
-            padding: 18px;
-            border: 2px solid #dfe6e9;
-            border-radius: 16px;
-            font-size: 18px;
-            transition: all 0.3s;
-            background-color: #f8fbfa;
-            font-weight: 700;
-            text-align: center;
+            width: 100%; padding: 14px 16px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 17px; font-weight: 700;
+            background: var(--gray-50); color: var(--gray-800);
+            transition: all 0.2s; text-align: center;
+            font-family: inherit;
         }
+        .input-field:focus { border-color: var(--blue); background: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
 
-        .input-field:focus {
-            border-color: var(--secondary);
-            background-color: white;
-            box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.15);
+        /* ── DASHBOARD STATS ── */
+        .stats-row { display: flex; gap: 10px; margin-bottom: 16px; }
+        .stat-card {
+            flex: 1; background: white; border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm); padding: 12px 14px;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: var(--shadow-sm);
         }
+        .stat-icon { font-size: 24px; flex-shrink: 0; }
+        .stat-label { font-size: 11px; color: var(--gray-400); font-weight: 600; }
+        .stat-value { font-size: 18px; font-weight: 900; color: var(--gray-800); line-height: 1; }
 
-        .btn-main {
-            width: 100%;
-            padding: 18px;
-            font-size: 18px;
-            font-weight: 900;
-            border: none;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: all 0.1s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-            top: 0;
-        }
-
-        .btn-main:active {
-            top: 4px;
-            box-shadow: none !important;
-        }
-
-        .btn-primary { background-color: var(--primary); color: white; box-shadow: 0 6px 0 var(--primary-dark); }
-        .btn-secondary { background-color: var(--secondary); color: white; box-shadow: 0 6px 0 #2e86de; }
-        .btn-accent { background-color: var(--accent); color: #833471; box-shadow: 0 6px 0 #f39c12; }
-        .btn-dark { background-color: #2d3436; color: white; box-shadow: 0 6px 0 #1e272e; }
-
-        .btn-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 25px;
-            width: 100%;
-        }
-
-        .btn-outline {
-            flex: 1;
-            min-width: 60px;
-            padding: 14px;
-            border: 2px solid #dfe6e9;
-            border-radius: 14px;
-            background-color: white;
-            color: var(--text-muted);
-            font-size: 15px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-            box-shadow: 0 4px 0 #dfe6e9;
-        }
-
-        .btn-outline:active { transform: translateY(4px); box-shadow: none; }
-
-        .btn-outline.active {
-            border-color: var(--primary);
-            background-color: #fff0f0;
-            color: var(--primary);
-            box-shadow: 0 4px 0 var(--primary-dark);
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .stat-badge {
-            background: linear-gradient(135deg, #feca57, #ff9f43);
-            color: #833471;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: 900;
-            font-size: 15px;
-            box-shadow: 0 4px 15px rgba(254, 202, 87, 0.4);
-            border: 2px solid #fff;
-        }
-
-        .streak-badge {
-            background: linear-gradient(135deg, #1dd1a1, #10ac84);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: 900;
-            font-size: 15px;
-            box-shadow: 0 4px 15px rgba(29, 209, 161, 0.4);
-            border: 2px solid #fff;
-        }
-
-        .quiz-status {
-            display: flex;
-            justify-content: space-between;
+        /* ── QUIZ HEADER ── */
+        .quiz-meta {
+            display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 10px;
-            font-weight: 800;
-            color: var(--text-muted);
-            font-size: 14px;
-            gap: 10px;
-            flex-wrap: wrap;
         }
-
-        .progress-bar-bg {
-            width: 100%;
-            height: 12px;
-            background-color: #dfe6e9;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            overflow: hidden;
+        .quiz-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 100px;
+            font-size: 12px; font-weight: 700; letter-spacing: 0.2px;
         }
+        .badge-blue   { background: var(--blue-light);   color: var(--blue); }
+        .badge-green  { background: var(--green-light);  color: var(--green); }
+        .badge-orange { background: #FFF7ED; color: #EA580C; }
+        .badge-purple { background: var(--purple-light); color: var(--purple); }
+        .badge-gray   { background: var(--gray-100);     color: var(--gray-600); }
 
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--secondary), #00d2d3);
-            border-radius: 10px;
-            transition: width 0.4s ease-out;
-            width: 0%;
+        /* ── PROGRESS BAR ── */
+        .progress-wrap { margin-bottom: 20px; }
+        .progress-info { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--gray-400); margin-bottom: 6px; }
+        .progress-track { width: 100%; height: 8px; background: var(--gray-200); border-radius: 100px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue), #60A5FA); border-radius: 100px; transition: width 0.4s cubic-bezier(.4,0,.2,1); width: 0%; }
+        .progress-fill.green { background: linear-gradient(90deg, var(--green), #34D399); }
+
+        /* ── QUESTION BOX ── */
+        .question-number {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; border-radius: 8px;
+            background: var(--blue); color: white;
+            font-size: 14px; font-weight: 900; margin-bottom: 12px; flex-shrink: 0;
         }
-
         .question-box {
-            font-size: 22px;
-            font-weight: 900;
-            line-height: 1.5;
-            color: var(--text-main);
-            margin-bottom: 25px;
-            white-space: normal;
-            word-break: keep-all;
-            text-align: left;
-            background: #f8fbfa;
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid #dfe6e9;
+            font-size: 17px; font-weight: 700; line-height: 1.7;
+            color: var(--gray-800); margin-bottom: 20px;
+            word-break: keep-all; white-space: normal;
+            background: var(--gray-50);
+            padding: 16px; border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-200);
+            border-left: 3px solid var(--blue);
         }
+        .question-box u { text-underline-offset: 3px; text-decoration-color: var(--blue); }
 
-        .question-box br { line-height: 1.8; }
-        .question-box u { text-underline-offset: 4px; }
-
-                .options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .option-row {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-        }
+        /* ── OPTION BUTTONS ── */
+        .options-container { display: flex; flex-direction: column; gap: 10px; }
+        .option-row { display: flex; gap: 8px; align-items: stretch; }
 
         .option-btn {
-            flex: 1;
-            padding: 18px;
-            background: white;
-            border: 2px solid #dfe6e9;
-            border-radius: 16px;
-            font-size: 17px;
-            font-weight: 800;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 0 #dfe6e9;
-            line-height: 1.55;
+            flex: 1; padding: 14px 16px;
+            background: white; border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-sm); cursor: pointer;
+            transition: all 0.15s; display: flex; align-items: center; gap: 12px;
+            text-align: left; line-height: 1.5;
+            font-family: inherit;
         }
+        .option-btn:hover:not(:disabled) { border-color: var(--blue); background: var(--blue-light); }
+        .option-btn:active:not(:disabled) { transform: scale(0.98); }
+        .option-btn:disabled { cursor: not-allowed; }
 
-        .option-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: none; }
-        .option-btn:hover:not(:disabled) { border-color: var(--secondary); background: #f0f8ff; }
-        .option-btn:disabled { cursor: not-allowed; opacity: 0.9; }
-        .option-btn u { text-underline-offset: 4px; }
+        .option-num {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--gray-100); border: 1.5px solid var(--gray-200);
+            font-size: 13px; font-weight: 900; color: var(--gray-600);
+            flex-shrink: 0; transition: all 0.15s;
+        }
+        .option-text { font-size: 15px; font-weight: 600; color: var(--gray-800); }
+
+        .option-btn.correct-ans { border-color: var(--green); background: var(--green-light); }
+        .option-btn.correct-ans .option-num { background: var(--green); border-color: var(--green); color: white; }
+        .option-btn.wrong-ans { border-color: var(--red); background: var(--red-light); }
+        .option-btn.wrong-ans .option-num { background: var(--red); border-color: var(--red); color: white; }
 
         .tts-opt-btn {
-            width: 65px;
-            background: #ffeaa7;
-            border: none;
-            border-radius: 14px;
-            box-shadow: 0 4px 0 #f3ca20;
-            color: #d35400;
-            font-weight: 900;
-            cursor: pointer;
-            transition: all 0.1s;
-            font-size: 20px;
+            width: 44px; flex-shrink: 0;
+            background: var(--amber-light); border: 1.5px solid #FCD34D;
+            border-radius: var(--radius-sm); color: var(--amber);
+            font-size: 16px; cursor: pointer; transition: all 0.15s;
+            display: flex; align-items: center; justify-content: center;
         }
+        .tts-opt-btn:active { transform: scale(0.92); }
 
-        .tts-opt-btn:active { transform: translateY(4px); box-shadow: none; }
+        /* ── TTS BUTTON ── */
+        .tts-main-btn {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--amber-light); border: 1.5px solid #FCD34D;
+            color: var(--amber); padding: 10px 16px;
+            border-radius: var(--radius-sm); cursor: pointer;
+            font-size: 14px; font-weight: 700; margin-bottom: 16px;
+            transition: all 0.15s; width: fit-content;
+        }
+        .tts-main-btn:active { transform: scale(0.96); }
 
+        /* ── FEEDBACK ── */
         #feedback-box {
-            margin-top: 25px;
-            font-size: 22px;
-            font-weight: 900;
-            text-align: center;
-            min-height: 33px;
-            animation: popIn 0.3s;
+            margin-top: 16px; font-size: 16px; font-weight: 800;
+            text-align: center; min-height: 24px; animation: popIn 0.25s;
+            letter-spacing: -0.3px;
         }
+        .fb-correct { color: var(--green); }
+        .fb-wrong   { color: var(--red); }
 
-        .correct { color: var(--success); }
-        .incorrect { color: var(--danger); }
-
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-            margin-top: 15px;
+        /* ── RESULT ── */
+        .result-score-ring {
+            width: 130px; height: 130px; border-radius: 50%;
+            background: conic-gradient(var(--blue) 0%, var(--blue-mid) 100%);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px; position: relative;
+            box-shadow: 0 0 0 6px var(--blue-light);
+        }
+        .result-score-ring::before {
+            content: ''; position: absolute; inset: 8px; border-radius: 50%;
             background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
+        .result-score-text {
+            position: relative; z-index: 1; text-align: center;
+        }
+        .result-score-num { font-size: 32px; font-weight: 900; color: var(--blue); line-height: 1; }
+        .result-score-label { font-size: 13px; font-weight: 700; color: var(--gray-400); }
 
-        .report-table th, .report-table td {
-            border-bottom: 1px solid #f1f2f6;
-            padding: 15px 10px;
-            text-align: center;
-            line-height: 1.4;
+        .points-earned {
+            background: linear-gradient(135deg, var(--blue-light), #EDE9FE);
+            border: 1px solid var(--blue-mid); border-radius: var(--radius-sm);
+            padding: 16px; text-align: center; margin-bottom: 16px;
         }
+        .points-earned-num { font-size: 28px; font-weight: 900; color: var(--blue); }
+        .points-earned-label { font-size: 13px; color: var(--gray-600); font-weight: 600; }
 
-        .report-table th {
-            background-color: #f8fbfa;
-            color: var(--text-muted);
-            font-weight: 800;
+        /* ── WRONG REVIEW ── */
+        .wrong-item {
+            background: white; border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm); padding: 16px;
+            margin-bottom: 12px; border-left: 3px solid var(--red);
         }
+        .wrong-q   { font-weight: 700; color: var(--gray-800); line-height: 1.6; margin-bottom: 10px; font-size: 15px; }
+        .wrong-ans { color: var(--red);   font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .right-ans { color: var(--green); font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+        .wrong-desc { background: var(--gray-50); border: 1px dashed var(--gray-200); border-radius: 8px; padding: 12px; font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+
+        /* ── LEARNING VIEW (단어) ── */
+        .word-card {
+            background: linear-gradient(135deg, var(--blue), #7C3AED);
+            border-radius: var(--radius-lg); padding: 36px 24px;
+            text-align: center; margin-bottom: 16px;
+            box-shadow: var(--shadow-lg);
+        }
+        .word-text   { font-size: 44px; font-weight: 900; color: white; letter-spacing: 1px; margin-bottom: 12px; }
+        .word-meaning{ font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.85); }
+
+        /* ── ADMIN / REPORT TABLE ── */
+        .report-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .report-table th { background: var(--gray-50); color: var(--gray-400); font-weight: 700; padding: 12px 8px; text-align: center; border-bottom: 2px solid var(--gray-200); font-size: 12px; }
+        .report-table td { padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--gray-100); line-height: 1.4; }
 
         .btn-small {
-            background: var(--text-main);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-weight: 800;
-            cursor: pointer;
+            background: var(--blue); color: white; border: none;
+            padding: 6px 12px; border-radius: 6px; font-weight: 700;
+            cursor: pointer; font-size: 12px; font-family: inherit;
         }
+        .btn-small.used { background: var(--gray-400); cursor: default; }
+        .btn-small:hover { opacity: 0.85; }
 
-        .btn-small.used { background: #b2bec3; cursor: default; }
-
-        .admin-info-box {
-            background: #fff0f0;
-            border: 2px solid #ffcccc;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
-
-        .admin-info-title {
-            font-weight: 900;
-            color: var(--danger);
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
+        /* ── SHOP ── */
         .shop-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 14px;
-            padding: 20px;
-            border: 2px solid #dfe6e9;
-            border-radius: 16px;
-            margin-bottom: 15px;
-            background: white;
-            box-shadow: 0 4px 0 #dfe6e9;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px; border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm); margin-bottom: 10px; background: white;
+            box-shadow: var(--shadow-sm); gap: 12px;
         }
+        .item-name  { font-weight: 700; font-size: 15px; margin-bottom: 2px; }
+        .item-price { font-size: 13px; font-weight: 700; color: var(--blue); }
 
-        .item-name {
-            font-weight: 900;
-            font-size: 18px;
-            margin-bottom: 6px;
-            color: var(--text-main);
+        /* ── ADMIN BOXES ── */
+        .admin-box {
+            background: var(--gray-50); border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm); padding: 16px; margin-bottom: 14px;
         }
+        .admin-box-title { font-weight: 700; font-size: 13px; color: var(--gray-600); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .admin-box.warn  { background: #FFF7ED; border-color: #FCD34D; }
+        .admin-box.info  { background: var(--blue-light); border-color: var(--blue-mid); }
+        .admin-box.success { background: var(--green-light); border-color: #6EE7B7; }
 
-        .item-cost {
-            color: var(--primary);
-            font-weight: 900;
-            font-size: 15px;
+        /* ── OVERLAY / SPINNER ── */
+        .overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(255,255,255,0.92);
+            z-index: 9999; flex-direction: column;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
         }
-
-        @keyframes bounceIn {
-            0% { opacity: 0; transform: scale(0.95) translateY(10px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+        .spinner-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+        .spinner {
+            width: 44px; height: 44px; border: 4px solid var(--blue-mid);
+            border-top-color: var(--blue); border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
+        .loading-title { font-size: 16px; font-weight: 700; color: var(--gray-800); text-align: center; line-height: 1.6; }
+        .loading-sub   { font-size: 13px; color: var(--gray-400); font-weight: 500; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* ── MODAL ── */
+        .modal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55); z-index: 9000;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+        .modal-content {
+            background: white; width: 90%; max-height: 82vh;
+            border-radius: var(--radius-lg); padding: 28px 20px;
+            overflow-y: auto; display: flex; flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            animation: popIn 0.3s cubic-bezier(.34,1.56,.64,1);
+        }
+        .modal-title  { font-size: 18px; font-weight: 900; margin-bottom: 16px; color: var(--gray-800); }
+        .modal-body   { font-size: 15px; line-height: 1.7; color: var(--gray-800); flex: 1; margin-bottom: 20px; white-space: pre-wrap; }
+        .modal-footer { display: flex; gap: 10px; }
+        .modal-footer .btn { flex: 1; }
+
+        /* ── ANIMATIONS ── */
         @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
+            from { opacity: 0; transform: scale(0.9); }
+            to   { opacity: 1; transform: scale(1); }
         }
-
         @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
-            100% { opacity: 0; transform: translateY(-80px) scale(1.8) rotate(10deg); }
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to   { opacity: 0; transform: translateY(-70px) scale(1.4); }
+        }
+        @keyframes fall {
+            to { transform: translateY(105vh) rotate(720deg); }
         }
 
         .floating-point {
-            position: fixed;
-            color: var(--primary);
-            font-size: 28px;
-            font-weight: 900;
-            text-shadow: 0 4px 0 var(--primary-dark), 0 2px 10px rgba(0,0,0,0.3);
-            pointer-events: none;
-            z-index: 9999;
-            animation: floatUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            position: fixed; color: var(--green);
+            font-size: 22px; font-weight: 900;
+            pointer-events: none; z-index: 9999;
+            animation: floatUp 0.9s ease forwards;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
+        .confetti { position: fixed; width: 8px; height: 8px; z-index: 8000; pointer-events: none; animation: fall linear forwards; }
 
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background-color: #f00;
-            z-index: 8000;
-            pointer-events: none;
-            animation: fall linear forwards;
-        }
+        /* ── DIVIDER ── */
+        .divider { height: 1px; background: var(--gray-200); margin: 16px 0; }
 
-        @keyframes fall {
-            to { transform: translateY(100vh) rotate(720deg); }
-        }
-
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.95);
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #ffeaa7;
-            border-top: 5px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 9000;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(3px);
-        }
-
-        .modal-content {
-            background: white;
-            width: 88%;
-            max-height: 80vh;
-            border-radius: 24px;
-            padding: 30px 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .modal-btns {
-            display: flex;
-            gap: 12px;
-            margin-top: 25px;
-            width: 100%;
-        }
-
-        .modal-btns button {
-            flex: 1;
-            margin: 0;
-            padding: 16px;
-            font-size: 16px;
-        }
-
-        .wrong-item {
-            background: #ffffff;
-            border: 2px solid #ffcccc;
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 15px;
-            text-align: left;
-            font-size: 15px;
-            box-shadow: 0 4px 0 #ffe0e0;
-        }
-
-        .wrong-q {
-            font-weight: 900;
-            margin-bottom: 10px;
-            color: var(--text-main);
-            white-space: normal;
-            line-height: 1.6;
-        }
-
-                .wrong-ans {
-            color: var(--danger);
-            margin-bottom: 5px;
-            font-weight: 700;
-        }
-
-        .correct-ans {
-            color: var(--success);
-            font-weight: 900;
-        }
-
-        .empty-report {
-            padding: 24px !important;
-            color: var(--text-muted);
-            font-weight: 800;
-        }
-
+        /* ── RESPONSIVE ── */
         @media (max-width: 420px) {
-            .header { font-size: 20px; }
-            .header-btn { padding: 7px 10px; font-size: 13px; }
-            .question-box { font-size: 20px; }
-            .shop-item { flex-direction: column; align-items: stretch; }
+            .word-text  { font-size: 36px; }
+            .chip       { font-size: 13px; padding: 7px 12px; }
+            .option-text{ font-size: 14px; }
         }
     </style>
 </head>
 <body>
-
 <div class="app-container" id="app">
+
+    <!-- HEADER -->
     <div class="header">
         <div class="header-left">
             <button id="back-btn" class="header-btn" style="display:none;" onclick="goBack()">← 뒤로</button>
         </div>
-        <div class="header-center">
-            <span id="header-title">🌟 스마트 학습 🌟</span>
-        </div>
-        <div class="header-right" style="justify-content:flex-end;">
-            <button id="logout-btn" class="header-btn" style="display:none;" onclick="logout()">나가기 🏃‍♂️</button>
+        <div class="header-center"><span id="header-title">🌟 스마트 학습</span></div>
+        <div class="header-right">
+            <button id="logout-btn" class="header-btn" style="display:none;" onclick="logout()">나가기</button>
         </div>
     </div>
 
+    <!-- LOADING OVERLAY -->
     <div id="loading-overlay" class="overlay">
-        <div class="spinner"></div>
-        <div style="font-size: 18px; font-weight: 900; color: var(--primary); text-align: center; line-height: 1.6;" id="loading-msg">
-            열심히 요청을 처리하고 있어요! ⏳🤓
+        <div class="spinner-wrap">
+            <div class="spinner"></div>
+            <div class="loading-title" id="loading-msg">처리 중입니다...</div>
+            <div class="loading-sub" id="loading-sub">잠시만 기다려 주세요</div>
         </div>
     </div>
 
+    <!-- ① LOGIN VIEW -->
     <div id="login-view" class="view-section active">
-        <div class="glass-card" style="margin-top: 20px;">
-            <div class="title-text">👨‍👩‍👧‍👦 로그인 구분</div>
-            <div class="subtitle-text">누가 사용하나요? 버튼을 눌러주세요. 👇</div>
-
-            <button class="btn-main btn-primary" style="margin-bottom: 20px;" onclick="showView('profile-select-view', { push: true })">🎒 학생/일반 사용하기</button>
-            <button class="btn-main btn-dark" onclick="loginAsParent()">📊 관리자 로그인</button>
+        <div style="text-align:center; padding: 24px 0 20px;">
+            <div style="font-size:52px; margin-bottom:8px;">🎓</div>
+            <div style="font-size:22px; font-weight:900; color:var(--gray-800); letter-spacing:-0.5px;">스마트 학습 시스템</div>
+            <div style="font-size:14px; color:var(--gray-400); margin-top:6px; font-weight:500;">AI 기반 맞춤형 학습 플랫폼</div>
+        </div>
+        <div class="card">
+            <div class="card-title">로그인 구분</div>
+            <div class="card-sub">사용자 유형을 선택해주세요.</div>
+            <button class="btn btn-primary" style="margin-bottom:12px;" onclick="showView('profile-select-view',{push:true})">🎒 학생 학습 시작</button>
+            <button class="btn btn-dark" onclick="loginAsParent()">📊 관리자(부모님) 로그인</button>
         </div>
     </div>
 
+    <!-- ② PROFILE SELECT VIEW -->
     <div id="profile-select-view" class="view-section">
-        <div class="glass-card" style="margin-top: 20px;">
-            <div class="title-text">🙋 사용자 선택</div>
-            <div class="subtitle-text">이름을 선택하고 비밀번호를 입력해요. 🔐</div>
-
-            <button class="btn-main btn-secondary" style="margin-bottom: 20px;" onclick="selectProfile('김로운')">👦 김로운</button>
-            <button class="btn-main btn-secondary" style="margin-bottom: 20px;" onclick="selectProfile('김서아')">👧 김서아</button>
-            <button class="btn-main btn-secondary" onclick="selectProfile('정지영')">👩 정지영</button>
+        <div class="card">
+            <div class="card-title">사용자 선택</div>
+            <div class="card-sub">이름을 선택하고 비밀번호를 입력해요.</div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <button class="btn btn-primary" onclick="selectProfile('김로운')">👦 김로운</button>
+                <button class="btn btn-primary" onclick="selectProfile('김서아')">👧 김서아</button>
+                <button class="btn btn-primary" onclick="selectProfile('정지영')">👩 정지영</button>
+            </div>
         </div>
     </div>
 
+    <!-- ③ CHILD DASHBOARD VIEW -->
     <div id="child-dashboard-view" class="view-section">
-        <div class="dashboard-header">
-            <div class="streak-badge" id="streak-display">🔥 연속 0일</div>
-            <div class="stat-badge" id="point-display">💰 0P</div>
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon">🔥</div>
+                <div>
+                    <div class="stat-label">연속 출석</div>
+                    <div class="stat-value" id="streak-display">0일</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div>
+                    <div class="stat-label">보유 포인트</div>
+                    <div class="stat-value" id="point-display">0P</div>
+                </div>
+            </div>
         </div>
 
-        <div class="glass-card">
-            <div class="title-text">🚀 오늘의 학습 시작 🚀</div>
+        <div class="card">
+            <div class="card-title">🚀 오늘의 학습</div>
+            <div class="card-sub">과정, 과목, 난이도를 선택하고 학습을 시작해요.</div>
 
-            <div class="subtitle-text" style="text-align: left; margin-bottom:10px; font-weight:800; color:var(--text-main);">1. 과정(학년) 선택 🏫</div>
-            <div class="btn-group" id="grade-container"></div>
+            <div class="section-label">1단계 · 과정(학년) 선택</div>
+            <div class="chip-group" id="grade-container"></div>
 
-            <div class="subtitle-text" style="text-align: left; margin-bottom:10px; font-weight:800; color:var(--text-main);">2. 과목 선택 📚</div>
-            <div class="btn-group" id="subject-container">
-                <button class="btn-outline active" onclick="selectConfig('subject', '국어')">📖 국어</button>
-                <button class="btn-outline" onclick="selectConfig('subject', '영어')">🔤 영어</button>
-                <button class="btn-outline" onclick="selectConfig('subject', '수학')">🔢 수학</button>
-                <button class="btn-outline" onclick="selectConfig('subject', '영단어')">📝 영단어</button>
+            <div class="section-label">2단계 · 과목 선택</div>
+            <div class="chip-group" id="subject-container">
+                <button class="chip subject-chip active" data-subject="국어" onclick="selectConfig('subject','국어')">📖 국어</button>
+                <button class="chip subject-chip" data-subject="영어" onclick="selectConfig('subject','영어')">🔤 영어</button>
+                <button class="chip subject-chip" data-subject="수학" onclick="selectConfig('subject','수학')">🔢 수학</button>
+                <button class="chip subject-chip" data-subject="영단어" onclick="selectConfig('subject','영단어')">📝 영단어</button>
             </div>
 
-            <div class="subtitle-text" style="text-align: left; margin-bottom:10px; font-weight:800; color:var(--text-main);">3. 난이도 선택 🎯</div>
-            <div class="btn-group" id="difficulty-container">
-                <button class="btn-outline" onclick="selectConfig('difficulty', '최저')">최저</button>
-                <button class="btn-outline" onclick="selectConfig('difficulty', '하')">하</button>
-                <button class="btn-outline active" onclick="selectConfig('difficulty', '중')">중</button>
-                <button class="btn-outline" onclick="selectConfig('difficulty', '상')">상</button>
-                <button class="btn-outline" onclick="selectConfig('difficulty', '최상')">최상</button>
+            <div class="section-label">3단계 · 난이도 선택</div>
+            <div class="chip-group" id="difficulty-container">
+                <button class="chip" onclick="selectConfig('difficulty','최저')">최저</button>
+                <button class="chip" onclick="selectConfig('difficulty','하')">하</button>
+                <button class="chip active" onclick="selectConfig('difficulty','중')">중</button>
+                <button class="chip" onclick="selectConfig('difficulty','상')">상</button>
+                <button class="chip" onclick="selectConfig('difficulty','최상')">최상</button>
             </div>
 
-            <button class="btn-main btn-primary" onclick="startNewQuiz()" style="margin-top:10px;">✨ 문제 풀기 출발! 🏃‍♂️💨</button>
+            <button class="btn btn-primary" onclick="startNewQuiz()" style="margin-top:8px;">✨ 학습 시작하기</button>
         </div>
 
-        <div style="display: flex; gap: 15px;">
-            <button class="btn-main btn-accent" style="flex: 2;" onclick="showView('shop-view', { push: true })">🏪 포인트 상점</button>
-            <button class="btn-main btn-outline" style="flex: 1; padding: 10px; font-size: 15px;" onclick="changePassword()">🔑 비번변경</button>
+        <div style="display:flex; gap:12px;">
+            <button class="btn btn-amber" style="flex:2;" onclick="showView('shop-view',{push:true})">🏪 포인트 상점</button>
+            <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="changePassword()">🔑 비번변경</button>
         </div>
     </div>
 
+    <!-- ④ SHOP VIEW -->
     <div id="shop-view" class="view-section">
-        <div class="glass-card">
-            <div class="title-text">🎁 내 포인트 상점 🎁</div>
-            <div class="subtitle-text" id="shop-point-display" style="color:var(--primary); font-size:18px;">현재 보유: 0P</div>
-
-            <div class="shop-item">
+        <div class="card">
+            <div class="card-title">🎁 포인트 상점</div>
+            <div style="background:var(--blue-light); border:1px solid var(--blue-mid); border-radius:10px; padding:14px; margin-bottom:20px; display:flex; align-items:center; gap:10px;">
+                <div style="font-size:24px;">💰</div>
                 <div>
-                    <div class="item-name">🎮 게임 충전: 3만원</div>
-                    <div class="item-cost">30,000 P</div>
+                    <div style="font-size:12px; color:var(--gray-400); font-weight:600;">현재 보유 포인트</div>
+                    <div style="font-size:22px; font-weight:900; color:var(--blue);" id="shop-point-display">0P</div>
                 </div>
-                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('게임 충전: 3만원', 30000)">구매</button>
             </div>
 
-            <div class="shop-item">
-                <div>
-                    <div class="item-name">🎮 게임 충전: 5만원</div>
-                    <div class="item-cost">50,000 P</div>
-                </div>
-                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('게임 충전: 5만원', 50000)">구매</button>
-            </div>
-
-            <div class="shop-item">
-                <div>
-                    <div class="item-name">🍺 맥주 6캔</div>
-                    <div class="item-cost">10,000 P</div>
-                </div>
-                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('맥주 6캔', 10000)">구매</button>
-            </div>
-
-            <div class="shop-item">
-                <div>
-                    <div class="item-name">🍪 초코파이 1박스</div>
-                    <div class="item-cost">4,000 P</div>
-                </div>
-                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('초코파이 1박스', 4000)">구매</button>
-            </div>
-
-            <div class="shop-item">
-                <div>
-                    <div class="item-name">🛒 다이소 1000원</div>
-                    <div class="item-cost">1,000 P</div>
-                </div>
-                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('다이소 1000원', 1000)">구매</button>
-            </div>
-
-            <div class="shop-item">
-                <div>
-                    <div class="item-name">🍦 빙빙 1000원</div>
-                    <div class="item-cost">1,000 P</div>
-                </div>
-                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('빙빙 1000원', 1000)">구매</button>
-            </div>
-
-            <div class="shop-item">
-                <div>
-                    <div class="item-name">💵 1,000원 용돈 교환권</div>
-                    <div class="item-cost">1,000 P</div>
-                </div>
-                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('1,000원 용돈 교환권', 1000)">구매</button>
-            </div>
-
-            <div class="shop-item">
-                <div>
-                    <div class="item-name">📱 휴대폰 1시간 쿠폰</div>
-                    <div class="item-cost">1,000 P</div>
-                </div>
-                <button class="btn-small" style="background:var(--success); box-shadow:0 4px 0 #10ac84;" onclick="buyItem('휴대폰 1시간 쿠폰', 1000)">구매</button>
+            <div id="shop-items-container">
+                <!-- 동적 생성 -->
             </div>
         </div>
     </div>
 
-        <div id="learning-view" class="view-section">
-        <div class="glass-card" style="text-align: center;">
-            <div class="title-text">📝 영단어 학습 📝</div>
-            <div class="subtitle-text" id="learning-progress">1 / 10</div>
-            <div class="progress-bar-bg"><div class="progress-bar-fill" id="learning-progress-bar"></div></div>
-            <div id="learning-word" style="font-size: 40px; font-weight: 900; color: var(--primary); margin: 20px 0;"></div>
-            <div id="learning-meaning" style="font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 30px;"></div>
-            <button id="learning-tts-btn" class="btn-main btn-accent" style="margin: 0 auto 25px; padding: 12px; font-size:16px;">🔊 발음 듣기</button>
-            <button id="learning-next-btn" class="btn-main btn-primary" onclick="nextLearningWord()">다음 단어 ➡️</button>
+    <!-- ⑤ LEARNING VIEW (영단어) -->
+    <div id="learning-view" class="view-section">
+        <div class="progress-wrap">
+            <div class="progress-info">
+                <span id="learning-progress-text">1 / 10</span>
+                <span id="learning-progress-pct">0%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill green" id="learning-progress-bar"></div></div>
         </div>
+
+        <div class="word-card">
+            <div style="font-size:13px; color:rgba(255,255,255,0.7); font-weight:600; margin-bottom:16px; letter-spacing:0.5px;">VOCABULARY</div>
+            <div class="word-text" id="learning-word">word</div>
+            <div class="word-meaning" id="learning-meaning">(뜻)</div>
+        </div>
+
+        <button id="learning-tts-btn" class="tts-main-btn" style="margin: 0 auto 16px;">🔊 발음 듣기</button>
+        <button id="learning-next-btn" class="btn btn-primary" onclick="nextLearningWord()">다음 단어 ➡️</button>
     </div>
 
+    <!-- ⑥ QUIZ VIEW -->
     <div id="quiz-view" class="view-section">
-        <div class="glass-card">
-            <div class="quiz-status">
-                <span id="current-status" style="background:#eafaf1; padding:4px 10px; border-radius:8px; color:var(--success);"></span>
-                <span id="progress-text" style="color:var(--primary);"></span>
+        <div class="quiz-meta">
+            <span class="quiz-badge badge-blue" id="current-status">학습 중</span>
+            <span class="quiz-badge badge-gray" id="progress-text">1 / 20</span>
+        </div>
+
+        <div class="progress-wrap">
+            <div class="progress-track"><div class="progress-fill" id="quiz-progress-bar"></div></div>
+        </div>
+
+        <div class="card" style="padding: 20px;">
+            <div id="question-header" style="display:flex; align-items:flex-start; gap:10px; margin-bottom:14px;">
+                <div class="question-number" id="question-num-badge">1</div>
+                <div id="question-type-badge" class="quiz-badge badge-blue" style="margin-top:4px;">객관식</div>
             </div>
 
-            <div class="progress-bar-bg"><div class="progress-bar-fill" id="quiz-progress-bar"></div></div>
+            <div id="question-text" class="question-box">문제를 불러오는 중입니다...</div>
 
-            <div id="question-text" class="question-box">문제를 불러오는 중입니다... 🧐</div>
-            <button id="tts-btn" class="btn-main btn-accent" style="display: none; margin: 0 auto 25px; padding: 12px; font-size:16px;">🔊 문제 읽어주기</button>
+            <button id="tts-btn" class="tts-main-btn" style="display:none;">🔊 문제 읽어주기</button>
 
-            <div id="options-container" class="options-container" style="display: none;"></div>
+            <div id="options-container" class="options-container" style="display:none;"></div>
 
-            <input type="text" id="answer-input" class="input-field" placeholder="단어를 정확히 쓰세요! ✍️" style="display: none; margin-bottom: 20px;" autocomplete="off">
-            <button class="btn-main btn-secondary" id="submit-btn" onclick="processSubjectiveAnswer(event)" style="display: none;">✅ 정답 확인</button>
+            <input type="text" id="answer-input" class="input-field" placeholder="정답을 입력하세요 ✍️" style="display:none; margin-bottom:14px;" autocomplete="off">
+            <button class="btn btn-primary" id="submit-btn" onclick="processSubjectiveAnswer(event)" style="display:none;">✅ 정답 확인</button>
 
             <div id="feedback-box"></div>
         </div>
     </div>
 
+    <!-- ⑦ RESULT VIEW -->
     <div id="result-view" class="view-section">
-        <div class="glass-card" style="text-align: center;">
-            <div class="title-text" id="result-title">🎉 학습 완료! 🎉</div>
-            <div style="font-size: 60px; font-weight: 900; color: var(--primary); margin: 20px 0; text-shadow: 2px 2px 0px #ffeaa7;" id="result-score">100점</div>
-            <div style="font-size: 16px; color: var(--secondary); font-weight: 900; margin-bottom: 25px; background-color: #f0f8ff; padding: 15px; border-radius: 12px; border: 1px solid var(--secondary);" id="earned-points"></div>
-            <div id="result-message" class="subtitle-text" style="font-size: 17px; line-height:1.5;">참 잘했어요! 👏</div>
-            <button id="result-action-btn" class="btn-main btn-primary" onclick="handleResultAction()">확인 ✅</button>
+        <div class="card" style="text-align:center;">
+            <div class="card-title" id="result-title" style="font-size:20px; margin-bottom:20px;">🎉 학습 완료!</div>
+
+            <div class="result-score-ring" id="result-ring" style="display:flex;">
+                <div class="result-score-text">
+                    <div class="result-score-num" id="result-score">100</div>
+                    <div class="result-score-label">점</div>
+                </div>
+            </div>
+
+            <div class="points-earned" id="earned-points" style="display:none;"></div>
+
+            <div id="result-message" style="font-size:15px; color:var(--gray-600); font-weight:600; margin-bottom:20px; line-height:1.6;">참 잘했어요! 👏</div>
+            <button id="result-action-btn" class="btn btn-primary" onclick="handleResultAction()">확인 ✅</button>
         </div>
     </div>
 
+    <!-- ⑧ WRONG REVIEW VIEW -->
     <div id="wrong-review-view" class="view-section">
-        <div class="glass-card" style="padding-bottom: 15px;">
-            <div class="title-text">📝 오답 개념 노트 🧐</div>
-            <div class="subtitle-text">내가 무엇을 실수했는지 정확한 풀이로 먼저 배워봐요! 💡</div>
-            <div id="wrong-review-container" style="max-height: 55vh; overflow-y: auto; margin-bottom: 20px;"></div>
-            <button class="btn-main btn-primary" onclick="startRetryQuiz()">💪 다 이해했어요! 다시 풀기 🚀</button>
+        <div class="card" style="padding-bottom:16px;">
+            <div class="card-title">📝 오답 개념 노트</div>
+            <div class="card-sub">틀린 문제를 꼼꼼히 이해하고 다시 도전해요!</div>
+            <div id="wrong-review-container" style="max-height:55vh; overflow-y:auto; margin-bottom:16px;"></div>
+            <button class="btn btn-primary" onclick="startRetryQuiz()">💪 이해 완료! 다시 풀기</button>
         </div>
     </div>
 
+    <!-- ⑨ PARENT VIEW -->
     <div id="parent-view" class="view-section">
-        <div class="glass-card">
-            <div class="title-text">👨‍🏫 부모님 관리 대시보드 📊</div>
+        <div class="card">
+            <div class="card-title">👨‍🏫 관리자 대시보드</div>
+            <div class="card-sub">학생 학습 현황 및 보상을 관리합니다.</div>
 
-            <div class="admin-info-box">
-                <div class="admin-info-title">🔑 사용자 비밀번호 상태</div>
-                <div id="admin-pw-display" style="font-size: 16px; font-weight: bold; color: var(--text-main);">
-                    정보를 불러오는 중입니다... ⏳
-                </div>
+            <div class="admin-box warn">
+                <div class="admin-box-title">🔑 사용자 비밀번호 현황</div>
+                <div id="admin-pw-display" style="font-size:14px; font-weight:600; color:var(--gray-800); line-height:2;">불러오는 중...</div>
             </div>
 
-            <div class="admin-info-box" style="border-color: var(--primary); background-color: #fff0f0;">
-                <div class="admin-info-title" style="color: var(--primary);">👶 학생 나이 설정 (과정 제한용) 🎂</div>
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <select id="age-student-select" class="input-field" style="padding: 10px; font-size: 15px;">
+            <div class="admin-box success" style="margin-top:0;">
+                <div class="admin-box-title">🎂 학생 나이 설정</div>
+                <div style="display:flex; gap:8px; margin-bottom:10px;">
+                    <select id="age-student-select" class="input-field" style="padding:10px; font-size:14px; flex:2;">
                         <option value="김로운">👦 김로운</option>
                         <option value="김서아">👧 김서아</option>
                         <option value="정지영">👩 정지영</option>
                     </select>
-                    <input type="number" id="age-input" class="input-field" placeholder="나이 입력 (예: 8)" style="padding: 10px; font-size: 15px;">
+                    <input type="number" id="age-input" class="input-field" placeholder="나이" style="padding:10px; font-size:14px; flex:1;">
                 </div>
-                <button class="btn-main btn-primary" style="padding: 12px; font-size: 15px;" onclick="setStudentAge()">나이 설정하기 ✅</button>
+                <button class="btn btn-green btn-sm" onclick="setStudentAge()">나이 설정 ✅</button>
             </div>
 
-            <div class="admin-info-box" style="border-color: var(--secondary); background-color: #f0f8ff;">
-                <div class="admin-info-title" style="color: var(--secondary);">🎁 특별 보너스 포인트 지급 ⭐</div>
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <select id="bonus-student-select" class="input-field" style="padding: 10px; font-size: 15px;">
+            <div class="admin-box info">
+                <div class="admin-box-title">⭐ 특별 보너스 포인트 지급</div>
+                <div style="display:flex; gap:8px; margin-bottom:10px;">
+                    <select id="bonus-student-select" class="input-field" style="padding:10px; font-size:14px; flex:2;">
                         <option value="김로운">👦 김로운</option>
                         <option value="김서아">👧 김서아</option>
                         <option value="정지영">👩 정지영</option>
                     </select>
-                    <input type="number" id="bonus-point-input" class="input-field" placeholder="지급할 수량 입력" style="padding: 10px; font-size: 15px;">
+                    <input type="number" id="bonus-point-input" class="input-field" placeholder="포인트" style="padding:10px; font-size:14px; flex:1;">
                 </div>
-                <button class="btn-main btn-secondary" style="padding: 12px; font-size: 15px;" onclick="giveBonusPoint()">포인트 지급하기 💰</button>
+                <button class="btn btn-primary btn-sm" onclick="giveBonusPoint()">지급하기 💰</button>
             </div>
 
-            <div class="btn-group" style="margin-bottom: 25px;">
-                <button class="btn-outline active" id="tab-report-btn" onclick="switchAdminTab('report')">📝 학습 리포트</button>
-                <button class="btn-outline" id="tab-reward-btn" onclick="switchAdminTab('reward')">🎁 보상/쿠폰 관리</button>
+            <div class="chip-group" style="margin-bottom:20px;">
+                <button class="chip active" id="tab-report-btn" onclick="switchAdminTab('report')">📝 학습 리포트</button>
+                <button class="chip" id="tab-reward-btn" onclick="switchAdminTab('reward')">🎁 보상 관리</button>
             </div>
 
             <div id="admin-report-section">
-                <div class="btn-group" style="margin-bottom: 20px;">
-                    <button class="btn-outline active" id="filter-all" onclick="filterReport('전체')">전체</button>
-                    <button class="btn-outline" id="filter-rw" onclick="filterReport('김로운')">김로운</button>
-                    <button class="btn-outline" id="filter-sa" onclick="filterReport('김서아')">김서아</button>
-                    <button class="btn-outline" id="filter-jj" onclick="filterReport('정지영')">정지영</button>
+                <div class="chip-group" style="margin-bottom:14px;">
+                    <button class="chip active" id="filter-all" onclick="filterReport('전체')">전체</button>
+                    <button class="chip" id="filter-rw" onclick="filterReport('김로운')">김로운</button>
+                    <button class="chip" id="filter-sa" onclick="filterReport('김서아')">김서아</button>
+                    <button class="chip" id="filter-jj" onclick="filterReport('정지영')">정지영</button>
                 </div>
 
-                <button class="btn-main btn-secondary" style="margin-bottom: 20px; padding:14px; font-size:16px;" onclick="analyzeComprehensiveWeakness()">🤖 선택 사용자 AI 종합 성장 리포트 📈</button>
+                <button class="btn btn-green" style="margin-bottom:14px;" onclick="analyzeComprehensiveWeakness()">🤖 AI 종합 성장 리포트 📈</button>
 
-                <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 0 0 1px #dfe6e9;">
-                    <table class="report-table" style="margin-top:0;">
-                        <thead>
-                            <tr>
-                                <th>이름</th>
-                                <th>일시/정보</th>
-                                <th>과목/점수</th>
-                                <th>상세/분석</th>
-                            </tr>
-                        </thead>
+                <div style="overflow-x:auto; border-radius:10px; border:1px solid var(--gray-200);">
+                    <table class="report-table">
+                        <thead><tr><th>이름</th><th>일시/정보</th><th>과목/점수</th><th>상세</th></tr></thead>
                         <tbody id="report-tbody"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="admin-reward-section" style="display: none;">
-                <div style="overflow-x: auto; border-radius: 12px; box-shadow: 0 0 0 1px #dfe6e9;">
-                    <table class="report-table" style="margin-top:0;">
-                        <thead>
-                            <tr>
-                                <th>이름</th>
-                                <th>구매내역</th>
-                                <th>P</th>
-                                <th>처리</th>
-                            </tr>
-                        </thead>
+            <div id="admin-reward-section" style="display:none;">
+                <div style="overflow-x:auto; border-radius:10px; border:1px solid var(--gray-200);">
+                    <table class="report-table">
+                        <thead><tr><th>이름</th><th>구매내역</th><th>P</th><th>처리</th></tr></thead>
                         <tbody id="reward-tbody"></tbody>
                     </table>
                 </div>
@@ -885,1825 +725,1313 @@
         </div>
     </div>
 
+    <!-- MODALS -->
     <div id="resume-modal" class="modal">
-        <div class="modal-content" style="text-align: center;">
-            <div class="title-text" id="resume-title">🚨 풀다 만 학습이 있어요! 🚨</div>
-            <div class="subtitle-text">이전에 풀던 문제부터 이어서 진행할까요? 🤔</div>
-            <div class="modal-btns">
-                <button class="btn-main btn-outline" style="flex: none; width: 45%; margin: 0 auto;" onclick="cancelResume()">처음부터 🔙</button>
-                <button class="btn-main btn-primary" style="flex: none; width: 45%; margin: 0 auto;" onclick="confirmResume()">이어하기 🚀</button>
+        <div class="modal-content" style="text-align:center;">
+            <div class="modal-title">🚨 이어하기</div>
+            <div style="font-size:15px; color:var(--gray-600); margin-bottom:20px; line-height:1.6;">이전에 풀던 문제가 있어요.<br>이어서 진행할까요?</div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="cancelResume()">처음부터</button>
+                <button class="btn btn-primary" onclick="confirmResume()">이어하기 🚀</button>
             </div>
         </div>
     </div>
 
     <div id="permission-modal" class="modal">
-        <div class="modal-content" style="text-align: center;">
-            <div class="title-text">🔔 알림 권한 허용 안내 🔔</div>
-            <div class="subtitle-text" style="color:var(--text-main); font-size:16px; line-height:1.5;">
-                학습 시작, 점수 결과 등을 실시간으로 받으시려면 <b>[권한 허용]</b>을 누르신 후 브라우저 팝업에서도 <b>허용</b>을 눌러주세요.<br><br>
-                <span style="color:var(--danger); font-size:14px;">※ 모바일 환경에서는 브라우저 탭을 백그라운드에 켜두셔야 정상적으로 알림이 수신됩니다.</span>
+        <div class="modal-content" style="text-align:center;">
+            <div class="modal-title">🔔 알림 권한</div>
+            <div style="font-size:14px; color:var(--gray-600); margin-bottom:20px; line-height:1.7;">
+                학습 결과를 실시간으로 받으시려면 <b>권한 허용</b>을 눌러주세요.<br>
+                <span style="color:var(--red); font-size:12px;">※ 브라우저 팝업에서도 '허용'을 클릭해야 합니다.</span>
             </div>
-            <div class="modal-btns">
-                <button class="btn-main btn-outline" style="flex: none; width: 40%; margin: 0 auto;" onclick="closePermissionModal()">다음에</button>
-                <button class="btn-main btn-primary" style="flex: none; width: 50%; margin: 0 auto;" onclick="requestPushPermission()">권한 허용 ✅</button>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closePermissionModal()">다음에</button>
+                <button class="btn btn-primary" onclick="requestPushPermission()">권한 허용</button>
             </div>
         </div>
     </div>
 
     <div id="detail-modal" class="modal">
         <div class="modal-content">
-            <div class="title-text" id="modal-title">🔍 상세 정보</div>
-            <div id="modal-body" style="line-height: 1.6; color: var(--text-main); font-size: 16px; margin-bottom: 25px; white-space: normal;"></div>
-            <button class="btn-main btn-dark" onclick="document.getElementById('detail-modal').style.display='none'">닫기 ❌</button>
+            <div class="modal-title" id="modal-title">상세 정보</div>
+            <div class="modal-body" id="modal-body"></div>
+            <button class="btn btn-dark" onclick="document.getElementById('detail-modal').style.display='none'">닫기</button>
         </div>
     </div>
-</div>
+
+</div><!-- /app-container -->
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyCJTPXzAVTuofcv902nnzIpJ_CcdK8OOEk",
-        authDomain: "smart-edu-app-3d607.firebaseapp.com",
-        databaseURL: "https://smart-edu-app-3d607-default-rtdb.firebaseio.com",
-        projectId: "smart-edu-app-3d607",
-        storageBucket: "smart-edu-app-3d607.firebasestorage.app",
-        messagingSenderId: "184288653031",
-        appId: "1:184288653031:web:12d62e0a2df72a49297c42"
-    };
-
-    let db = null;
-    if (firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.database();
-    }
-
-    const KEY1 = "AIzaSyA1H3rfJarOuDx" + "A1NflRN96_ugCsaehU0M";
-    const KEY2 = "AIzaSyBred_9lqK4Jx1" + "emrzyHWcUVnmLrqnttUQ";
-    const API_KEYS = [KEY1, KEY2];
-
-    const AI_MODELS = [
-        "gemini-2.5-pro",
-        "gemini-2.5-flash",
-        "gemini-1.5-pro",
-        "gemini-1.5-flash"
-    ];
-
-    let currentProfile = null;
-    let currentReportFilter = '전체';
-    let reportDataCache = [];
-    let purchaseDataCache = [];
-    let ttsVoices = [];
-    let viewHistory = [];
-
-    let config = { grade: 1, subject: '국어', difficulty: '중' };
-
-    let sessionState = {
-        mode: 'quiz',
-        learningWords: [],
-        questions: [],
-        currentIndex: 0,
-        wrongQuestions: [],
-        wrongHistory: [],
-        initialScore: 0,
-        isRetryMode: false,
-        totalCount: 20,
-        reportSaved: false,
-        reportSavedRetry: false
-    };
-
-        function getKSTTime() {
-        const d = new Date();
-        const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
-        const kstTime = new Date(utc + (9 * 3600000));
-        const month = kstTime.getMonth() + 1;
-        const day = kstTime.getDate();
-        const hours = kstTime.getHours();
-        const minutes = String(kstTime.getMinutes()).padStart(2, '0');
-        const ampm = hours >= 12 ? '오후' : '오전';
-        const h = hours % 12 || 12;
-        return `${month}월 ${day}일 ${ampm} ${h}:${minutes}`;
-    }
-
-    function formatGrade(g) {
-        return g === 0 ? '7세' : g + '학년';
-    }
-
-    function loadTTSVoices() {
-        if (!('speechSynthesis' in window)) return;
-        ttsVoices = window.speechSynthesis.getVoices() || [];
-    }
-
-    function pickTTSVoice(lang = 'ko-KR') {
-        const normalized = String(lang).toLowerCase();
-        const base = normalized.split('-')[0];
-        const voices = (ttsVoices && ttsVoices.length) ? ttsVoices : (window.speechSynthesis ? window.speechSynthesis.getVoices() : []);
-        if (!voices || voices.length === 0) return null;
-        return (
-            voices.find(v => (v.lang || '').toLowerCase() === normalized) ||
-            voices.find(v => (v.lang || '').toLowerCase().startsWith(base)) ||
-            voices.find(v => base === 'ko' && /korean|한국/i.test(v.name || '')) ||
-            voices.find(v => base === 'en' && /english|us|uk/i.test((v.name || '') + ' ' + (v.lang || ''))) ||
-            voices[0]
-        );
-    }
-
-    function playTTS(text, lang = 'ko-KR') {
-        if (!('speechSynthesis' in window)) {
-            alert("현재 브라우저는 음성 듣기 기능(TTS)을 지원하지 않습니다. 🚫");
-            return;
-        }
-
-        const cleanText = stripHtmlTags(String(text || '')).trim();
-        if (!cleanText) {
-            alert("읽어줄 내용이 없습니다. 😅");
-            return;
-        }
-
-        try {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(cleanText);
-            utterance.lang = lang;
-            utterance.rate = lang.toLowerCase().startsWith('en') ? 0.92 : 0.95;
-            utterance.pitch = 1.0;
-            utterance.volume = 1.0;
-
-            const voice = pickTTSVoice(lang);
-            if (voice) utterance.voice = voice;
-
-            utterance.onerror = function(err) {
-                console.error("TTS 재생 오류:", err);
-            };
-
-            window.speechSynthesis.speak(utterance);
-        } catch (e) {
-            console.error("playTTS 오류:", e);
-            alert("음성 재생 중 오류가 발생했습니다. ❌");
-        }
-    }
-
-    function escapeHtml(text = '') {
-        return String(text ?? '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-    }
-
-    function sanitizeLimitedHtml(text = '') {
-        let safe = escapeHtml(String(text ?? ''));
-        safe = safe.replace(/&lt;(\/?(?:u|b|strong|i|em))&gt;/gi, '<$1>');
-        safe = safe.replace(/&lt;br\s*\/?&gt;/gi, '<br>');
-        safe = safe.replace(/\n/g, '<br>');
-        return safe;
-    }
-
-    function stripHtmlTags(text = '') {
-        return String(text ?? '')
-            .replace(/<br\s*\/?>/gi, ' ')
-            .replace(/<[^>]*>/g, ' ')
-            .replace(/&nbsp;/gi, ' ')
-            .replace(/&quot;/gi, '"')
-            .replace(/&#39;/gi, "'")
-            .replace(/&amp;/gi, '&')
-            .replace(/\s+/g, ' ')
-            .trim();
-    }
-
-    function normalizeCompareText(text = '') {
-        return stripHtmlTags(String(text ?? ''))
-            .replace(/\s+/g, ' ')
-            .replace(/^["'“”‘’]+|["'“”‘’]+$/g, '')
-            .replace(/[.,!?]+$/g, '')
-            .trim()
-            .toLowerCase();
-    }
-
-    function isSameAnswer(a, b) {
-        return normalizeCompareText(a) === normalizeCompareText(b);
-    }
-
-    function renderSafeHtml(el, text = '') {
-        el.innerHTML = sanitizeLimitedHtml(text);
-    }
-
-    function extractJSONArrayText(rawText = '') {
-        const cleaned = String(rawText || '')
-            .replace(/^```json\s*/i, '')
-            .replace(/^```\s*/i, '')
-            .replace(/\s*```$/i, '')
-            .trim();
-
-        const start = cleaned.indexOf('[');
-        const end = cleaned.lastIndexOf(']');
-
-        if (start === -1) throw new Error('JSON 배열 시작([)을 찾지 못했습니다.');
-        if (end === -1 || end < start) throw new Error('JSON 배열 끝(])이 없어 응답이 잘린 것으로 보입니다.');
-
-        return cleaned.slice(start, end + 1);
-    }
-
-    function parseJSONArray(rawText = '') {
-        return JSON.parse(extractJSONArrayText(rawText));
-    }
-
-    function plainQuestionSignature(questionObj) {
-        return normalizeCompareText(stripHtmlTags(questionObj?.q || '')).slice(0, 140);
-    }
-
-    function validateVocabArray(arr) {
-        if (!Array.isArray(arr)) throw new Error('영단어 응답이 배열이 아닙니다.');
-
-        const normalizedWords = new Set();
-
-        return arr.map((item, idx) => {
-            const word = String(item?.word ?? '').trim();
-            const meaning = String(item?.meaning ?? '').trim();
-            const tts = String(item?.tts ?? word).trim();
-
-            if (!word) throw new Error(`${idx + 1}번 영단어의 word가 비어 있습니다.`);
-            if (!meaning) throw new Error(`${idx + 1}번 영단어의 meaning이 비어 있습니다.`);
-
-            const key = normalizeCompareText(word);
-            if (normalizedWords.has(key)) throw new Error(`${idx + 1}번 영단어가 중복되었습니다.`);
-            normalizedWords.add(key);
-
-            return { word, meaning, tts };
-        });
-    }
-
-    function validateQuizArray(arr) {
-        if (!Array.isArray(arr)) throw new Error('퀴즈 응답이 배열이 아닙니다.');
-
-        return arr.map((item, idx) => {
-            const type = item?.type === 'subjective' ? 'subjective' : 'objective';
-            const q = String(item?.q ?? '').trim();
-            const aRaw = String(item?.a ?? '').trim();
-            const desc = String(item?.desc ?? '해설이 제공되지 않았습니다.').trim();
-
-            if (!q) throw new Error(`${idx + 1}번 문항의 q 값이 비어 있습니다.`);
-            if (!aRaw) throw new Error(`${idx + 1}번 문항의 a 값이 비어 있습니다.`);
-
-            if (type === 'objective') {
-                const options = Array.isArray(item?.options)
-                    ? item.options.map(v => String(v).trim()).filter(Boolean)
-                    : [];
-
-                if (options.length !== 4) throw new Error(`${idx + 1}번 객관식 문항의 보기가 4개가 아닙니다.`);
-
-                const dedup = new Set(options.map(opt => normalizeCompareText(opt)));
-                if (dedup.size !== 4) throw new Error(`${idx + 1}번 객관식 문항의 보기에 중복이 있습니다.`);
-
-                const matchedAnswer = options.find(opt => isSameAnswer(opt, aRaw));
-                if (!matchedAnswer) throw new Error(`${idx + 1}번 문항의 정답(a)이 보기(options) 중 하나와 일치하지 않습니다.`);
-
-                const ttsOptions = (
-                    Array.isArray(item?.tts_options) &&
-                    item.tts_options.length === 4
-                )
-                    ? item.tts_options.map(v => String(v).trim())
-                    : [...options];
-
-                return {
-                    type: 'objective',
-                    q,
-                    options,
-                    a: matchedAnswer,
-                    desc,
-                    tts_q: String(item?.tts_q ?? q).trim(),
-                    tts_options: ttsOptions
-                };
-            }
-
-            return {
-                type: 'subjective',
-                q,
-                a: aRaw,
-                desc
-            };
-        });
-    }
-
-    function getQualityIssue(questionObj) {
-        const plainQ = stripHtmlTags(questionObj?.q || '');
-        const rawQ = String(questionObj?.q || '');
-        const options = Array.isArray(questionObj?.options) ? questionObj.options : [];
-
-        if (plainQ.length < 8) return '질문 길이가 너무 짧음';
-        if (/그림|표를 보고/.test(plainQ)) return '텍스트 외 자료 요구 문제';
-        if (/바르게 배열하여 문장을 만들 때/.test(plainQ)) return '배열형 문제는 자동 제외';
-        if (/세 번째에 올 말|두 번째에 올 말|네 번째에 올 말|첫 번째에 올 말/.test(plainQ)) return '순서 배열형 문제는 자동 제외';
-
-        if (/밑줄|밑줄 친|밑 친/.test(plainQ)) {
-            const hasUnderline = /<u>.*?<\/u>/i.test(rawQ) || options.some(opt => /<u>.*?<\/u>/i.test(String(opt || '')));
-            if (!hasUnderline) return '밑줄 문제인데 실제 밑줄 표시가 없음';
-        }
-
-        if (/괄호 안/.test(plainQ)) {
-            const hasParen = /[()（）]/.test(plainQ);
-            if (!hasParen) return '괄호 문제인데 괄호가 없음';
-        }
-
-        if (questionObj.type === 'objective') {
-            if (!Array.isArray(options) || options.length !== 4) return '보기가 4개가 아님';
-            if (options.some(opt => stripHtmlTags(opt).length < 2)) return '보기 길이가 너무 짧음';
-
-            const answerMatches = options.filter(opt => isSameAnswer(opt, questionObj.a));
-            if (answerMatches.length !== 1) return '정답이 보기와 정확히 1개만 일치하지 않음';
-
-            const optionDedup = new Set(options.map(opt => normalizeCompareText(opt)));
-            if (optionDedup.size !== 4) return '보기 중복';
-        }
-
-        return '';
-    }
-
-        async function fetchFromGemini(promptText, attempt = 0, isJson = true) {
-        const totalAttempts = AI_MODELS.length * API_KEYS.length;
-
-        if (attempt >= totalAttempts) {
-            console.error("[시스템 오류] 통신 실패");
-            alert("통신 상태가 불안정하거나 한도에 도달했습니다. 잠시 후 다시 시도해주세요. 😅");
-            throw new Error("통신 제한 도달");
-        }
-
-        const modelIndex = attempt % AI_MODELS.length;
-        const keyIndex = Math.floor(attempt / AI_MODELS.length);
-        const currentModel = AI_MODELS[modelIndex];
-        const currentKey = API_KEYS[keyIndex];
-
-        const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${currentKey}`;
-
-        const generationConfig = {
-            temperature: 0.1,
-            maxOutputTokens: 8192
-        };
-        if (isJson) generationConfig.response_mime_type = "application/json";
-
-        try {
-            const response = await fetch(apiEndpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: promptText }] }],
-                    generationConfig
-                })
-            });
-
-            const raw = await response.text();
-            let result = null;
-
-            try {
-                result = JSON.parse(raw);
-            } catch (parseErr) {
-                console.warn("Gemini API raw JSON 파싱 실패:", raw);
-                return fetchFromGemini(promptText, attempt + 1, isJson);
-            }
-
-            if (!response.ok || !result?.candidates?.length) {
-                console.warn("Gemini API 응답 이상:", result);
-                return fetchFromGemini(promptText, attempt + 1, isJson);
-            }
-
-            return result;
-        } catch (error) {
-            console.warn("Gemini fetch 실패:", error);
-            return fetchFromGemini(promptText, attempt + 1, isJson);
-        }
-    }
-
-    async function fetchStructuredArrayWithRetry(promptText, expectedCount, mode = 'quiz', maxRetries = 4) {
-        let lastError = null;
-        let lastRawText = '';
-
-        for (let i = 0; i < maxRetries; i++) {
-            const data = await fetchFromGemini(promptText, 0, true);
-            lastRawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-            try {
-                const parsed = parseJSONArray(lastRawText);
-                const validated = mode === 'vocab' ? validateVocabArray(parsed) : validateQuizArray(parsed);
-
-                if (validated.length < expectedCount) {
-                    throw new Error(`문항/단어 수 부족: ${validated.length}/${expectedCount}`);
-                }
-
-                return validated.slice(0, expectedCount);
-            } catch (err) {
-                lastError = err;
-                console.warn(`구조화 응답 파싱 실패 / 재시도 ${i + 1}/${maxRetries}`, err);
-                console.warn('Raw JSON text:', lastRawText);
-
-                promptText = `${promptText}
-
-[재출력 보정 지시 - 매우 중요]
-- 직전 응답은 JSON이 잘렸거나 문법 오류가 있었습니다.
-- 반드시 JSON 배열 하나만 출력하십시오.
-- 응답 시작은 [ 로, 끝은 ] 로 정확히 닫으십시오.
-- 마크다운 코드블록(\`\`\`)은 절대 출력하지 마십시오.
-- 객관식은 보기 4개만 작성하십시오.
-- 정답 a는 반드시 options 중 하나와 완전히 동일해야 합니다.
-- desc는 2문장 이하, 120자 이내로 매우 짧게 작성하십시오.
-- 문자열 내부 줄바꿈은 \\n 으로 표현하십시오.`;
-            }
-        }
-
-        console.error("최종 실패 원문:", lastRawText);
-        throw lastError || new Error("문제 JSON 생성에 최종 실패했습니다.");
-    }
-
-    async function regenerateInvalidQuestions(basePrompt, invalidItems, existingQuestions) {
-        const count = invalidItems.length;
-        const existingStems = existingQuestions
-            .map((q, idx) => `${idx + 1}. ${stripHtmlTags(q.q).slice(0, 80)}`)
-            .join('\n');
-
-        const invalidReasons = invalidItems
-            .map((item, i) => `${i + 1}. 기존 ${item.index + 1}번 / 사유: ${item.reason}`)
-            .join('\n');
-
-        const regeneratePrompt = `${basePrompt}
-
-[부분 재출제 요청]
-직전 생성 문항 중 일부가 품질 검증에서 탈락했습니다.
-아래 탈락 수만큼 새로운 문항 ${count}개만 JSON 배열로 다시 생성하십시오.
-
-[필수 조건]
-1. 기존 문항과 절대 겹치지 마십시오.
-2. '바르게 배열하여 문장을 만들 때' 유형은 금지합니다.
-3. '첫 번째/두 번째/세 번째/네 번째에 올 말' 유형은 금지합니다.
-4. 밑줄 문제는 반드시 실제 <u>태그를 포함하십시오.
-5. 정답 a는 반드시 options 중 하나와 완전히 동일해야 합니다.
-6. desc는 2문장 이하, 120자 이내로 짧게 작성하십시오.
-7. 오직 JSON 배열만 출력하십시오.
-
-[탈락 사유]
-${invalidReasons}
-
-[중복 금지 참고용 기존 문항]
-${existingStems}`;
-
-        return await fetchStructuredArrayWithRetry(regeneratePrompt, count, 'quiz');
-    }
-
-    async function postProcessQuizQuestions(questions, basePrompt, maxRounds = 3) {
-        let current = [...questions];
-
-        for (let round = 0; round < maxRounds; round++) {
-            const invalidMap = new Map();
-            const seen = new Set();
-
-            current.forEach((q, idx) => {
-                const sig = plainQuestionSignature(q);
-                if (seen.has(sig)) {
-                    if (!invalidMap.has(idx)) invalidMap.set(idx, { index: idx, reason: '중복 문항' });
-                } else {
-                    seen.add(sig);
-                }
-
-                const issue = getQualityIssue(q);
-                if (issue && !invalidMap.has(idx)) {
-                    invalidMap.set(idx, { index: idx, reason: issue });
-                }
-            });
-
-            const invalidItems = [...invalidMap.values()];
-            if (invalidItems.length === 0) return current;
-
-            const replacements = await regenerateInvalidQuestions(basePrompt, invalidItems, current);
-            invalidItems.forEach((item, i) => {
-                if (replacements[i]) current[item.index] = replacements[i];
-            });
-        }
-
-        const finalIssues = [];
-        const seenFinal = new Set();
-
-        current.forEach((q, idx) => {
-            const sig = plainQuestionSignature(q);
-            if (seenFinal.has(sig)) finalIssues.push(`${idx + 1}번 중복`);
-            else seenFinal.add(sig);
-
-            const issue = getQualityIssue(q);
-            if (issue) finalIssues.push(`${idx + 1}번 ${issue}`);
-        });
-
-        if (finalIssues.length) {
-            throw new Error(`문제 품질 재검증 최종 실패: ${finalIssues.join(', ')}`);
-        }
-
-        return current;
-    }
-
-    async function dbGet(path) {
-        if (db) {
-            const snap = await db.ref(path).once('value');
-            return snap.val();
-        }
-        return JSON.parse(localStorage.getItem('edu_' + path.replace(/\//g, '_')));
-    }
-
-    async function dbSet(path, data) {
-        if (db) return db.ref(path).set(data);
-        localStorage.setItem('edu_' + path.replace(/\//g, '_'), JSON.stringify(data));
-    }
-
-    async function triggerPushNotification(msg) {
-        if (!db) return;
-        const pushRef = db.ref('push_notifications').push();
-        await pushRef.set({
-            message: msg,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
-        });
-    }
-
-    function setupAdminPushListener() {
-        if (!db || Notification.permission !== "granted") return;
-        const now = Date.now();
-        db.ref('push_notifications').orderByChild('timestamp').startAt(now).on('child_added', snap => {
-            const data = snap.val();
-            if (data && data.message) {
-                new Notification("스마트 학습 알림 🔔", {
-                    body: data.message,
-                    icon: "icon.png?v=18",
-                    vibrate: [200, 100, 200]
-                });
-            }
-        });
-    }
-
-    async function requestPushPermission() {
-        document.getElementById('permission-modal').style.display = 'none';
-        if ("Notification" in window) {
-            const permission = await Notification.requestPermission();
-            if (permission === "granted") {
-                alert("알림 권한이 허용되었습니다. 이제 백그라운드에 앱을 켜두시면 실시간 소식을 받을 수 있습니다. 🎉");
-                setupAdminPushListener();
-            } else {
-                alert("알림이 차단되었습니다. 기기 설정에서 허용으로 변경해 주세요. 😅");
-            }
-        } else {
-            alert("현재 브라우저는 알림 기능을 지원하지 않습니다. 🚫");
-        }
-    }
-
-    function closePermissionModal() {
-        document.getElementById('permission-modal').style.display = 'none';
-    }
-
-    function triggerConfetti() {
-        const colors = ['#ff6b6b', '#4facfe', '#feca57', '#1dd1a1', '#a29bfe'];
-        for (let i = 0; i < 70; i++) {
-            let confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-            confetti.style.opacity = Math.random();
-            document.body.appendChild(confetti);
-            setTimeout(() => confetti.remove(), 4000);
-        }
-    }
-
-    function showFloatingPoint(e, text) {
-        const floater = document.createElement('div');
-        floater.className = 'floating-point';
-        floater.innerText = text;
-        let x = e?.clientX || (e?.touches && e.touches[0].clientX) || window.innerWidth / 2;
-        let y = e?.clientY || (e?.touches && e.touches[0].clientY) || window.innerHeight / 2;
-        floater.style.left = `${x - 40}px`;
-        floater.style.top = `${y - 40}px`;
-        document.body.appendChild(floater);
-        setTimeout(() => floater.remove(), 1000);
-    }
-
-    function showLoading(show, message = "요청을 처리 중입니다. ⏳") {
-        const overlay = document.getElementById('loading-overlay');
-        if (show) {
-            document.getElementById('loading-msg').innerHTML = message;
-            overlay.style.display = 'flex';
-        } else {
-            overlay.style.display = 'none';
-        }
-    }
-
-    function confirmAction(message) {
-        return window.confirm(message);
-    }
-
-    function getActiveViewId() {
-        return document.querySelector('.view-section.active')?.id || '';
-    }
-
-    function isLearningFlowView(viewId) {
-        return ['learning-view', 'quiz-view', 'result-view', 'wrong-review-view'].includes(viewId);
-    }
-
-    function confirmLeaveCurrentView(actionType = 'home') {
-        const activeId = getActiveViewId();
-
-        if (isLearningFlowView(activeId)) {
-            if (actionType === 'logout') {
-                return confirmAction(
-                    "정말 나가시겠습니까?\n\n진행 중인 학습 화면에서 나가게 됩니다.\n현재 진행 내용은 저장되어 이어하기가 가능하지만,\n지금 화면은 종료됩니다."
-                );
-            }
-            return confirmAction(
-                "정말 홈으로 가시겠습니까?\n\n진행 중인 학습 화면에서 나가게 됩니다.\n현재 진행 내용은 저장되어 이어하기가 가능하지만,\n지금 화면은 종료됩니다."
-            );
-        }
-
-        if (activeId === 'shop-view') {
-            return confirmAction(
-                actionType === 'logout'
-                    ? "정말 나가시겠습니까?"
-                    : "정말 홈으로 이동하시겠습니까?"
-            );
-        }
-
-        if (activeId === 'parent-view') {
-            return confirmAction(
-                actionType === 'logout'
-                    ? "정말 나가시겠습니까?"
-                    : "정말 홈으로 이동하시겠습니까?"
-            );
-        }
-
-        return true;
-    }
-
-    function updateHeaderUI(viewId) {
-        const headerTitle = document.getElementById('header-title');
-        const logoutBtn = document.getElementById('logout-btn');
-        const backBtn = document.getElementById('back-btn');
-
-        if (viewId === 'login-view') {
-            headerTitle.innerText = '🌟 스마트 학습 🌟';
-            logoutBtn.style.display = 'none';
-            backBtn.style.display = 'none';
-            return;
-        }
-
-        if (viewId === 'profile-select-view') {
-            headerTitle.innerText = '🙋 사용자 선택 🙋';
-        } else if (viewId === 'parent-view') {
-            headerTitle.innerText = '📊 관리자 센터 📊';
-        } else if (viewId === 'shop-view') {
-            headerTitle.innerText = '🎁 포인트 상점 🎁';
-        } else if (viewId === 'wrong-review-view') {
-            headerTitle.innerText = '📝 오답 개념 노트 📝';
-        } else if (viewId === 'learning-view') {
-            headerTitle.innerText = '📝 영단어 학습 📝';
-        } else if (viewId === 'quiz-view') {
-            headerTitle.innerText = `${currentProfile || '학습자'}의 문제 풀이 ✨`;
-        } else if (viewId === 'result-view') {
-            headerTitle.innerText = '🎉 학습 결과 🎉';
-        } else {
-            headerTitle.innerText = currentProfile ? `${currentProfile}의 학습장 ✨` : '🌟 스마트 학습 🌟';
-        }
-
-        if (
-            viewId === 'profile-select-view' ||
-            viewId === 'child-dashboard-view' ||
-            viewId === 'parent-view'
-        ) {
-            backBtn.style.display = 'none';
-        } else {
-            backBtn.style.display = 'inline-flex';
-            backBtn.innerText = viewHistory.length > 0 ? '← 뒤로' : '← 홈';
-        }
-
-        logoutBtn.style.display = currentProfile ? 'inline-flex' : 'none';
-    }
-
-    function showView(viewId, options = {}) {
-        const { push = true, resetHistory = false } = options;
-        const currentEl = document.querySelector('.view-section.active');
-        const currentId = currentEl ? currentEl.id : null;
-
-        if (resetHistory) viewHistory = [];
-        if (push && currentId && currentId !== viewId) viewHistory.push(currentId);
-
-        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-        document.getElementById(viewId).classList.add('active');
-        updateHeaderUI(viewId);
-    }
-
-    function goBack() {
-        const detailModal = document.getElementById('detail-modal');
-        const permissionModal = document.getElementById('permission-modal');
-        const resumeModal = document.getElementById('resume-modal');
-
-        if (detailModal.style.display === 'flex') {
-            detailModal.style.display = 'none';
-            return;
-        }
-        if (permissionModal.style.display === 'flex') {
-            permissionModal.style.display = 'none';
-            return;
-        }
-        if (resumeModal.style.display === 'flex') {
-            resumeModal.style.display = 'none';
-            return;
-        }
-
-        if (!confirmLeaveCurrentView('home')) return;
-
-        if (viewHistory.length > 0) {
-            const prevId = viewHistory.pop();
-            showView(prevId, { push: false });
-            return;
-        }
-
-        const activeId = getActiveViewId();
-
-        if (currentProfile === 'admin') {
-            showView('parent-view', { push: false, resetHistory: true });
-            return;
-        }
-
-        if (currentProfile && activeId !== 'child-dashboard-view') {
-            showView('child-dashboard-view', { push: false, resetHistory: true });
-            return;
-        }
-
-        if (!currentProfile && activeId !== 'login-view') {
-            showView('login-view', { push: false, resetHistory: true });
-        }
-    }
-
-    function saveSession() {
-        if (!currentProfile || currentProfile === 'admin') return;
-        dbSet('sessions/' + currentProfile, { config, sessionState });
-    }
-
-    function calculateStreak(dates) {
-        if (!dates || dates.length === 0) return 0;
-
-        let streak = 1;
-        const today = new Date();
-        today.setHours(0,0,0,0);
-
-        let lastDate = new Date(dates[dates.length - 1]);
-        lastDate.setHours(0,0,0,0);
-
-        const diffDays = Math.ceil(Math.abs(today - lastDate) / (1000 * 60 * 60 * 24));
-        if (diffDays > 1) return 0;
-
-        for (let i = dates.length - 1; i > 0; i--) {
-            let d1 = new Date(dates[i]);
-            d1.setHours(0,0,0,0);
-            let d2 = new Date(dates[i - 1]);
-            d2.setHours(0,0,0,0);
-
-            const diff = Math.ceil(Math.abs(d1 - d2) / (1000 * 60 * 60 * 24));
-            if (diff === 1) streak++;
-            else if (diff === 0) continue;
-            else break;
-        }
-
-        return streak;
-    }
-
-    async function addPoints(amount) {
-        let pts = await dbGet('users/' + currentProfile + '/points') || 0;
-        await dbSet('users/' + currentProfile + '/points', pts + amount);
-        document.getElementById('point-display').innerText = `💰 ${pts + amount}P`;
-        document.getElementById('shop-point-display').innerText = `현재 보유: ${pts + amount}P`;
-    }
-
-    async function updateDashboardStats() {
-        let user = await dbGet('users/' + currentProfile) || { points: 0, streak: [] };
-        let points = user.points || 0;
-        document.getElementById('point-display').innerText = `💰 ${points}P`;
-        document.getElementById('shop-point-display').innerText = `현재 보유: ${points}P`;
-        document.getElementById('streak-display').innerText = `🔥 연속 ${calculateStreak(user.streak || [])}일`;
-    }
-
-    async function recordTodayStreak() {
-        let user = await dbGet('users/' + currentProfile);
-        let dates = user.streak || [];
-        const todayStr = new Date().toDateString();
-
-        if (dates.length === 0 || dates[dates.length - 1] !== todayStr) {
-            dates.push(todayStr);
-            await dbSet('users/' + currentProfile + '/streak', dates);
-            let currentStreak = calculateStreak(dates);
-            await addPoints(currentStreak);
-            alert(`출석 완료! 연속 ${currentStreak}일 보상으로 ${currentStreak}포인트를 받았어요! 🎉`);
-        }
-
-        document.getElementById('streak-display').innerText = `🔥 연속 ${calculateStreak(dates)}일`;
-    }
-
-    function renderGradeButtons(age) {
-        const gradeContainer = document.getElementById('grade-container');
-        gradeContainer.innerHTML = '';
-
-        const userAge = age || 8;
-        const minGradeIndex = Math.max(0, userAge - 8);
-
-        const grades = [
-            { val: 0, text: '7세 👶' },
-            { val: 1, text: '1학년' },
-            { val: 2, text: '2학년' },
-            { val: 3, text: '3학년' },
-            { val: 4, text: '4학년' },
-            { val: 5, text: '5학년' },
-            { val: 6, text: '6학년 🎓' }
-        ];
-
-        if (config.grade < minGradeIndex) config.grade = minGradeIndex;
-
-        grades.forEach((g, index) => {
-            const btn = document.createElement('button');
-            btn.className = `btn-outline ${g.val === config.grade ? 'active' : ''}`;
-            btn.innerText = g.text;
-            btn.dataset.val = g.val;
-
-            if (index < minGradeIndex) {
-                btn.disabled = true;
-                btn.style.opacity = '0.4';
-                btn.style.cursor = 'not-allowed';
-            } else {
-                btn.onclick = () => selectConfig('grade', g.val);
-            }
-
-            gradeContainer.appendChild(btn);
-        });
-    }
-
-    function selectConfig(type, val) {
-        config[type] = val;
-        updateSetupUI();
-    }
-
-    function updateSetupUI() {
-        document.querySelectorAll('#grade-container .btn-outline').forEach(btn => {
-            btn.classList.toggle('active', parseInt(btn.dataset.val) === config.grade);
-        });
-
-        document.querySelectorAll('#subject-container .btn-outline').forEach(btn => {
-            btn.classList.toggle('active', btn.innerText.includes(config.subject));
-        });
-
-        document.querySelectorAll('#difficulty-container .btn-outline').forEach(btn => {
-            btn.classList.toggle('active', btn.innerText === config.difficulty);
-        });
-    }
-
-    async function loginAsParent() {
-        const pw = prompt("관리자 비밀번호를 입력하십시오. 🔐");
-        if (pw === "1010") {
-            currentProfile = 'admin';
-            renderAdminPasswords(await dbGet('users') || {});
-            switchAdminTab('report');
-            showView('parent-view', { push: false, resetHistory: true });
-
-            if ("Notification" in window) {
-                if (Notification.permission === "default") {
-                    document.getElementById('permission-modal').style.display = 'flex';
-                } else if (Notification.permission === "granted") {
-                    setupAdminPushListener();
-                }
-            }
-        } else if (pw !== null) {
-            alert("비밀번호가 일치하지 않습니다. ❌");
-        }
-    }
-
-    function renderAdminPasswords(usersData) {
-        if (!usersData) return;
-
-        const rwPw = (usersData['김로운'] && usersData['김로운'].pw) ? usersData['김로운'].pw : '미설정';
-        const rwAge = (usersData['김로운'] && usersData['김로운'].age) ? usersData['김로운'].age + '세' : '나이 미설정';
-        const saPw = (usersData['김서아'] && usersData['김서아'].pw) ? usersData['김서아'].pw : '미설정';
-        const saAge = (usersData['김서아'] && usersData['김서아'].age) ? usersData['김서아'].age + '세' : '나이 미설정';
-        const jjPw = (usersData['정지영'] && usersData['정지영'].pw) ? usersData['정지영'].pw : '미설정';
-        const jjAge = (usersData['정지영'] && usersData['정지영'].age) ? usersData['정지영'].age + '세' : '나이 미설정';
-
-        document.getElementById('admin-pw-display').innerHTML = `
-            <div style="margin-bottom: 5px;">👦 김로운 : 비밀번호 <span style="color:var(--primary);">${escapeHtml(rwPw)}</span> | ${rwAge}</div>
-            <div style="margin-bottom: 5px;">👧 김서아 : 비밀번호 <span style="color:var(--primary);">${escapeHtml(saPw)}</span> | ${saAge}</div>
-            <div>👩 정지영 : 비밀번호 <span style="color:var(--primary);">${escapeHtml(jjPw)}</span> | ${jjAge}</div>
-        `;
-    }
-
-    async function setStudentAge() {
-        const student = document.getElementById('age-student-select').value;
-        const ageInput = parseInt(document.getElementById('age-input').value);
-
-        if (isNaN(ageInput) || ageInput < 7) {
-            alert("7 이상의 올바른 나이를 입력해주세요. 😅");
-            return;
-        }
-
-        let user = await dbGet('users/' + student);
-        if (!user) {
-            alert("사용자 정보가 없습니다. 먼저 1회 로그인이 필요합니다. 💡");
-            return;
-        }
-
-        const ok = confirmAction(
-            `[나이 설정 확인]\n\n${student} 님의 나이를 ${ageInput}세로 설정하시겠습니까?`
-        );
-        if (!ok) return;
-
-        await dbSet('users/' + student + '/age', ageInput);
-        alert(`${student} 님의 나이가 ${ageInput}세로 설정되었습니다. ✅`);
-        document.getElementById('age-input').value = '';
-
-        let usersData = await dbGet('users');
-        renderAdminPasswords(usersData);
-    }
-
-    async function selectProfile(profileName) {
-        showLoading(true, "사용자 정보를 불러오는 중입니다... ⏳");
-
-        let user = await dbGet('users/' + profileName);
-        if (!user) {
-            user = { pw: '', points: 0, streak: [], age: 8 };
-            await dbSet('users/' + profileName, user);
-        }
-
-        showLoading(false);
-
-        if (user.pw === '') {
-            let newPw = prompt(`[${profileName}] 처음 오셨네요! 사용할 비밀번호를 만들어주세요. 🔐`);
-            if (!newPw || newPw.trim() === '') return;
-            user.pw = newPw.trim();
-            await dbSet('users/' + profileName + '/pw', user.pw);
-            alert('비밀번호가 안전하게 만들어졌어요! 🎉');
-            triggerPushNotification(`[계정 알림] ${profileName} 님이 최초 비밀번호를 설정했습니다.`);
-        } else {
-            let inputPw = prompt(`[${profileName}] 비밀번호를 입력해주세요. 🔑`);
-            if (inputPw === null) return;
-            if (inputPw.trim() !== user.pw) {
-                alert('비밀번호가 틀렸어요. 다시 시도해봐요! 😅');
-                return;
-            }
-        }
-
-        currentProfile = profileName;
-        renderGradeButtons(user.age);
-        await updateDashboardStats();
-        await recordTodayStreak();
-        await checkSavedSession();
-    }
-
-    async function changePassword() {
-        let user = await dbGet('users/' + currentProfile);
-        let oldPw = prompt("현재 비밀번호를 입력해주세요. 🔑");
-        if (oldPw === null) return;
-
-        if (oldPw.trim() !== user.pw) {
-            alert("현재 비밀번호가 일치하지 않습니다. ❌");
-            return;
-        }
-
-        let newPw = prompt("새롭게 사용할 비밀번호를 입력해주세요. 🔐");
-        if (!newPw || newPw.trim() === '') {
-            alert("유효한 비밀번호를 입력해주세요. 😅");
-            return;
-        }
-
-        const ok = confirmAction(
-            `[비밀번호 변경 확인]\n\n정말 비밀번호를 변경하시겠습니까?`
-        );
-        if (!ok) return;
-
-        await dbSet('users/' + currentProfile + '/pw', newPw.trim());
-        alert("비밀번호가 성공적으로 변경되었어요! ✅");
-        triggerPushNotification(`[계정 알림] ${currentProfile} 님이 비밀번호를 변경했습니다.`);
-    }
-
-    function logout() {
-        if (!confirmLeaveCurrentView('logout')) return;
-
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        currentProfile = null;
-        viewHistory = [];
-        showView('login-view', { push: false, resetHistory: true });
-    }
-
-    async function giveBonusPoint() {
-        const student = document.getElementById('bonus-student-select').value;
-        const pointInput = document.getElementById('bonus-point-input').value;
-        const pointsToGive = parseInt(pointInput);
-
-        if (isNaN(pointsToGive) || pointsToGive <= 0) {
-            alert("올바른 포인트 수량을 입력해주세요. 😅");
-            return;
-        }
-
-        let user = await dbGet('users/' + student);
-        if (!user) {
-            alert("해당 사용자의 계정 정보가 없습니다. 먼저 1회 로그인이 필요합니다. 💡");
-            return;
-        }
-
-        const ok = confirmAction(
-            `[보너스 지급 확인]\n\n${student} 님에게 ${pointsToGive}P를 지급하시겠습니까?`
-        );
-        if (!ok) return;
-
-        let currentPoints = user.points || 0;
-        await dbSet('users/' + student + '/points', currentPoints + pointsToGive);
-        alert(`${student} 님에게 특별 보너스 ${pointsToGive}P가 지급되었습니다! 🎉`);
-        document.getElementById('bonus-point-input').value = '';
-        triggerPushNotification(`[보너스 알림] 관리자가 ${student} 님에게 특별 보너스 ${pointsToGive}P를 선물했습니다! 🎁`);
-    }
-
-    async function buyItem(itemName, cost) {
-        let points = await dbGet('users/' + currentProfile + '/points') || 0;
-
-        if (points < cost) {
-            alert(`앗, 포인트가 부족해요. (현재: ${points}P, 필요: ${cost}P) 😅`);
-            return;
-        }
-
-        const ok = confirmAction(
-            `[구매 확인]\n\n'${itemName}'을(를) ${cost}P에 정말 구매하시겠습니까?\n구매 후에는 포인트가 즉시 차감되고,\n관리자 승인 대기 상태가 됩니다.`
-        );
-        if (!ok) return;
-
-        await dbSet('users/' + currentProfile + '/points', points - cost);
-        await updateDashboardStats();
-
-        let purchases = await dbGet('purchases') || [];
-        purchases.push({
-            id: new Date().getTime(),
-            profile: currentProfile,
-            itemName: itemName,
-            cost: cost,
-            date: getKSTTime(),
-            status: 'pending'
-        });
-
-        await dbSet('purchases', purchases);
-        alert(`성공적으로 구매했어요. 관리자 승인을 기다려주세요! ✅`);
-        triggerPushNotification(`[상점 알림] ${currentProfile} 님이 '${itemName}'을(를) 구매 요청했습니다. 🛍️`);
-    }
-
-    async function checkSavedSession() {
-        const saved = await dbGet('sessions/' + currentProfile);
-        if (saved && saved.sessionState && saved.sessionState.questions && saved.sessionState.currentIndex < saved.sessionState.questions.length) {
-            document.getElementById('resume-title').innerText = `🚨 풀다 만 학습이 있어요! 🚨`;
-            document.getElementById('resume-modal').style.display = 'flex';
-            showView('child-dashboard-view', { push: false, resetHistory: true });
-        } else {
-            showView('child-dashboard-view', { push: false, resetHistory: true });
-        }
-    }
-
-    async function confirmResume() {
-        const saved = await dbGet('sessions/' + currentProfile);
-        config = saved.config;
-        sessionState = saved.sessionState;
-
-        if (!sessionState.wrongHistory) sessionState.wrongHistory = [];
-        if (!sessionState.totalCount) sessionState.totalCount = (config.subject === '영단어' ? 10 : 20);
-
-        document.getElementById('resume-modal').style.display = 'none';
-
-        let user = await dbGet('users/' + currentProfile);
-        renderGradeButtons(user.age);
-        updateSetupUI();
-
-        if (sessionState.mode === 'learning') {
-            showView('learning-view', { push: false, resetHistory: true });
-            renderLearningWord();
-        } else {
-            showView('quiz-view', { push: false, resetHistory: true });
-            if (sessionState.currentIndex >= sessionState.questions.length) finishQuizCycle();
-            else renderCurrentQuestion();
-        }
-    }
-
-    async function cancelResume() {
-        const ok = confirmAction(
-            "[처음부터 시작 확인]\n\n정말 처음부터 다시 시작하시겠습니까?\n저장된 이어하기 정보는 삭제됩니다."
-        );
-        if (!ok) return;
-
-        await dbSet('sessions/' + currentProfile, null);
-        document.getElementById('resume-modal').style.display = 'none';
-        showView('child-dashboard-view', { push: false, resetHistory: true });
-    }
-
-    async function startNewQuiz() {
-        const startOk = confirmAction(
-            `[학습 시작 확인]\n\n${formatGrade(config.grade)} ${config.subject} (${config.difficulty}) 학습을 시작할까요?\n\n정답 1개당 5포인트가 적립됩니다.\n단, 과정을 끝까지 완료해야 최종 지급됩니다.\n중도 포기 시 포인트가 지급되지 않습니다.`
-        );
-        if (!startOk) return;
-
-        showLoading(true, "👩‍🏫 꼼꼼한 AI 선생님이<br>시험 문제를 출제하고 있어요! ⏳");
-
-        const gradeText = config.grade === 0 ? "유치원 7세(예비 초등)" : "초등학교 " + config.grade + "학년";
-
-        const difficultyDesc = {
-            '최저': '해당 학년에서 가장 기초적인 수준입니다. 직관적이고 1차원적인 사고만 요구하며 지문과 연산이 매우 짧고 단순해야 합니다.',
-            '하': '교과서 기본 문제 수준입니다. 꼬아낸 부분 없이 정답이 명확하게 드러나야 합니다.',
-            '중': '표준 수준입니다. 2단계 이상의 연산이나 문장 흐름 파악이 필요합니다.',
-            '상': '심화 응용 수준입니다. 여러 개념의 복합적 이해가 필요하며 추론 능력을 요구합니다.',
-            '최상': '최상위권 변별력 수준입니다. 깊은 논리적 사고와 다각적 접근이 필수적입니다.'
-        }[config.difficulty];
-
-        const commonStrictRules = `
-[엄격한 출제 원칙]
-1. 정답 스포일러 금지.
-2. 그림, 표, 사진이 필요한 문제 금지.
-3. 객관식 보기 4개는 서로 완전히 달라야 합니다.
-4. 정답은 반드시 1개만 존재해야 합니다.
-5. 보기 중 정답은 a 값과 완전히 동일해야 합니다.
-6. 해설(desc)은 2문장 이하, 120자 이내로 짧게 작성하십시오.
-7. '바르게 배열하여 문장을 만들 때' 문제는 금지합니다.
-8. '첫 번째/두 번째/세 번째/네 번째에 올 말' 유형은 금지합니다.
-9. '밑줄 친' 문제는 반드시 실제 <u>태그를 사용하십시오.
-`;
-
-        const jsonOutputRules = `
-[출력 형식 최종 규칙]
-1. 반드시 JSON 배열 하나만 출력하십시오.
-2. 마크다운 코드블록(\`\`\`) 사용 금지.
-3. 응답 시작은 [ 로, 끝은 ] 로 닫으십시오.
-4. 문자열 내부 줄바꿈은 \\n 으로 표현하십시오.
-`;
-
-        let prompt = '';
-
-        if (config.subject === '영단어') {
-            prompt = `당신은 대한민국 최고의 영어 교육 전문가입니다. '2026년 AI 디지털 교과서' 기준에 맞춘 영단어 학습 콘텐츠를 생성합니다.
-대상 학년: ${gradeText}
-수준 및 난이도: ${config.difficulty} (${difficultyDesc})
-고유값: ${new Date().getTime()}
-
-${commonStrictRules}
-${jsonOutputRules}
-
-[추가 영단어 지침]
-1. ${gradeText} 학생에게 적합한 영단어 10개를 생성하십시오.
-2. 선행학습 수준의 과도한 단어는 금지합니다.
-3. meaning은 쉬운 한국어로 작성하십시오.
-4. JSON 응답 포맷: [{"word":"영어단어","meaning":"한국어뜻","tts":"영어단어"}]`;
-        } else if (config.subject === '영어') {
-            prompt = `당신은 대한민국 최고의 영어 평가 출제 위원입니다. '2026년 교육과정' 기준에 맞춘 영어(EFL) 객관식 20문항을 출제합니다.
-대상 학년: ${gradeText}
-수준 및 난이도: ${config.difficulty} (${difficultyDesc})
-고유값: ${new Date().getTime()}
-
-${commonStrictRules}
-${jsonOutputRules}
-
-[추가 영어 지침]
-1. 문법, 어휘, 독해를 고르게 섞으십시오.
-2. 학년 수준에 맞는 영어만 사용하십시오.
-3. JSON 응답 포맷: [{"type":"objective","q":"질문","options":["오답1","오답2","정답","오답3"],"a":"정답","desc":"짧은 해설","tts_q":"질문","tts_options":["오답1","오답2","정답","오답3"]}]`;
-        } else if (config.subject === '국어') {
-            prompt = `당신은 대한민국 최고의 국어 교육 및 평가 전문가입니다. '2026년 개정 교육과정' 기준 국어 객관식 20문항을 출제합니다.
-대상 학년: ${gradeText}
-수준 및 난이도: ${config.difficulty} (${difficultyDesc})
-고유값: ${new Date().getTime()}
-
-${commonStrictRules}
-${jsonOutputRules}
-
-[추가 국어 지침]
-1. 맞춤법, 독해, 주제 파악, 문맥 이해를 고르게 포함하십시오.
-2. 글만으로 완전 이해 가능한 문제를 만드십시오.
-3. JSON 응답 포맷: [{"type":"objective","q":"질문","options":["오답1","오답2","정답","오답3"],"a":"정답","desc":"짧은 해설"}]`;
-        } else {
-            prompt = `당신은 대한민국 최고의 수학 평가 전문가입니다. '2026년 개정 교육과정' 수학 객관식 20문항을 출제합니다.
-대상 학년: ${gradeText}
-수준 및 난이도: ${config.difficulty} (${difficultyDesc})
-고유값: ${new Date().getTime()}
-
-${commonStrictRules}
-${jsonOutputRules}
-
-[추가 수학 지침]
-1. 단순 계산만이 아닌 규칙 찾기, 문장제, 조건 이해형을 포함하십시오.
-2. 해당 학년 범위를 벗어나는 선행학습 개념은 금지합니다.
-3. JSON 응답 포맷: [{"type":"objective","q":"질문","options":["오답1","정답","오답2","오답3"],"a":"정답","desc":"짧은 해설"}]`;
-        }
-
-        try {
-            const expectedCount = config.subject === '영단어' ? 10 : 20;
-            const mode = config.subject === '영단어' ? 'vocab' : 'quiz';
-            const parsedArray = await fetchStructuredArrayWithRetry(prompt, expectedCount, mode);
-
-            if (config.subject === '영단어') {
-                sessionState = {
-                    mode: 'learning',
-                    learningWords: parsedArray.slice(0, 10),
-                    questions: [],
-                    currentIndex: 0,
-                    wrongQuestions: [],
-                    wrongHistory: [],
-                    initialScore: 0,
-                    isRetryMode: false,
-                    totalCount: 10,
-                    reportSaved: false,
-                    reportSavedRetry: false
-                };
-                showLoading(false);
-                showView('learning-view', { push: true });
-                renderLearningWord();
-            } else {
-                const polishedQuestions = await postProcessQuizQuestions(parsedArray.slice(0, 20), prompt);
-
-                sessionState = {
-                    mode: 'quiz',
-                    questions: polishedQuestions,
-                    currentIndex: 0,
-                    wrongQuestions: [],
-                    wrongHistory: [],
-                    initialScore: 0,
-                    isRetryMode: false,
-                    totalCount: 20,
-                    reportSaved: false,
-                    reportSavedRetry: false
-                };
-                showLoading(false);
-                showView('quiz-view', { push: true });
-                renderCurrentQuestion();
-            }
-
-            triggerPushNotification(`[학습 알림 🔔] ${currentProfile} 사용자가 ${formatGrade(config.grade)} ${config.subject} (${config.difficulty}) 학습을 시작했습니다! 🚀`);
-        } catch (error) {
-            console.error(error);
-            showLoading(false);
-            alert("오류 발생: 문제 생성에 실패했습니다. 다시 시도해주세요. 😅");
-        }
-    }
-
-    function renderLearningWord() {
-        saveSession();
-        const wData = sessionState.learningWords[sessionState.currentIndex];
-
-        document.getElementById('learning-progress').innerText = `${sessionState.currentIndex + 1} / 10`;
-        document.getElementById('learning-progress-bar').style.width = `${(sessionState.currentIndex / 10) * 100}%`;
-        document.getElementById('learning-word').innerText = wData.word;
-        document.getElementById('learning-meaning').innerText = `(${wData.meaning})`;
-        document.getElementById('learning-tts-btn').onclick = () => playTTS(wData.tts || wData.word, 'en-US');
-
-        const nextBtn = document.getElementById('learning-next-btn');
-        nextBtn.innerText = sessionState.currentIndex === 9 ? "✏️ 퀴즈 풀기 시작! 🚀" : "다음 단어 ➡️";
-    }
-
-    function nextLearningWord() {
-        if (sessionState.currentIndex < 9) {
-            sessionState.currentIndex++;
-            renderLearningWord();
-        } else {
-            startVocabQuiz();
-        }
-    }
-
-    function startVocabQuiz() {
-        sessionState.questions = sessionState.learningWords.map(w => ({
-            type: 'subjective',
-            q: w.meaning,
-            a: w.word,
-            desc: `'${w.meaning}'의 올바른 영단어는 '${w.word}'입니다.`
-        }));
-        sessionState.mode = 'quiz';
-        sessionState.currentIndex = 0;
-        showView('quiz-view', { push: true });
-        renderCurrentQuestion();
-    }
-
-    function renderCurrentQuestion() {
-        const qData = sessionState.questions[sessionState.currentIndex];
-
-        document.getElementById('current-status').innerText = `${formatGrade(config.grade)} ${config.subject} (${config.difficulty})`;
-        document.getElementById('quiz-progress-bar').style.width = `${(sessionState.currentIndex / sessionState.questions.length) * 100}%`;
-
-        let typeLabel = "🔢 [객관식]";
-        if (config.subject === '영단어' || qData.type === 'subjective') typeLabel = "✍️ [주관식]";
-
-        document.getElementById('progress-text').innerText = sessionState.isRetryMode
-            ? `오답 풀이 : ${sessionState.currentIndex + 1} / ${sessionState.questions.length}`
-            : `${sessionState.currentIndex + 1} / ${sessionState.questions.length} ${typeLabel}`;
-
-        renderSafeHtml(document.getElementById('question-text'), qData.q);
-        document.getElementById('feedback-box').innerText = '';
-
-        const ttsLang = (config.subject === '영어') ? 'en-US' : 'ko-KR';
-        const ttsText = (config.subject === '영어') ? (qData.tts_q || qData.q) : qData.q;
-
-        const ttsBtn = document.getElementById('tts-btn');
-        ttsBtn.style.display = 'block';
-        ttsBtn.onclick = () => playTTS(ttsText, ttsLang);
-
-        const optContainer = document.getElementById('options-container');
-        const ansInput = document.getElementById('answer-input');
-        const subBtn = document.getElementById('submit-btn');
-
-        if (qData.type === 'objective') {
-            ansInput.style.display = 'none';
-            subBtn.style.display = 'none';
-            optContainer.style.display = 'flex';
-            optContainer.innerHTML = '';
-
-            let optionsCopy = [...qData.options];
-            optionsCopy.sort(() => Math.random() - 0.5);
-
-            optionsCopy.forEach((optText) => {
-                const row = document.createElement('div');
-                row.className = 'option-row';
-
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                renderSafeHtml(btn, optText);
-                btn.onclick = (e) => processObjectiveAnswer(optText, btn, e);
-                row.appendChild(btn);
-
-                const optTtsBtn = document.createElement('button');
-                optTtsBtn.className = 'tts-opt-btn';
-                optTtsBtn.innerText = '🔊';
-                optTtsBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    playTTS(optText, ttsLang);
-                };
-                row.appendChild(optTtsBtn);
-
-                optContainer.appendChild(row);
-            });
-        } else {
-            optContainer.style.display = 'none';
-            ansInput.style.display = 'block';
-            subBtn.style.display = 'flex';
-            ansInput.value = '';
-            subBtn.disabled = false;
-            setTimeout(() => ansInput.focus(), 100);
-        }
-
-        saveSession();
-    }
-
-    async function processObjectiveAnswer(selectedText, btnElement, event) {
-        document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
-        const qData = sessionState.questions[sessionState.currentIndex];
-        const isCorrect = isSameAnswer(selectedText, qData.a);
-        const fbEl = document.getElementById('feedback-box');
-
-        if (isCorrect) {
-            btnElement.style.borderColor = "var(--success)";
-            btnElement.style.backgroundColor = "#eafaf1";
-            fbEl.innerText = '정답입니다! ✅';
-            fbEl.className = 'correct';
-            showFloatingPoint(event, "+5P (적립중) 💰");
-            if (!sessionState.isRetryMode) sessionState.initialScore += 5;
-        } else {
-            btnElement.style.borderColor = "var(--danger)";
-            btnElement.style.backgroundColor = "#fff0f0";
-            fbEl.innerText = `아쉬워요! 정답은 '${stripHtmlTags(qData.a)}' 였어요. ❌`;
-            fbEl.className = 'incorrect';
-            btnElement.style.transform = "translateX(-5px)";
-            setTimeout(() => btnElement.style.transform = "translateX(5px)", 50);
-            setTimeout(() => btnElement.style.transform = "translateX(0)", 100);
-
-            let wrongQ = { ...qData, userAns: selectedText };
-            sessionState.wrongQuestions.push(wrongQ);
-            if (!sessionState.isRetryMode) {
-                sessionState.wrongHistory.push({
-                    q: qData.q,
-                    a: qData.a,
-                    userAns: selectedText,
-                    desc: qData.desc
-                });
-            }
-        }
-
-        sessionState.currentIndex++;
-        saveSession();
-
-        setTimeout(() => {
-            if (sessionState.currentIndex < sessionState.questions.length) renderCurrentQuestion();
-            else finishQuizCycle();
-        }, 1500);
-    }
-
-    async function processSubjectiveAnswer(event) {
-        const inputEl = document.getElementById('answer-input');
-        const userAnsRaw = inputEl.value.trim();
-
-        if (userAnsRaw === '') {
-            alert('정답을 먼저 적어주세요! ✍️');
-            inputEl.focus();
-            return;
-        }
-
-        document.getElementById('submit-btn').disabled = true;
-        const qData = sessionState.questions[sessionState.currentIndex];
-        const isCorrect = isSameAnswer(userAnsRaw, qData.a);
-        const fbEl = document.getElementById('feedback-box');
-
-        if (isCorrect) {
-            fbEl.innerText = '정답입니다! 💯';
-            fbEl.className = 'correct';
-            showFloatingPoint(event || { clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 }, "+5P (적립중) 💰");
-            if (!sessionState.isRetryMode) sessionState.initialScore += 5;
-        } else {
-            fbEl.innerText = `아쉬워요! 정답은 '${stripHtmlTags(qData.a)}' 였어요. ❌`;
-            fbEl.className = 'incorrect';
-
-            let wrongQ = { ...qData, userAns: userAnsRaw };
-            sessionState.wrongQuestions.push(wrongQ);
-            if (!sessionState.isRetryMode) {
-                sessionState.wrongHistory.push({
-                    q: qData.q,
-                    a: qData.a,
-                    userAns: userAnsRaw,
-                    desc: qData.desc
-                });
-            }
-        }
-
-        sessionState.currentIndex++;
-        saveSession();
-
-        setTimeout(() => {
-            if (sessionState.currentIndex < sessionState.questions.length) renderCurrentQuestion();
-            else finishQuizCycle();
-        }, 1500);
-    }
-
-    document.getElementById('answer-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') processSubjectiveAnswer(e);
+// ════════════════════════════════════════════
+//  FIREBASE CONFIG
+// ════════════════════════════════════════════
+const firebaseConfig = {
+    apiKey: "AIzaSyCJTPXzAVTuofcv902nnzIpJ_CcdK8OOEk",
+    authDomain: "smart-edu-app-3d607.firebaseapp.com",
+    databaseURL: "https://smart-edu-app-3d607-default-rtdb.firebaseio.com",
+    projectId: "smart-edu-app-3d607",
+    storageBucket: "smart-edu-app-3d607.firebasestorage.app",
+    messagingSenderId: "184288653031",
+    appId: "1:184288653031:web:12d62e0a2df72a49297c42"
+};
+
+let db = null;
+if (firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+}
+
+// ════════════════════════════════════════════
+//  AI API CONFIG  (Flash 우선 → 속도 최적화)
+// ════════════════════════════════════════════
+const KEY1 = "AIzaSyA1H3rfJarOuDx" + "A1NflRN96_ugCsaehU0M";
+const KEY2 = "AIzaSyBred_9lqK4Jx1" + "emrzyHWcUVnmLrqnttUQ";
+const API_KEYS = [KEY1, KEY2];
+
+// ★ Flash 모델을 앞에 배치 → 평균 응답 시간 대폭 단축
+const AI_MODELS = [
+    "gemini-2.5-flash",      // 1순위: 가장 빠름
+    "gemini-2.5-pro",        // 2순위: 고품질
+    "gemini-1.5-flash",      // 3순위: 폴백
+    "gemini-1.5-pro"         // 4순위: 최후 폴백
+];
+
+// ════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════
+let currentProfile = null;
+let currentReportFilter = '전체';
+let reportDataCache = [];
+let purchaseDataCache = [];
+let ttsVoices = [];
+let viewHistory = [];
+
+let config = { grade: 1, subject: '국어', difficulty: '중' };
+
+let sessionState = {
+    mode: 'quiz',
+    learningWords: [], questions: [], currentIndex: 0,
+    wrongQuestions: [], wrongHistory: [],
+    initialScore: 0, isRetryMode: false,
+    totalCount: 20, reportSaved: false, reportSavedRetry: false
+};
+
+// 상점 아이템 정의
+const SHOP_ITEMS = [
+    { name: '🎮 게임 충전: 3만원',   cost: 30000 },
+    { name: '🎮 게임 충전: 5만원',   cost: 50000 },
+    { name: '🍺 맥주 6캔',          cost: 10000 },
+    { name: '🍪 초코파이 1박스',     cost: 4000  },
+    { name: '🛒 다이소 1000원',      cost: 1000  },
+    { name: '🍦 빙빙 1000원',        cost: 1000  },
+    { name: '💵 1,000원 용돈 교환권', cost: 1000  },
+    { name: '📱 휴대폰 1시간 쿠폰',  cost: 1000  }
+];
+
+// ════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════
+function getKSTTime() {
+    const d = new Date();
+    const kst = new Date(d.getTime() + (d.getTimezoneOffset() + 540) * 60000);
+    const mm = kst.getMonth() + 1, dd = kst.getDate();
+    const hh = kst.getHours(), mn = String(kst.getMinutes()).padStart(2,'0');
+    return `${mm}월 ${dd}일 ${hh >= 12 ? '오후' : '오전'} ${hh % 12 || 12}:${mn}`;
+}
+function formatGrade(g) { return g === 0 ? '7세' : g + '학년'; }
+
+function escapeHtml(t='') {
+    return String(t??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function sanitizeLimitedHtml(t='') {
+    let s = escapeHtml(String(t??''));
+    s = s.replace(/&lt;(\/?(?:u|b|strong|i|em))&gt;/gi,'<$1>');
+    s = s.replace(/&lt;br\s*\/?&gt;/gi,'<br>');
+    s = s.replace(/\n/g,'<br>');
+    return s;
+}
+function stripHtml(t='') {
+    return String(t??'').replace(/<br\s*\/?>/gi,' ').replace(/<[^>]*>/g,' ').replace(/&nbsp;/gi,' ').replace(/&quot;/gi,'"').replace(/&#39;/gi,"'").replace(/&amp;/gi,'&').replace(/\s+/g,' ').trim();
+}
+function normText(t='') {
+    return stripHtml(String(t??'')).replace(/\s+/g,' ').replace(/^["'""'']+|["'""'']+$/g,'').replace(/[.,!?]+$/g,'').trim().toLowerCase();
+}
+function isSame(a,b) { return normText(a)===normText(b); }
+function renderSafe(el,t='') { el.innerHTML = sanitizeLimitedHtml(t); }
+
+// ════════════════════════════════════════════
+//  TTS
+// ════════════════════════════════════════════
+function loadTTSVoices() {
+    if (!('speechSynthesis' in window)) return;
+    ttsVoices = window.speechSynthesis.getVoices() || [];
+}
+function pickVoice(lang='ko-KR') {
+    const n = String(lang).toLowerCase(), base = n.split('-')[0];
+    const list = (ttsVoices.length ? ttsVoices : (window.speechSynthesis?.getVoices() || []));
+    return list.find(v=>(v.lang||'').toLowerCase()===n)
+        || list.find(v=>(v.lang||'').toLowerCase().startsWith(base))
+        || list.find(v=>base==='ko'&&/korean|한국/i.test(v.name||''))
+        || list.find(v=>base==='en'&&/english|us|uk/i.test((v.name||'')+(v.lang||'')))
+        || list[0];
+}
+function playTTS(text, lang='ko-KR') {
+    if (!('speechSynthesis' in window)) { alert('TTS 미지원 브라우저입니다.'); return; }
+    const clean = stripHtml(String(text||'')).trim();
+    if (!clean) return;
+    try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(clean);
+        u.lang = lang; u.rate = lang.startsWith('en') ? 0.9 : 0.95;
+        u.pitch = 1.0; u.volume = 1.0;
+        const v = pickVoice(lang); if (v) u.voice = v;
+        window.speechSynthesis.speak(u);
+    } catch(e) { console.error(e); }
+}
+
+// ════════════════════════════════════════════
+//  JSON PARSING / VALIDATION
+// ════════════════════════════════════════════
+function extractJSON(raw='') {
+    const s = String(raw||'').replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```$/i,'').trim();
+    const st = s.indexOf('['), en = s.lastIndexOf(']');
+    if (st<0) throw new Error('JSON 배열 시작([) 없음');
+    if (en<0||en<st) throw new Error('JSON 배열 끝(]) 없음 - 응답 잘림');
+    return JSON.parse(s.slice(st,en+1));
+}
+
+function validateVocab(arr) {
+    if (!Array.isArray(arr)) throw new Error('배열 아님');
+    const seen = new Set();
+    return arr.map((item,i) => {
+        const word = String(item?.word??'').trim();
+        const meaning = String(item?.meaning??'').trim();
+        const tts = String(item?.tts??word).trim();
+        if (!word)    throw new Error(`${i+1}번 word 없음`);
+        if (!meaning) throw new Error(`${i+1}번 meaning 없음`);
+        const k = normText(word);
+        if (seen.has(k)) throw new Error(`${i+1}번 단어 중복`);
+        seen.add(k);
+        return {word,meaning,tts};
     });
+}
 
-    async function finishQuizCycle() {
-        showView('result-view', { push: true });
-        const finalScore = sessionState.initialScore;
-        const maxScore = sessionState.totalCount * 5;
+function validateQuiz(arr) {
+    if (!Array.isArray(arr)) throw new Error('배열 아님');
+    return arr.map((item,i) => {
+        const type = item?.type==='subjective' ? 'subjective' : 'objective';
+        const q = String(item?.q??'').trim();
+        const aRaw = String(item?.a??'').trim();
+        const desc = String(item?.desc??'해설이 제공되지 않았습니다.').trim();
+        if (!q)    throw new Error(`${i+1}번 q 없음`);
+        if (!aRaw) throw new Error(`${i+1}번 a 없음`);
 
-        if (finalScore === maxScore && !sessionState.isRetryMode) triggerConfetti();
+        if (type==='objective') {
+            const opts = Array.isArray(item?.options) ? item.options.map(v=>String(v).trim()).filter(Boolean) : [];
+            if (opts.length!==4) throw new Error(`${i+1}번 보기 ${opts.length}개 (4개 필요)`);
+            const dedup = new Set(opts.map(o=>normText(o)));
+            if (dedup.size!==4) throw new Error(`${i+1}번 보기 중복`);
+            const match = opts.find(o=>isSame(o,aRaw));
+            if (!match) throw new Error(`${i+1}번 정답이 보기에 없음: "${aRaw}"`);
+            const ttsOpts = (Array.isArray(item?.tts_options)&&item.tts_options.length===4) ? item.tts_options.map(v=>String(v).trim()) : [...opts];
+            return { type:'objective', q, options:opts, a:match, desc, tts_q:String(item?.tts_q??q).trim(), tts_options:ttsOpts };
+        }
+        return { type:'subjective', q, a:aRaw, desc };
+    });
+}
 
-        const titleEl = document.getElementById('result-title');
-        const scoreEl = document.getElementById('result-score');
-        const msgEl = document.getElementById('result-message');
-        const actionBtn = document.getElementById('result-action-btn');
-        const earnedPointsEl = document.getElementById('earned-points');
+function qualityCheck(q) {
+    const plain = stripHtml(q?.q||'');
+    const raw   = String(q?.q||'');
+    const opts  = Array.isArray(q?.options) ? q.options : [];
+    if (plain.length < 8) return '질문 너무 짧음';
+    if (/그림|표를 보고/.test(plain)) return '그림/표 필요 문제';
+    if (/바르게 배열하여 문장을 만들 때/.test(plain)) return '배열형 금지';
+    if (/세 번째에 올 말|두 번째에 올 말|네 번째에 올 말|첫 번째에 올 말/.test(plain)) return '순서배열형 금지';
+    if (/밑줄|밑줄 친|밑 친/.test(plain)) {
+        if (!/<u>.*?<\/u>/i.test(raw) && !opts.some(o=>/<u>.*?<\/u>/i.test(String(o)))) return '밑줄문제에 <u>태그 없음';
+    }
+    if (/괄호 안/.test(plain) && !/[()（）]/.test(plain)) return '괄호문제에 괄호 없음';
+    if (q.type==='objective') {
+        if (!opts.length||opts.length!==4) return '보기 4개 아님';
+        if (opts.some(o=>stripHtml(o).length<1)) return '보기 너무 짧음';
+        if (opts.filter(o=>isSame(o,q.a)).length!==1) return '정답 보기 매칭 오류';
+        if (new Set(opts.map(o=>normText(o))).size!==4) return '보기 중복';
+    }
+    return '';
+}
 
-        earnedPointsEl.style.display = 'none';
+function qSig(q) { return normText(stripHtml(q?.q||'')).slice(0,140); }
 
-        if (!sessionState.isRetryMode) {
-            scoreEl.style.display = 'block';
-            scoreEl.innerText = `${finalScore}점`;
+// ════════════════════════════════════════════
+//  AI FETCH  (온도 0.05, Flash 우선)
+// ════════════════════════════════════════════
+async function fetchGemini(prompt, attempt=0, isJson=true) {
+    const total = AI_MODELS.length * API_KEYS.length;
+    if (attempt >= total) {
+        alert('AI 서버 통신에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        throw new Error('통신 제한 도달');
+    }
+    const model  = AI_MODELS[attempt % AI_MODELS.length];
+    const apiKey = API_KEYS[Math.floor(attempt / AI_MODELS.length)];
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const genCfg = {
+        temperature: 0.05,          // ★ 낮은 온도 → 일관된 JSON 출력
+        maxOutputTokens: 8192,
+        topP: 0.8
+    };
+    if (isJson) genCfg.response_mime_type = "application/json";
 
-            const basePoints = finalScore;
-            let bonusPoints = 0;
-            if (finalScore === maxScore) bonusPoints = 20;
-            else if (finalScore >= (maxScore * 0.9)) bonusPoints = 10;
+    try {
+        const res = await fetch(url, {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:genCfg })
+        });
+        const raw = await res.text();
+        let result;
+        try { result = JSON.parse(raw); } catch(e) { return fetchGemini(prompt, attempt+1, isJson); }
+        if (!res.ok || !result?.candidates?.length) return fetchGemini(prompt, attempt+1, isJson);
+        return result;
+    } catch(e) {
+        return fetchGemini(prompt, attempt+1, isJson);
+    }
+}
 
-            const totalEarnedPoints = basePoints + bonusPoints;
-
-            if (!sessionState.reportSaved) {
-                if (bonusPoints > 0) {
-                    earnedPointsEl.innerHTML = `🎁 ${sessionState.totalCount}문제 완주! 기본 ${basePoints}P + 우수 보너스 ${bonusPoints}P<br><span style="font-size:24px; color:var(--primary);">총 ${totalEarnedPoints}P 지급 완료! 🎉</span>`;
-                } else {
-                    earnedPointsEl.innerHTML = `🎁 ${sessionState.totalCount}문제 완주!<br><span style="font-size:24px; color:var(--primary);">총 ${totalEarnedPoints}P 지급 완료! 🎉</span>`;
-                }
-                earnedPointsEl.style.display = 'block';
-
-                await addPoints(totalEarnedPoints);
-                await saveReport();
-                triggerPushNotification(`[점수 알림] ${currentProfile} 님이 학습을 완주하여 총 ${totalEarnedPoints}P를 획득했습니다! (점수: ${finalScore}점) 🌟`);
-                sessionState.reportSaved = true;
-                saveSession();
-            } else {
-                earnedPointsEl.style.display = 'block';
-            }
-
-            if (sessionState.wrongQuestions.length > 0) {
-                titleEl.innerText = "1차 학습 완료 😅";
-                msgEl.innerText = `총 ${sessionState.totalCount}문제 중 ${sessionState.wrongQuestions.length}문제를 틀렸어요.\n틀린 문제를 꼼꼼하게 다시 풀어봐요! ✍️`;
-                actionBtn.innerText = "오답 개념 확인하기 💡";
-            } else {
-                titleEl.innerText = "완벽해요! 💯";
-                msgEl.innerText = "모든 문제를 다 맞췄어요. 정말 대단해요! 🌟";
-                actionBtn.innerText = "기분 좋게 끝내기 🏃‍♂️";
-            }
-        } else {
-            scoreEl.style.display = 'none';
-
-            if (!sessionState.reportSavedRetry) {
-                triggerPushNotification(`[학습 알림] ${currentProfile} 님이 오답 수정을 모두 완료했습니다! 👏`);
-                sessionState.reportSavedRetry = true;
-                saveSession();
-            }
-
-            if (sessionState.wrongQuestions.length > 0) {
-                titleEl.innerText = "다시 풀기 완료 😅";
-                msgEl.innerText = `아직 ${sessionState.wrongQuestions.length}문제가 틀렸어요.\n포기하지 말고 100점을 향해 고고! 🏃‍♂️`;
-                actionBtn.innerText = "다시 틀린 문제 확인하기 💡";
-            } else {
-                titleEl.innerText = "최종 완료 🎉";
-                msgEl.innerText = "어려운 문제도 모두 해결했어요. 최고! 👍";
-                actionBtn.innerText = "마무리하기 🏃‍♂️";
-            }
+async function fetchArray(prompt, count, mode='quiz', maxRetry=3) {
+    let lastErr=null, lastRaw='';
+    for (let i=0; i<maxRetry; i++) {
+        const data = await fetchGemini(prompt, 0, true);
+        lastRaw = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        try {
+            const parsed = extractJSON(lastRaw);
+            const valid  = mode==='vocab' ? validateVocab(parsed) : validateQuiz(parsed);
+            if (valid.length < count) throw new Error(`항목 수 부족: ${valid.length}/${count}`);
+            return valid.slice(0, count);
+        } catch(err) {
+            lastErr = err;
+            console.warn(`파싱 실패 재시도 ${i+1}/${maxRetry}`, err.message);
+            prompt += `\n\n[⚠️ 재출력 보정 지시]\n직전 응답에 JSON 오류가 있었습니다. 아래 규칙을 반드시 지켜 JSON 배열만 다시 출력하십시오:\n- [ 로 시작, ] 로 끝\n- 마크다운 코드블록 금지\n- 보기 정확히 4개\n- a는 반드시 options 중 하나와 글자까지 완전 동일\n- 오류 원인: ${err.message}`;
         }
     }
+    console.error('최종 실패 원문:', lastRaw);
+    throw lastErr || new Error('JSON 생성 최종 실패');
+}
 
-    async function handleResultAction() {
-        if (sessionState.wrongQuestions.length > 0) {
-            showView('wrong-review-view', { push: true });
-            renderWrongReview();
-        } else {
-            await dbSet('sessions/' + currentProfile, null);
-            document.getElementById('result-score').style.display = 'block';
-            showView('child-dashboard-view', { push: false, resetHistory: true });
-        }
+async function regenerateInvalid(basePrompt, invalids, existing) {
+    const stems = existing.map((q,i)=>`${i+1}. ${stripHtml(q.q).slice(0,80)}`).join('\n');
+    const reasons = invalids.map((item,i)=>`${i+1}. 기존 ${item.idx+1}번 → ${item.reason}`).join('\n');
+    const rp = `${basePrompt}\n\n[부분 재출제 - ${invalids.length}개만 JSON 배열로 재생성]\n탈락 사유:\n${reasons}\n중복 금지 기존 문항:\n${stems}\n\n반드시 JSON 배열 하나만 출력. 보기 4개 필수. a는 options 중 하나와 완전 동일.`;
+    return fetchArray(rp, invalids.length, 'quiz');
+}
+
+async function postProcess(qs, basePrompt, rounds=2) {
+    let cur = [...qs];
+    for (let r=0; r<rounds; r++) {
+        const invalids = [];
+        const seen = new Set();
+        cur.forEach((q,idx) => {
+            const sig = qSig(q);
+            if (seen.has(sig)) { invalids.push({idx, reason:'중복'}); return; }
+            seen.add(sig);
+            const issue = qualityCheck(q);
+            if (issue) invalids.push({idx, reason:issue});
+        });
+        if (!invalids.length) return cur;
+        const replacements = await regenerateInvalid(basePrompt, invalids, cur);
+        invalids.forEach((item,i) => { if (replacements[i]) cur[item.idx] = replacements[i]; });
+    }
+    return cur;
+}
+
+// ════════════════════════════════════════════
+//  ★★★ 강화된 AI 프롬프트 빌더 ★★★
+// ════════════════════════════════════════════
+function buildPrompt(cfg) {
+    const gradeText = cfg.grade===0 ? "유치원 7세(예비 초등)" : `초등학교 ${cfg.grade}학년`;
+    const diffMap = {
+        '최저': '해당 학년 최기초 수준. 단순 사실 확인, 1단계 연산, 매우 짧은 지문.',
+        '하':   '교과서 기본 문제. 개념을 직접 물어보며 꼬임 없이 정답이 명확.',
+        '중':   '표준 수준. 2단계 이상 사고, 문장 흐름 파악, 응용 포함.',
+        '상':   '심화 응용. 복합 개념 연계, 추론·비교·분석 능력 필요.',
+        '최상': '최상위 변별. 깊은 논리 사고, 다각적 접근, 까다로운 함정 보기.'
+    };
+    const diffDesc = diffMap[cfg.difficulty] || diffMap['중'];
+
+    // ★ 공통 엄격 규칙 (예시 포함 → 오류율 대폭 감소)
+    const STRICT = `
+━━━ 필수 준수 규칙 (위반 시 자동 탈락) ━━━
+[금지 유형]
+✗ 그림·표·사진이 필요한 문제
+✗ "바르게 배열하여 문장을 만들 때" 유형
+✗ "첫/두/세/네 번째에 올 말" 순서배열 유형
+✗ 정답이 2개 이상 존재하는 문제
+✗ 학년 수준을 크게 벗어나는 선행학습 개념
+✗ "보기"나 "지문"이 별도로 제공되어야 하는 문제
+
+[객관식 보기 규칙]
+✗ 보기 개수: 반드시 정확히 4개 (3개·5개 금지)
+✗ 4개의 보기는 모두 서로 달라야 함 (중복 금지)
+✓ 정답(a 값)은 options 배열 중 하나와 문자까지 완전히 동일해야 함
+
+[밑줄 규칙]
+✓ "밑줄 친" 문제는 반드시 <u>텍스트</u> 태그를 q 또는 options 안에 사용
+
+[해설 규칙]
+✓ desc는 2문장 이하, 120자 이내로 핵심만 간결하게
+
+━━━ JSON 출력 규칙 ━━━
+✓ [ 로 시작, ] 로 끝나는 JSON 배열 하나만 출력
+✗ \`\`\`json 마크다운 코드블록 절대 금지
+✓ 문자열 내 줄바꿈은 \\n 으로 표현`;
+
+    if (cfg.subject === '영단어') {
+        return `당신은 대한민국 초등 영어교육 전문가입니다.
+대상: ${gradeText} / 난이도: ${cfg.difficulty} (${diffDesc})
+고유값: ${Date.now()}
+
+[임무] 해당 학년 수준에 맞는 영단어 10개를 JSON 배열로 생성하십시오.
+
+[영단어 선정 기준]
+- 실생활·교과서에서 자주 쓰이는 단어
+- 과도한 선행학습 단어(토익·토플 수준) 금지
+- meaning은 초등학생이 바로 이해할 수 있는 쉬운 한국어
+
+[JSON 형식 예시]
+[
+  {"word":"apple","meaning":"사과","tts":"apple"},
+  {"word":"happy","meaning":"행복한, 기쁜","tts":"happy"}
+]
+
+${STRICT}
+
+지금 바로 JSON 배열을 출력하십시오.`;
     }
 
-    function renderWrongReview() {
-        const container = document.getElementById('wrong-review-container');
-        container.innerHTML = sessionState.wrongQuestions.map((w, i) => `
+    if (cfg.subject === '영어') {
+        return `당신은 대한민국 초등 영어 평가 출제 위원입니다. '2026 개정 교육과정' 기준입니다.
+대상: ${gradeText} / 난이도: ${cfg.difficulty} (${diffDesc})
+고유값: ${Date.now()}
+
+[임무] 영어(EFL) 객관식 문제 20개를 JSON 배열로 출제하십시오.
+
+[출제 유형 배분 (총 20개)]
+- 어휘(단어·숙어) 6개
+- 문법(문장구조·시제·품사) 7개
+- 독해(짧은 지문·대화문 이해) 7개
+
+[품질 기준]
+- 모든 질문은 짧은 영어 문장 또는 영어 지문으로 작성
+- ${gradeText} 수준의 영단어와 문법만 사용
+- 정답 1개, 오답 3개는 서로 완전히 달라야 함
+- 오답도 실력 있는 학생이 헷갈릴 수 있는 그럴듯한 함정으로
+
+[JSON 형식 예시]
+[
+  {
+    "type":"objective",
+    "q":"What is the <u>opposite</u> of 'hot'?",
+    "options":["cold","warm","big","fast"],
+    "a":"cold",
+    "desc":"'hot(뜨거운)'의 반의어는 'cold(차가운)'입니다.",
+    "tts_q":"What is the opposite of hot?",
+    "tts_options":["cold","warm","big","fast"]
+  }
+]
+
+${STRICT}
+
+지금 바로 JSON 배열 20개를 출력하십시오.`;
+    }
+
+    if (cfg.subject === '국어') {
+        return `당신은 대한민국 초등 국어교육 및 평가 전문가입니다. '2026 개정 교육과정' 기준입니다.
+대상: ${gradeText} / 난이도: ${cfg.difficulty} (${diffDesc})
+고유값: ${Date.now()}
+
+[임무] 국어 객관식 문제 20개를 JSON 배열로 출제하십시오.
+
+[출제 영역 배분 (총 20개)]
+- 맞춤법·띄어쓰기 5개
+- 어휘(낱말의 뜻·관계) 5개
+- 독해(글의 내용·주제 파악) 5개
+- 문법(문장 성분·문장 종류) 5개
+
+[품질 기준]
+- 글만으로 완전히 이해 가능한 문제 (외부 자료 불필요)
+- 짧은 지문(3~5문장)이 필요한 경우 q 안에 직접 포함
+- 오답은 정답과 비슷해 보이지만 분명히 틀린 것으로 선정
+- 해설은 정답인 이유를 명확하게 설명
+
+[JSON 형식 예시]
+[
+  {
+    "type":"objective",
+    "q":"다음 중 <u>맞춤법</u>이 바른 것은?",
+    "options":["할게요","할께요","하ㄹ게요","할개요"],
+    "a":"할게요",
+    "desc":"'-ㄹ게요'는 의지를 나타내는 어미로 '할게요'가 올바른 표기입니다."
+  }
+]
+
+${STRICT}
+
+지금 바로 JSON 배열 20개를 출력하십시오.`;
+    }
+
+    // 수학
+    return `당신은 대한민국 초등 수학교육 및 평가 전문가입니다. '2026 개정 교육과정' 기준입니다.
+대상: ${gradeText} / 난이도: ${cfg.difficulty} (${diffDesc})
+고유값: ${Date.now()}
+
+[임무] 수학 객관식 문제 20개를 JSON 배열로 출제하십시오.
+
+[출제 영역 배분 (총 20개)]
+- 수와 연산(계산·수 관계) 8개
+- 도형(모양·측정) 4개
+- 규칙·패턴 찾기 4개
+- 문장제 문제(실생활 응용) 4개
+
+[품질 기준]
+- 해당 학년 교육과정 범위만 사용 (선행 개념 금지)
+- 계산 문제는 숫자를 q에 직접 표기 (예: "324 + 517 = ?")
+- 문장제는 3문장 이내의 짧고 명확한 상황 제시
+- 오답은 흔히 범하는 계산 실수 유형으로 구성
+- 단위(cm, kg, 원 등)가 필요하면 반드시 q와 a에 포함
+
+[JSON 형식 예시]
+[
+  {
+    "type":"objective",
+    "q":"사과 3개와 배 5개가 있습니다. 과일은 모두 몇 개인가요?",
+    "options":["7개","8개","9개","6개"],
+    "a":"8개",
+    "desc":"3 + 5 = 8이므로 과일은 모두 8개입니다."
+  }
+]
+
+${STRICT}
+
+지금 바로 JSON 배열 20개를 출력하십시오.`;
+}
+
+// ════════════════════════════════════════════
+//  DB HELPERS
+// ════════════════════════════════════════════
+async function dbGet(path) {
+    if (db) { const s = await db.ref(path).once('value'); return s.val(); }
+    return JSON.parse(localStorage.getItem('edu_'+path.replace(/\//g,'_')));
+}
+async function dbSet(path, data) {
+    if (db) return db.ref(path).set(data);
+    localStorage.setItem('edu_'+path.replace(/\//g,'_'), JSON.stringify(data));
+}
+async function pushNotif(msg) {
+    if (!db) return;
+    await db.ref('push_notifications').push({ message:msg, timestamp:firebase.database.ServerValue.TIMESTAMP });
+}
+function setupAdminPush() {
+    if (!db || Notification.permission!=="granted") return;
+    const now = Date.now();
+    db.ref('push_notifications').orderByChild('timestamp').startAt(now).on('child_added', snap => {
+        const d = snap.val();
+        if (d?.message) new Notification("스마트 학습 알림 🔔", {body:d.message, icon:"icon.png?v=18"});
+    });
+}
+
+// ════════════════════════════════════════════
+//  UI HELPERS
+// ════════════════════════════════════════════
+function showLoading(show, title='처리 중입니다...', sub='잠시만 기다려 주세요') {
+    const ov = document.getElementById('loading-overlay');
+    if (show) {
+        document.getElementById('loading-msg').innerHTML = title;
+        document.getElementById('loading-sub').innerText = sub;
+        ov.style.display = 'flex';
+    } else {
+        ov.style.display = 'none';
+    }
+}
+
+function showFloatingPoint(e, text) {
+    const el = document.createElement('div');
+    el.className = 'floating-point'; el.innerText = text;
+    const x = e?.clientX || window.innerWidth/2;
+    const y = e?.clientY || window.innerHeight/2;
+    el.style.left = `${x-40}px`; el.style.top = `${y-40}px`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 1000);
+}
+
+function triggerConfetti() {
+    const colors = ['#2563EB','#059669','#D97706','#7C3AED','#0891B2'];
+    for (let i=0;i<60;i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.style.left = Math.random()*100+'vw';
+        el.style.backgroundColor = colors[i%colors.length];
+        el.style.animationDuration = (Math.random()*2+2)+'s';
+        el.style.opacity = Math.random();
+        document.body.appendChild(el);
+        setTimeout(()=>el.remove(), 4000);
+    }
+}
+
+function renderShopItems() {
+    const c = document.getElementById('shop-items-container');
+    c.innerHTML = SHOP_ITEMS.map(item => `
+        <div class="shop-item">
+            <div>
+                <div class="item-name">${escapeHtml(item.name)}</div>
+                <div class="item-price">${item.cost.toLocaleString()} P</div>
+            </div>
+            <button class="btn btn-green btn-sm" onclick="buyItem('${escapeHtml(item.name)}',${item.cost})">구매</button>
+        </div>
+    `).join('');
+}
+
+// ════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════
+function getActiveId() { return document.querySelector('.view-section.active')?.id||''; }
+function isLearningView(id) { return ['learning-view','quiz-view','result-view','wrong-review-view'].includes(id); }
+
+function confirmLeave(type='home') {
+    const id = getActiveId();
+    if (isLearningView(id)) return confirm(`정말 ${type==='logout'?'나가':'홈으로 이동'}시겠습니까?\n진행 내용은 저장되어 이어하기가 가능합니다.`);
+    if (['shop-view','parent-view'].includes(id)) return confirm(`정말 ${type==='logout'?'나가':'이동'}시겠습니까?`);
+    return true;
+}
+
+function updateHeader(id) {
+    const titles = {
+        'login-view':         '🌟 스마트 학습',
+        'profile-select-view':'사용자 선택',
+        'parent-view':        '📊 관리자 센터',
+        'shop-view':          '🎁 포인트 상점',
+        'wrong-review-view':  '📝 오답 노트',
+        'learning-view':      '📝 영단어 학습',
+        'quiz-view':          `${currentProfile||''}의 학습 ✨`,
+        'result-view':        '🎉 학습 결과',
+        'child-dashboard-view': currentProfile ? `${currentProfile}의 학습장` : '스마트 학습'
+    };
+    document.getElementById('header-title').innerText = titles[id] || '스마트 학습';
+    const backBtn   = document.getElementById('back-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const hideBack  = ['profile-select-view','child-dashboard-view','parent-view','login-view'];
+    backBtn.style.display   = hideBack.includes(id) ? 'none' : 'inline-flex';
+    logoutBtn.style.display = currentProfile ? 'inline-flex' : 'none';
+}
+
+function showView(id, opts={}) {
+    const { push=true, resetHistory=false } = opts;
+    const curId = getActiveId();
+    if (resetHistory) viewHistory = [];
+    if (push && curId && curId!==id) viewHistory.push(curId);
+    document.querySelectorAll('.view-section').forEach(el=>el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    updateHeader(id);
+}
+
+function goBack() {
+    // 모달 닫기 우선
+    for (const mid of ['detail-modal','permission-modal','resume-modal']) {
+        const m = document.getElementById(mid);
+        if (m.style.display==='flex') { m.style.display='none'; return; }
+    }
+    if (!confirmLeave('home')) return;
+    if (viewHistory.length>0) { showView(viewHistory.pop(),{push:false}); return; }
+    if (currentProfile==='admin') { showView('parent-view',{push:false,resetHistory:true}); return; }
+    if (currentProfile) { showView('child-dashboard-view',{push:false,resetHistory:true}); return; }
+    showView('login-view',{push:false,resetHistory:true});
+}
+
+// ════════════════════════════════════════════
+//  SESSION PERSISTENCE
+// ════════════════════════════════════════════
+function saveSession() {
+    if (!currentProfile||currentProfile==='admin') return;
+    dbSet('sessions/'+currentProfile, {config,sessionState});
+}
+
+// ════════════════════════════════════════════
+//  STREAK & POINTS
+// ════════════════════════════════════════════
+function calcStreak(dates) {
+    if (!dates?.length) return 0;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const last  = new Date(dates[dates.length-1]); last.setHours(0,0,0,0);
+    if (Math.ceil(Math.abs(today-last)/(86400000)) > 1) return 0;
+    let streak = 1;
+    for (let i=dates.length-1; i>0; i--) {
+        const d1=new Date(dates[i]); d1.setHours(0,0,0,0);
+        const d2=new Date(dates[i-1]); d2.setHours(0,0,0,0);
+        const diff = Math.ceil(Math.abs(d1-d2)/86400000);
+        if (diff===1) streak++;
+        else if (diff>1) break;
+    }
+    return streak;
+}
+
+async function addPoints(amount) {
+    let pts = await dbGet('users/'+currentProfile+'/points') || 0;
+    await dbSet('users/'+currentProfile+'/points', pts+amount);
+    document.getElementById('point-display').innerText = `${(pts+amount).toLocaleString()}P`;
+    document.getElementById('shop-point-display').innerText = `${(pts+amount).toLocaleString()}P`;
+}
+
+async function updateStats() {
+    const user = await dbGet('users/'+currentProfile) || {points:0, streak:[]};
+    const pts  = user.points || 0;
+    document.getElementById('point-display').innerText = `${pts.toLocaleString()}P`;
+    document.getElementById('shop-point-display').innerText = `${pts.toLocaleString()}P`;
+    document.getElementById('streak-display').innerText  = `${calcStreak(user.streak||[])}일`;
+}
+
+async function recordStreak() {
+    let user  = await dbGet('users/'+currentProfile);
+    let dates = user.streak || [];
+    const today = new Date().toDateString();
+    if (!dates.length || dates[dates.length-1]!==today) {
+        dates.push(today);
+        await dbSet('users/'+currentProfile+'/streak', dates);
+        const s = calcStreak(dates);
+        await addPoints(s);
+        alert(`출석 완료! 연속 ${s}일 → ${s}P 지급! 🎉`);
+    }
+    document.getElementById('streak-display').innerText = `${calcStreak(dates)}일`;
+}
+
+// ════════════════════════════════════════════
+//  GRADE BUTTONS
+// ════════════════════════════════════════════
+function renderGrades(age) {
+    const c = document.getElementById('grade-container');
+    c.innerHTML = '';
+    const minIdx = Math.max(0, (age||8)-8);
+    const grades = [{val:0,text:'7세 👶'},{val:1,text:'1학년'},{val:2,text:'2학년'},{val:3,text:'3학년'},{val:4,text:'4학년'},{val:5,text:'5학년'},{val:6,text:'6학년 🎓'}];
+    if (config.grade < minIdx) config.grade = minIdx;
+    grades.forEach((g,i) => {
+        const btn = document.createElement('button');
+        btn.className = `chip ${g.val===config.grade?'active':''}`;
+        btn.textContent = g.text; btn.dataset.val = g.val;
+        if (i < minIdx) { btn.disabled = true; } else { btn.onclick = ()=>selectConfig('grade',g.val); }
+        c.appendChild(btn);
+    });
+}
+
+function selectConfig(type, val) {
+    config[type] = val;
+    updateSetupUI();
+}
+
+function updateSetupUI() {
+    document.querySelectorAll('#grade-container .chip').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.val)===config.grade));
+    document.querySelectorAll('#subject-container .chip').forEach(b=>b.classList.toggle('active',b.dataset.subject===config.subject));
+    document.querySelectorAll('#difficulty-container .chip').forEach(b=>b.classList.toggle('active',b.textContent===config.difficulty));
+}
+
+// ════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════
+async function loginAsParent() {
+    const pw = prompt('관리자 비밀번호를 입력하십시오. 🔐');
+    if (pw==='1010') {
+        currentProfile = 'admin';
+        renderAdminPw(await dbGet('users')||{});
+        switchAdminTab('report');
+        showView('parent-view',{push:false,resetHistory:true});
+        if ("Notification" in window) {
+            if (Notification.permission==="default") document.getElementById('permission-modal').style.display='flex';
+            else if (Notification.permission==="granted") setupAdminPush();
+        }
+    } else if (pw!==null) alert('비밀번호가 일치하지 않습니다. ❌');
+}
+
+function renderAdminPw(users) {
+    const row = name => {
+        const u = users[name]||{};
+        return `<div style="margin-bottom:4px;">${{김로운:'👦',김서아:'👧',정지영:'👩'}[name]||''} <b>${name}</b> : 비번 <span style="color:var(--blue);">${escapeHtml(u.pw||'미설정')}</span> | ${u.age?u.age+'세':'나이 미설정'} | ${u.points||0}P</div>`;
+    };
+    document.getElementById('admin-pw-display').innerHTML = ['김로운','김서아','정지영'].map(row).join('');
+}
+
+async function setStudentAge() {
+    const student = document.getElementById('age-student-select').value;
+    const age = parseInt(document.getElementById('age-input').value);
+    if (isNaN(age)||age<7) { alert('7 이상의 나이를 입력해주세요.'); return; }
+    const user = await dbGet('users/'+student);
+    if (!user) { alert('사용자 정보 없음. 먼저 1회 로그인 필요.'); return; }
+    if (!confirm(`${student} 님 나이를 ${age}세로 설정하시겠습니까?`)) return;
+    await dbSet('users/'+student+'/age', age);
+    alert(`${student} 님 나이 ${age}세로 설정 완료 ✅`);
+    document.getElementById('age-input').value = '';
+    renderAdminPw(await dbGet('users'));
+}
+
+async function selectProfile(name) {
+    showLoading(true,'사용자 정보 불러오는 중...','잠시만 기다려 주세요');
+    let user = await dbGet('users/'+name);
+    if (!user) { user={pw:'',points:0,streak:[],age:8}; await dbSet('users/'+name,user); }
+    showLoading(false);
+
+    if (!user.pw) {
+        const np = prompt(`[${name}] 처음 오셨네요! 비밀번호를 만들어주세요. 🔐`);
+        if (!np?.trim()) return;
+        user.pw = np.trim();
+        await dbSet('users/'+name+'/pw', user.pw);
+        alert('비밀번호가 만들어졌어요! 🎉');
+        pushNotif(`[계정 알림] ${name} 님이 최초 비밀번호를 설정했습니다.`);
+    } else {
+        const ip = prompt(`[${name}] 비밀번호를 입력해주세요. 🔑`);
+        if (ip===null) return;
+        if (ip.trim()!==user.pw) { alert('비밀번호가 틀렸어요. ❌'); return; }
+    }
+
+    currentProfile = name;
+    renderGrades(user.age);
+    await updateStats();
+    await recordStreak();
+    await checkSession();
+}
+
+async function changePassword() {
+    const user = await dbGet('users/'+currentProfile);
+    const old  = prompt('현재 비밀번호를 입력해주세요. 🔑');
+    if (old===null) return;
+    if (old.trim()!==user.pw) { alert('현재 비밀번호가 일치하지 않습니다. ❌'); return; }
+    const np = prompt('새 비밀번호를 입력해주세요. 🔐');
+    if (!np?.trim()) { alert('유효한 비밀번호를 입력해주세요.'); return; }
+    if (!confirm('비밀번호를 변경하시겠습니까?')) return;
+    await dbSet('users/'+currentProfile+'/pw', np.trim());
+    alert('비밀번호가 변경되었어요! ✅');
+    pushNotif(`[계정 알림] ${currentProfile} 님이 비밀번호를 변경했습니다.`);
+}
+
+function logout() {
+    if (!confirmLeave('logout')) return;
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    currentProfile = null; viewHistory = [];
+    showView('login-view',{push:false,resetHistory:true});
+}
+
+async function giveBonusPoint() {
+    const student = document.getElementById('bonus-student-select').value;
+    const pts = parseInt(document.getElementById('bonus-point-input').value);
+    if (isNaN(pts)||pts<=0) { alert('올바른 포인트 수량을 입력해주세요.'); return; }
+    const user = await dbGet('users/'+student);
+    if (!user) { alert('사용자 정보 없음. 먼저 1회 로그인 필요.'); return; }
+    if (!confirm(`${student} 님에게 ${pts}P를 지급하시겠습니까?`)) return;
+    await dbSet('users/'+student+'/points', (user.points||0)+pts);
+    alert(`${student} 님에게 ${pts}P 지급 완료! 🎉`);
+    document.getElementById('bonus-point-input').value = '';
+    pushNotif(`[보너스] 관리자가 ${student} 님에게 ${pts}P를 선물했습니다! 🎁`);
+}
+
+async function buyItem(name, cost) {
+    const pts = await dbGet('users/'+currentProfile+'/points') || 0;
+    if (pts<cost) { alert(`포인트 부족! (현재: ${pts}P, 필요: ${cost}P)`); return; }
+    if (!confirm(`'${name}'을(를) ${cost}P에 구매하시겠습니까?\n구매 후 관리자 승인 대기 상태가 됩니다.`)) return;
+    await dbSet('users/'+currentProfile+'/points', pts-cost);
+    await updateStats();
+    let purchases = await dbGet('purchases') || [];
+    purchases.push({id:Date.now(), profile:currentProfile, itemName:name, cost, date:getKSTTime(), status:'pending'});
+    await dbSet('purchases', purchases);
+    alert('구매 완료! 관리자 승인을 기다려주세요. ✅');
+    pushNotif(`[상점] ${currentProfile} 님이 '${name}' 구매 요청! 🛍️`);
+}
+
+// ════════════════════════════════════════════
+//  SESSION
+// ════════════════════════════════════════════
+async function checkSession() {
+    const saved = await dbGet('sessions/'+currentProfile);
+    if (saved?.sessionState?.questions?.length && saved.sessionState.currentIndex < saved.sessionState.questions.length) {
+        document.getElementById('resume-modal').style.display='flex';
+        showView('child-dashboard-view',{push:false,resetHistory:true});
+    } else {
+        showView('child-dashboard-view',{push:false,resetHistory:true});
+    }
+}
+
+async function confirmResume() {
+    const saved = await dbGet('sessions/'+currentProfile);
+    config = saved.config; sessionState = saved.sessionState;
+    if (!sessionState.wrongHistory) sessionState.wrongHistory = [];
+    if (!sessionState.totalCount)   sessionState.totalCount = (config.subject==='영단어'?10:20);
+    document.getElementById('resume-modal').style.display='none';
+    const user = await dbGet('users/'+currentProfile);
+    renderGrades(user.age); updateSetupUI();
+    if (sessionState.mode==='learning') { showView('learning-view',{push:false,resetHistory:true}); renderLearningWord(); }
+    else { showView('quiz-view',{push:false,resetHistory:true}); if (sessionState.currentIndex>=sessionState.questions.length) finishCycle(); else renderQuestion(); }
+}
+
+async function cancelResume() {
+    if (!confirm('처음부터 시작하시겠습니까? 저장된 이어하기 정보가 삭제됩니다.')) return;
+    await dbSet('sessions/'+currentProfile, null);
+    document.getElementById('resume-modal').style.display='none';
+    showView('child-dashboard-view',{push:false,resetHistory:true});
+}
+
+// ════════════════════════════════════════════
+//  START QUIZ
+// ════════════════════════════════════════════
+async function startNewQuiz() {
+    if (!confirm(`[학습 시작 확인]\n${formatGrade(config.grade)} ${config.subject} (${config.difficulty}) 학습을 시작할까요?\n\n정답 1개당 5P 적립 (완주 시 지급)\n중도 포기 시 포인트 미지급`)) return;
+
+    showLoading(true,
+        `🤖 AI 선생님이 <b>${formatGrade(config.grade)} ${config.subject}</b> 문제를 출제하고 있어요!`,
+        config.subject==='영단어' ? '영단어 10개 생성 중...' : '20문제 생성 중 (약 10~20초)'
+    );
+
+    const prompt = buildPrompt(config);
+
+    try {
+        const expected = config.subject==='영단어' ? 10 : 20;
+        const mode     = config.subject==='영단어' ? 'vocab' : 'quiz';
+        const parsed   = await fetchArray(prompt, expected, mode);
+
+        if (config.subject==='영단어') {
+            sessionState = { mode:'learning', learningWords:parsed, questions:[], currentIndex:0, wrongQuestions:[], wrongHistory:[], initialScore:0, isRetryMode:false, totalCount:10, reportSaved:false, reportSavedRetry:false };
+            showLoading(false);
+            showView('learning-view',{push:true});
+            renderLearningWord();
+        } else {
+            const polished = await postProcess(parsed, prompt);
+            sessionState   = { mode:'quiz', questions:polished, currentIndex:0, wrongQuestions:[], wrongHistory:[], initialScore:0, isRetryMode:false, totalCount:20, reportSaved:false, reportSavedRetry:false };
+            showLoading(false);
+            showView('quiz-view',{push:true});
+            renderQuestion();
+        }
+
+        pushNotif(`[학습 시작] ${currentProfile} 님 → ${formatGrade(config.grade)} ${config.subject} (${config.difficulty}) 시작 🚀`);
+    } catch(e) {
+        console.error(e);
+        showLoading(false);
+        alert('문제 생성에 실패했습니다. 다시 시도해주세요. 😅');
+    }
+}
+
+// ════════════════════════════════════════════
+//  LEARNING (영단어)
+// ════════════════════════════════════════════
+function renderLearningWord() {
+    saveSession();
+    const w = sessionState.learningWords[sessionState.currentIndex];
+    const pct = Math.round((sessionState.currentIndex/10)*100);
+    document.getElementById('learning-progress-text').innerText = `${sessionState.currentIndex+1} / 10`;
+    document.getElementById('learning-progress-pct').innerText  = `${pct}%`;
+    document.getElementById('learning-progress-bar').style.width = pct+'%';
+    document.getElementById('learning-word').innerText    = w.word;
+    document.getElementById('learning-meaning').innerText = `(${w.meaning})`;
+    document.getElementById('learning-tts-btn').onclick   = ()=>playTTS(w.tts||w.word,'en-US');
+    const nb = document.getElementById('learning-next-btn');
+    nb.innerText = sessionState.currentIndex===9 ? '✏️ 퀴즈 시작! 🚀' : '다음 단어 ➡️';
+}
+
+function nextLearningWord() {
+    if (sessionState.currentIndex < 9) { sessionState.currentIndex++; renderLearningWord(); }
+    else { startVocabQuiz(); }
+}
+
+function startVocabQuiz() {
+    sessionState.questions = sessionState.learningWords.map(w=>({
+        type:'subjective', q:w.meaning, a:w.word,
+        desc:`'${w.meaning}'의 올바른 영단어는 '${w.word}'입니다.`
+    }));
+    sessionState.mode='quiz'; sessionState.currentIndex=0;
+    showView('quiz-view',{push:true}); renderQuestion();
+}
+
+// ════════════════════════════════════════════
+//  QUIZ RENDER
+// ════════════════════════════════════════════
+
+// 과목별 배지 색상
+function getSubjectBadgeClass(subject) {
+    return {국어:'badge-blue', 영어:'badge-green', 수학:'badge-orange', 영단어:'badge-purple'}[subject]||'badge-gray';
+}
+
+function renderQuestion() {
+    const q = sessionState.questions[sessionState.currentIndex];
+    const n = sessionState.currentIndex+1;
+    const total = sessionState.questions.length;
+
+    // 상단 배지
+    document.getElementById('current-status').className = `quiz-badge ${getSubjectBadgeClass(config.subject)}`;
+    document.getElementById('current-status').innerText = `${formatGrade(config.grade)} ${config.subject} · ${config.difficulty}`;
+
+    document.getElementById('progress-text').innerText = sessionState.isRetryMode
+        ? `오답 ${n}/${total}`
+        : `${n}/${total}`;
+
+    // 진행바
+    document.getElementById('quiz-progress-bar').style.width = `${((n-1)/total)*100}%`;
+
+    // 문제 번호 뱃지
+    document.getElementById('question-num-badge').innerText = n;
+    const typeBadge = document.getElementById('question-type-badge');
+    if (q.type==='subjective') {
+        typeBadge.className = 'quiz-badge badge-purple'; typeBadge.innerText = '✍️ 주관식';
+    } else {
+        typeBadge.className = 'quiz-badge badge-blue'; typeBadge.innerText = '① 객관식';
+    }
+
+    renderSafe(document.getElementById('question-text'), q.q);
+    document.getElementById('feedback-box').innerHTML = '';
+    document.getElementById('feedback-box').className = '';
+
+    // TTS
+    const lang = (config.subject==='영어'||config.subject==='영단어') ? 'en-US' : 'ko-KR';
+    const ttsQ = (config.subject==='영어') ? (q.tts_q||q.q) : q.q;
+    const ttsBtn = document.getElementById('tts-btn');
+    ttsBtn.style.display = 'flex'; ttsBtn.onclick = ()=>playTTS(ttsQ, lang);
+
+    const opts   = document.getElementById('options-container');
+    const ainput = document.getElementById('answer-input');
+    const subBtn = document.getElementById('submit-btn');
+
+    const NUMS = ['①','②','③','④'];
+
+    if (q.type==='objective') {
+        ainput.style.display='none'; subBtn.style.display='none';
+        opts.style.display='flex'; opts.innerHTML='';
+
+        const shuffled = [...q.options].sort(()=>Math.random()-0.5);
+
+        shuffled.forEach((opt, i) => {
+            const row = document.createElement('div');
+            row.className = 'option-row';
+
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="option-num">${NUMS[i]}</span><span class="option-text">${sanitizeLimitedHtml(opt)}</span>`;
+            btn.onclick = (e) => handleObjective(opt, btn, e);
+            row.appendChild(btn);
+
+            const tb = document.createElement('button');
+            tb.className = 'tts-opt-btn'; tb.innerText = '🔊';
+            tb.onclick = (e) => { e.stopPropagation(); playTTS(opt, lang); };
+            row.appendChild(tb);
+
+            opts.appendChild(row);
+        });
+    } else {
+        opts.style.display='none';
+        ainput.style.display='block'; ainput.value='';
+        subBtn.style.display='flex'; subBtn.disabled=false;
+        setTimeout(()=>ainput.focus(), 100);
+    }
+
+    saveSession();
+}
+
+// ════════════════════════════════════════════
+//  ANSWER HANDLING
+// ════════════════════════════════════════════
+async function handleObjective(selected, btnEl, e) {
+    document.querySelectorAll('.option-btn').forEach(b=>b.disabled=true);
+    const q = sessionState.questions[sessionState.currentIndex];
+    const correct = isSame(selected, q.a);
+    const fb = document.getElementById('feedback-box');
+
+    if (correct) {
+        btnEl.classList.add('correct-ans');
+        fb.innerHTML = '✅ 정답입니다!'; fb.className = 'fb-correct';
+        showFloatingPoint(e, '+5P');
+        if (!sessionState.isRetryMode) sessionState.initialScore += 5;
+    } else {
+        btnEl.classList.add('wrong-ans');
+        // 정답 버튼 하이라이트
+        document.querySelectorAll('.option-btn').forEach(b => {
+            if (isSame(b.querySelector('.option-text')?.innerText||'', q.a)) b.classList.add('correct-ans');
+        });
+        fb.innerHTML = `❌ 오답! 정답: <b>${stripHtml(q.a)}</b>`; fb.className = 'fb-wrong';
+        sessionState.wrongQuestions.push({...q, userAns:selected});
+        if (!sessionState.isRetryMode) sessionState.wrongHistory.push({q:q.q,a:q.a,userAns:selected,desc:q.desc});
+    }
+
+    sessionState.currentIndex++; saveSession();
+    setTimeout(()=>{ if (sessionState.currentIndex<sessionState.questions.length) renderQuestion(); else finishCycle(); }, 1400);
+}
+
+async function processSubjectiveAnswer(e) {
+    const inp = document.getElementById('answer-input');
+    const ans = inp.value.trim();
+    if (!ans) { alert('정답을 먼저 입력해주세요! ✍️'); inp.focus(); return; }
+    document.getElementById('submit-btn').disabled = true;
+    const q = sessionState.questions[sessionState.currentIndex];
+    const correct = isSame(ans, q.a);
+    const fb = document.getElementById('feedback-box');
+
+    if (correct) {
+        fb.innerHTML='✅ 정답입니다!'; fb.className='fb-correct';
+        showFloatingPoint(e||{clientX:window.innerWidth/2,clientY:window.innerHeight/2}, '+5P');
+        if (!sessionState.isRetryMode) sessionState.initialScore += 5;
+    } else {
+        fb.innerHTML=`❌ 오답! 정답: <b>${stripHtml(q.a)}</b>`; fb.className='fb-wrong';
+        sessionState.wrongQuestions.push({...q, userAns:ans});
+        if (!sessionState.isRetryMode) sessionState.wrongHistory.push({q:q.q,a:q.a,userAns:ans,desc:q.desc});
+    }
+
+    sessionState.currentIndex++; saveSession();
+    setTimeout(()=>{ if (sessionState.currentIndex<sessionState.questions.length) renderQuestion(); else finishCycle(); }, 1400);
+}
+
+document.getElementById('answer-input').addEventListener('keypress', e=>{ if (e.key==='Enter') processSubjectiveAnswer(e); });
+
+// ════════════════════════════════════════════
+//  RESULT
+// ════════════════════════════════════════════
+async function finishCycle() {
+    showView('result-view',{push:true});
+    const score = sessionState.initialScore;
+    const max   = sessionState.totalCount * 5;
+
+    if (score===max && !sessionState.isRetryMode) triggerConfetti();
+
+    const titleEl  = document.getElementById('result-title');
+    const scoreEl  = document.getElementById('result-score');
+    const msgEl    = document.getElementById('result-message');
+    const actionBtn= document.getElementById('result-action-btn');
+    const earnedEl = document.getElementById('earned-points');
+    const ringEl   = document.getElementById('result-ring');
+
+    earnedEl.style.display='none';
+
+    // 점수 링 색상
+    const ratio = score/max;
+    const ringColor = ratio===1 ? '#059669' : ratio>=0.8 ? '#2563EB' : ratio>=0.6 ? '#D97706' : '#DC2626';
+    ringEl.style.background = `conic-gradient(${ringColor} 0%, #e5e7eb ${ratio*100}%, #e5e7eb 100%)`;
+
+    if (!sessionState.isRetryMode) {
+        scoreEl.parentElement.style.display='flex';
+        scoreEl.innerText = score;
+        scoreEl.parentElement.querySelector('.result-score-label').innerText = `/ ${max}점`;
+
+        const bonus = score===max ? 20 : score>=(max*0.9) ? 10 : 0;
+        const total = score + bonus;
+
+        if (!sessionState.reportSaved) {
+            earnedEl.innerHTML = bonus>0
+                ? `<div class="points-earned-num">+${total}P 획득! 🎉</div><div class="points-earned-label">기본 ${score}P + 우수 보너스 ${bonus}P</div>`
+                : `<div class="points-earned-num">+${total}P 획득! 🎉</div><div class="points-earned-label">${sessionState.totalCount}문제 완주 보상</div>`;
+            earnedEl.style.display='block';
+            await addPoints(total);
+            await saveReport();
+            pushNotif(`[점수] ${currentProfile} 님 완주! ${score}점 → ${total}P 획득 🌟`);
+            sessionState.reportSaved=true; saveSession();
+        } else { earnedEl.style.display='block'; }
+
+        if (sessionState.wrongQuestions.length>0) {
+            titleEl.innerText='1차 학습 완료 😅';
+            msgEl.innerText=`${sessionState.wrongQuestions.length}개 오답이 있어요.\n오답 개념을 확인하고 다시 도전해볼까요? 💪`;
+            actionBtn.innerText='📝 오답 확인하기';
+        } else {
+            titleEl.innerText='완벽해요! 💯';
+            msgEl.innerText='모든 문제를 맞혔어요! 정말 대단해요! 🌟';
+            actionBtn.innerText='🏠 홈으로 돌아가기';
+        }
+    } else {
+        ringEl.style.display='none';
+        if (!sessionState.reportSavedRetry) {
+            pushNotif(`[학습] ${currentProfile} 님 오답 수정 완료! 👏`);
+            sessionState.reportSavedRetry=true; saveSession();
+        }
+        if (sessionState.wrongQuestions.length>0) {
+            titleEl.innerText='다시 풀기 완료 😅';
+            msgEl.innerText=`아직 ${sessionState.wrongQuestions.length}개가 틀렸어요.\n포기하지 말고 다시 도전! 🏃`;
+            actionBtn.innerText='📝 오답 다시 확인';
+        } else {
+            titleEl.innerText='최종 완료! 🎉';
+            msgEl.innerText='어려운 문제도 모두 해결했어요. 최고예요! 👍';
+            actionBtn.innerText='🏠 홈으로 돌아가기';
+        }
+    }
+}
+
+async function handleResultAction() {
+    if (sessionState.wrongQuestions.length>0) { showView('wrong-review-view',{push:true}); renderWrongReview(); }
+    else { await dbSet('sessions/'+currentProfile, null); showView('child-dashboard-view',{push:false,resetHistory:true}); }
+}
+
+function renderWrongReview() {
+    document.getElementById('wrong-review-container').innerHTML = sessionState.wrongQuestions.map((w,i)=>`
+        <div class="wrong-item">
+            <div class="wrong-q">${i+1}. ${sanitizeLimitedHtml(w.q)}</div>
+            <div class="wrong-ans">내 답: ${sanitizeLimitedHtml(stripHtml(w.userAns||''))}</div>
+            <div class="right-ans">✅ 정답: ${sanitizeLimitedHtml(w.a)}</div>
+            <div class="wrong-desc"><b>💡 해설:</b> ${sanitizeLimitedHtml(w.desc||'해설이 제공되지 않았습니다.')}</div>
+        </div>
+    `).join('');
+}
+
+function startRetryQuiz() {
+    if (!confirm('오답 다시 풀기를 시작하시겠습니까?')) return;
+    sessionState.questions=[...sessionState.wrongQuestions];
+    sessionState.wrongQuestions=[]; sessionState.currentIndex=0;
+    sessionState.isRetryMode=true; sessionState.reportSavedRetry=false;
+    saveSession(); showView('quiz-view',{push:true}); renderQuestion();
+}
+
+// ════════════════════════════════════════════
+//  REPORT SAVE
+// ════════════════════════════════════════════
+async function saveReport() {
+    let reports = await dbGet('reports') || [];
+    reports.unshift({ id:Date.now(), profile:currentProfile, date:getKSTTime(), grade:config.grade, subject:config.subject, difficulty:config.difficulty, score:sessionState.initialScore, totalCount:sessionState.totalCount||20, wrongDetails:sessionState.wrongHistory });
+    if (reports.length>100) reports.pop();
+    await dbSet('reports', reports);
+}
+
+// ════════════════════════════════════════════
+//  ADMIN — REPORT
+// ════════════════════════════════════════════
+function switchAdminTab(tab) {
+    ['tab-report-btn','tab-reward-btn'].forEach(id=>document.getElementById(id).classList.remove('active'));
+    document.getElementById('admin-report-section').style.display='none';
+    document.getElementById('admin-reward-section').style.display='none';
+    if (tab==='report') { document.getElementById('tab-report-btn').classList.add('active'); document.getElementById('admin-report-section').style.display='block'; filterReport('전체'); }
+    else { document.getElementById('tab-reward-btn').classList.add('active'); document.getElementById('admin-reward-section').style.display='block'; renderRewardList(); }
+}
+
+function filterReport(profile) {
+    currentReportFilter=profile;
+    ['filter-all','filter-rw','filter-sa','filter-jj'].forEach(id=>document.getElementById(id).classList.remove('active'));
+    const map={전체:'filter-all',김로운:'filter-rw',김서아:'filter-sa',정지영:'filter-jj'};
+    if (map[profile]) document.getElementById(map[profile]).classList.add('active');
+    renderReportList();
+}
+
+function renderReportList() {
+    const tbody = document.getElementById('report-tbody');
+    const data  = currentReportFilter==='전체' ? reportDataCache : reportDataCache.filter(r=>r.profile===currentReportFilter);
+    if (!data.length) { tbody.innerHTML='<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--gray-400); font-weight:600;">학습 기록이 없습니다.</td></tr>'; return; }
+    tbody.innerHTML = data.map(r=>`
+        <tr>
+            <td style="font-weight:700;">${escapeHtml(r.profile)}</td>
+            <td style="font-size:11px; color:var(--gray-400); line-height:1.5;">${escapeHtml(r.date)}<br>${formatGrade(r.grade)} ${escapeHtml(r.difficulty||'중')}급</td>
+            <td>${escapeHtml(r.subject)}<br><b style="color:${r.score===(r.totalCount*5)?'var(--green)':'var(--red)'};">${r.score}점</b></td>
+            <td><button class="btn-small" onclick="openDetail(${r.id})">상세 🔍</button></td>
+        </tr>
+    `).join('');
+}
+
+function openDetail(id) {
+    const r = reportDataCache.find(r=>r.id===id); if (!r) return;
+    let html = `<div style="margin-bottom:16px;"><button class="btn btn-green btn-sm" onclick="analyzeSingle(${r.id})">🤖 AI 심층 분석</button></div>`;
+    if (!r.wrongDetails?.length) {
+        html += `<div style="text-align:center; color:var(--green); font-weight:700; font-size:16px;">🎉 오답 없음! 완벽한 점수!</div>`;
+    } else {
+        html += r.wrongDetails.map((w,i)=>`
             <div class="wrong-item">
-                <div class="wrong-q">${i + 1}. ${sanitizeLimitedHtml(w.q)}</div>
-                <div style="margin-bottom: 5px;"><span style="color:var(--danger); font-weight:bold;">나의 선택: ${sanitizeLimitedHtml(stripHtmlTags(w.userAns || ''))}</span></div>
-                <div style="margin-bottom: 10px;"><span style="color:var(--success); font-weight:bold;">올바른 정답: ${sanitizeLimitedHtml(w.a)}</span></div>
-                <div style="background: #ffffff; padding: 12px; border-radius: 8px; border: 1px dashed #ffcccc; font-size: 14px; color: var(--text-main); line-height: 1.5;">
-                    <b>💡 선생님의 개념 풀이:</b><br>${sanitizeLimitedHtml(w.desc || '설명이 제공되지 않았습니다.')}
-                </div>
+                <div class="wrong-q">${i+1}. ${sanitizeLimitedHtml(w.q)}</div>
+                <div class="wrong-ans">사용자 답: ${sanitizeLimitedHtml(stripHtml(w.userAns||''))}</div>
+                <div class="right-ans">✅ 정답: ${sanitizeLimitedHtml(w.a)}</div>
+                <div class="wrong-desc">💡 ${sanitizeLimitedHtml(w.desc||'해설 없음')}</div>
             </div>
         `).join('');
     }
+    document.getElementById('modal-title').innerText='오답 상세 📝';
+    document.getElementById('modal-body').innerHTML=html;
+    document.getElementById('detail-modal').style.display='flex';
+}
 
-    function startRetryQuiz() {
-        const ok = confirmAction(
-            "[오답 다시 풀기 확인]\n\n오답 문제 다시 풀기를 시작하시겠습니까?"
-        );
-        if (!ok) return;
+async function analyzeSingle(id) {
+    const r = reportDataCache.find(r=>r.id===id); if (!r) return;
+    showLoading(true,'🤖 AI가 이 회차를 심층 분석 중...','잠시만 기다려 주세요');
+    const summary = { profile:r.profile, grade:r.grade, subject:r.subject, difficulty:r.difficulty||'중', score:r.score, total:r.totalCount||20, wrongs:(r.wrongDetails||[]).map(w=>({q:stripHtml(w.q),ans:stripHtml(w.userAns||''),correct:stripHtml(w.a),desc:stripHtml(w.desc)})) };
+    const prompt = `교육 분석가로서 ${r.profile} 학생의 학습 데이터를 분석하십시오.
+데이터: ${JSON.stringify(summary)}
+1. 점수·오답 기반 성취도 평가
+2. 오답 해설 종합 분석 → 부족 개념 도출
+3. 칭찬·개선점·부모님 지도팁
+500자 이내, 가독성 있게 작성.`;
+    try {
+        const data = await fetchGemini(prompt,0,false);
+        showLoading(false);
+        document.getElementById('modal-title').innerText='📊 AI 심층 분석';
+        document.getElementById('modal-body').innerHTML=sanitizeLimitedHtml(data.candidates[0].content.parts[0].text);
+    } catch(e) { showLoading(false); alert('분석 실패 😅'); }
+}
 
-        sessionState.questions = [...sessionState.wrongQuestions];
-        sessionState.wrongQuestions = [];
-        sessionState.currentIndex = 0;
-        sessionState.isRetryMode = true;
-        sessionState.reportSavedRetry = false;
-        saveSession();
-        showView('quiz-view', { push: true });
-        document.getElementById('result-score').style.display = 'block';
-        renderCurrentQuestion();
-    }
+async function analyzeComprehensiveWeakness() {
+    if (currentReportFilter==='전체') { alert('먼저 특정 학생 탭을 선택하십시오.'); return; }
+    const reports = reportDataCache.filter(r=>r.profile===currentReportFilter).sort((a,b)=>a.id-b.id);
+    if (reports.length<2) { alert(`종합 분석은 최소 2회 이상 기록이 필요합니다. (현재 ${reports.length}회)`); return; }
+    showLoading(true,'📈 AI 종합 성장 리포트 작성 중...','처음~최근 성적을 비교 분석합니다');
+    const oldest=reports[0], newest=reports[reports.length-1];
+    const recentAvg = reports.slice(-3).reduce((s,r)=>s+r.score,0)/Math.min(3,reports.length);
+    const cmp = { profile:currentReportFilter, sessions:reports.length, initial:{date:oldest.date,subject:oldest.subject,score:oldest.score,wrong_concepts:(oldest.wrongDetails||[]).slice(0,3).map(w=>stripHtml(w.q))}, current:{date:newest.date,subject:newest.subject,score:newest.score,recent_avg:recentAvg,wrong_concepts:(newest.wrongDetails||[]).slice(0,3).map(w=>stripHtml(w.q))} };
+    const prompt = `대한민국 교육 분석 전문가로서 ${currentReportFilter} 학생의 누적 성장 데이터를 분석하십시오.
+데이터: ${JSON.stringify(cmp)}
+1. 초기 대비 현재 발전 사항 구체적 칭찬
+2. 정체·취약 부분 지적
+3. 현재 가장 시급한 취약 개념과 가정 내 지도 방향
+600자 이내, 가독성 있게 작성.`;
+    try {
+        const data = await fetchGemini(prompt,0,false);
+        showLoading(false);
+        document.getElementById('modal-title').innerText='📈 AI 종합 성장 리포트';
+        document.getElementById('modal-body').innerHTML=sanitizeLimitedHtml(data.candidates[0].content.parts[0].text);
+        document.getElementById('detail-modal').style.display='flex';
+    } catch(e) { showLoading(false); alert('서버 통신 오류 ❌'); }
+}
 
-    async function saveReport() {
-        let reports = await dbGet('reports') || [];
-        reports.unshift({
-            id: new Date().getTime(),
-            profile: currentProfile,
-            date: getKSTTime(),
-            grade: config.grade,
-            subject: config.subject,
-            difficulty: config.difficulty,
-            score: sessionState.initialScore,
-            totalCount: sessionState.totalCount || 20,
-            wrongDetails: sessionState.wrongHistory
+function renderRewardList() {
+    const tbody=document.getElementById('reward-tbody');
+    if (!purchaseDataCache.length) { tbody.innerHTML='<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--gray-400); font-weight:600;">구매 내역이 없습니다.</td></tr>'; return; }
+    tbody.innerHTML=purchaseDataCache.map(p=>`
+        <tr>
+            <td style="font-weight:700;">${escapeHtml(p.profile)}</td>
+            <td><div style="font-weight:700;">${escapeHtml(p.itemName)}</div><div style="font-size:11px;color:var(--gray-400);">${escapeHtml(p.date)}</div></td>
+            <td style="color:var(--blue);font-weight:700;">${p.cost}P</td>
+            <td>${p.status==='pending' ? `<button class="btn-small" onclick="markUsed(${p.id})">승인 ✅</button>` : '<button class="btn-small used" disabled>완료</button>'}</td>
+        </tr>
+    `).join('');
+}
+
+async function markUsed(id) {
+    if (!confirm('실제로 보상을 제공하셨습니까? 확인 시 사용 완료 처리됩니다.')) return;
+    let purchases=await dbGet('purchases')||[];
+    const idx=purchases.findIndex(p=>p.id===id);
+    if (idx!==-1) { purchases[idx].status='used'; await dbSet('purchases',purchases); }
+}
+
+// ════════════════════════════════════════════
+//  PUSH NOTIFICATIONS
+// ════════════════════════════════════════════
+async function requestPushPermission() {
+    document.getElementById('permission-modal').style.display='none';
+    if (!("Notification" in window)) { alert('알림 미지원 브라우저입니다.'); return; }
+    const p = await Notification.requestPermission();
+    if (p==="granted") { alert('알림 권한 허용 완료! 🎉'); setupAdminPush(); }
+    else alert('알림이 차단되었습니다. 기기 설정에서 허용해주세요.');
+}
+function closePermissionModal() { document.getElementById('permission-modal').style.display='none'; }
+
+// ════════════════════════════════════════════
+//  WINDOW LOAD
+// ════════════════════════════════════════════
+window.onload = async () => {
+    showView('login-view',{push:false,resetHistory:true});
+    renderShopItems();
+    if ('speechSynthesis' in window) { loadTTSVoices(); window.speechSynthesis.onvoiceschanged=loadTTSVoices; }
+
+    if (db) {
+        db.ref('reports').on('value', snap=>{
+            reportDataCache=Object.values(snap.val()||[]).sort((a,b)=>b.id-a.id);
+            if (currentProfile==='admin') renderReportList();
         });
-        if (reports.length > 100) reports.pop();
-        await dbSet('reports', reports);
-    }
-
-    function switchAdminTab(tabName) {
-        document.getElementById('tab-report-btn').classList.remove('active');
-        document.getElementById('tab-reward-btn').classList.remove('active');
-        document.getElementById('admin-report-section').style.display = 'none';
-        document.getElementById('admin-reward-section').style.display = 'none';
-
-        if (tabName === 'report') {
-            document.getElementById('tab-report-btn').classList.add('active');
-            document.getElementById('admin-report-section').style.display = 'block';
-            filterReport('전체');
-        } else {
-            document.getElementById('tab-reward-btn').classList.add('active');
-            document.getElementById('admin-reward-section').style.display = 'block';
-            renderRewardList();
-        }
-    }
-
-    function filterReport(profile) {
-        currentReportFilter = profile;
-        ['filter-all', 'filter-rw', 'filter-sa', 'filter-jj'].forEach(id => document.getElementById(id).classList.remove('active'));
-        if (profile === '전체') document.getElementById('filter-all').classList.add('active');
-        if (profile === '김로운') document.getElementById('filter-rw').classList.add('active');
-        if (profile === '김서아') document.getElementById('filter-sa').classList.add('active');
-        if (profile === '정지영') document.getElementById('filter-jj').classList.add('active');
-        renderReportsList();
-    }
-
-    function renderReportsList() {
-        const tbody = document.getElementById('report-tbody');
-        let filtered = currentReportFilter !== '전체'
-            ? reportDataCache.filter(r => r.profile === currentReportFilter)
-            : reportDataCache;
-
-        if (!filtered || filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="empty-report">학습 기록이 없습니다. 📭</td></tr>';
-            return;
-        }
-
-        let html = '';
-        filtered.forEach(r => {
-            const diffText = r.difficulty ? r.difficulty : '중';
-            html += `<tr>
-                <td style="font-weight:900; color:var(--text-main);">${escapeHtml(r.profile)}</td>
-                <td style="color:var(--text-muted); font-size:12px; line-height:1.4;">${escapeHtml(r.date)}<br>${formatGrade(r.grade)} ${escapeHtml(diffText)}급</td>
-                <td>${escapeHtml(r.subject)}<br><b style="color:${r.score === (r.totalCount * 5) ? 'var(--success)' : 'var(--danger)'};">${r.score}점</b></td>
-                <td><button class="btn-small" onclick="openDetailModal(${r.id})">상세보기 🔍</button></td>
-            </tr>`;
+        db.ref('purchases').on('value', snap=>{
+            purchaseDataCache=Object.values(snap.val()||[]).sort((a,b)=>b.id-a.id);
+            if (currentProfile==='admin') renderRewardList();
         });
-
-        tbody.innerHTML = html;
-    }
-
-    function openDetailModal(reportId) {
-        const report = reportDataCache.find(r => r.id === reportId);
-        if (!report) return;
-
-        let html = `<div style="text-align:center; margin-bottom:20px;">
-            <button class="btn-main btn-secondary" style="padding:12px; font-size:15px; background:linear-gradient(135deg, #1dd1a1, #10ac84); box-shadow:0 4px 0 #059669;" onclick="analyzeSingleReport(${report.id})">🤖 이 회차 AI 심층 분석하기</button>
-        </div>`;
-
-        if (!report.wrongDetails || report.wrongDetails.length === 0) {
-            html += `<div style="text-align:center; font-weight:bold; color:var(--success); font-size:18px; margin-top:20px;">틀린 문제가 없습니다! 완벽해요! 🎉💯</div>`;
-        } else {
-            report.wrongDetails.forEach((item, idx) => {
-                html += `<div class="wrong-item">
-                    <div class="wrong-q">${idx + 1}. ${sanitizeLimitedHtml(item.q)}</div>
-                    <div class="wrong-ans">사용자 답: ${sanitizeLimitedHtml(stripHtmlTags(item.userAns || ''))}</div>
-                    <div class="correct-ans">올바른 정답: ${sanitizeLimitedHtml(item.a)}</div>
-                    <div style="margin-top:10px; font-size:13px; color:#555; background:#fff; padding:10px; border-radius:8px; border:1px dashed #ccc; line-height:1.4;">💡 해설: ${sanitizeLimitedHtml(item.desc || '제공되지 않음')}</div>
-                </div>`;
-            });
-        }
-
-        document.getElementById('modal-title').innerText = "오답 노트 상세 📝";
-        document.getElementById('modal-body').innerHTML = html;
-        document.getElementById('detail-modal').style.display = 'flex';
-    }
-
-    async function analyzeSingleReport(reportId) {
-        const report = reportDataCache.find(r => r.id === reportId);
-        if (!report) return;
-
-        showLoading(true, "해당 회차의 학습 결과를<br>AI가 분석 중입니다... 🧐");
-
-        const summary = {
-            profile: report.profile,
-            grade: report.grade,
-            subject: report.subject,
-            difficulty: report.difficulty || '중',
-            score: report.score,
-            total: report.totalCount || 20,
-            wrongs: report.wrongDetails ? report.wrongDetails.map(w => ({
-                q: stripHtmlTags(w.q),
-                ans: stripHtmlTags(w.userAns || ''),
-                correct: stripHtmlTags(w.a),
-                desc: stripHtmlTags(w.desc)
-            })) : []
-        };
-
-        const prompt = `당신은 교육 분석가입니다. 학생 '${report.profile}'의 단일 회차(${summary.total}문제) 학습 데이터입니다: ${JSON.stringify(summary)}.
-1. 점수와 오답 개수를 기반으로 성취도를 평가하세요.
-2. 틀린 문제의 해설을 종합 분석해 부족 개념을 짚어주세요.
-3. 칭찬과 개선점, 부모님 지도 팁을 500자 이내로 작성하세요.`;
-
-        try {
-            const data = await fetchFromGemini(prompt, 0, false);
-            showLoading(false);
-            document.getElementById('modal-title').innerText = `📊 해당 회차 집중 AI 분석`;
-            document.getElementById('modal-body').innerHTML = sanitizeLimitedHtml(data.candidates[0].content.parts[0].text);
-        } catch (e) {
-            showLoading(false);
-            alert("분석 실패 😅");
-        }
-    }
-
-    async function analyzeComprehensiveWeakness() {
-        if (currentReportFilter === '전체') {
-            alert('사용자 탭(김로운, 김서아 또는 정지영)을 먼저 선택하십시오. 🙋');
-            return;
-        }
-
-        const studentReports = reportDataCache
-            .filter(r => r.profile === currentReportFilter)
-            .sort((a, b) => a.id - b.id);
-
-        if (studentReports.length < 2) {
-            alert(`종합 성장 분석을 위해 최소 2회 이상의 누적 학습 기록이 필요합니다. (현재 ${studentReports.length}회) 📚`);
-            return;
-        }
-
-        showLoading(true, `최초 성적과 최근 성적을 비교하여<br>종합 성장 리포트를 작성 중입니다. 📈`);
-
-        const oldestReport = studentReports[0];
-        const newestReport = studentReports[studentReports.length - 1];
-        const recentReports = studentReports.slice(-3);
-        const recentAverage = recentReports.reduce((sum, r) => sum + r.score, 0) / recentReports.length;
-
-        const comparisonData = {
-            profile: currentReportFilter,
-            total_sessions: studentReports.length,
-            initial_state: {
-                date: oldestReport.date,
-                subject: oldestReport.subject,
-                score: oldestReport.score,
-                wrong_concepts: oldestReport.wrongDetails ? oldestReport.wrongDetails.slice(0, 3).map(w => stripHtmlTags(w.q)) : []
-            },
-            current_state: {
-                date: newestReport.date,
-                subject: newestReport.subject,
-                score: newestReport.score,
-                recent_avg_score: recentAverage,
-                wrong_concepts: newestReport.wrongDetails ? newestReport.wrongDetails.slice(0, 3).map(w => stripHtmlTags(w.q)) : []
-            }
-        };
-
-        const prompt = `당신은 대한민국 교육 분석 전문가입니다. 학생 '${currentReportFilter}'의 전체 누적 학습 데이터를 비교 분석하십시오.
-비교 데이터: ${JSON.stringify(comparisonData)}
-
-1. 처음 성적과 최근 성적을 비교해 발전한 점을 구체적으로 칭찬하세요.
-2. 정체되거나 약한 부분을 지적하세요.
-3. 현재 가장 시급한 취약 개념과 가정 내 지도 방향을 제시하세요.
-4. 전체 내용을 600자 이내로 가독성 있게 작성하세요.`;
-
-        try {
-            const data = await fetchFromGemini(prompt, 0, false);
-            showLoading(false);
-            document.getElementById('modal-title').innerText = `📈 AI 종합 성장 리포트`;
-            document.getElementById('modal-body').innerHTML = sanitizeLimitedHtml(data.candidates[0].content.parts[0].text);
-            document.getElementById('detail-modal').style.display = 'flex';
-        } catch (e) {
-            showLoading(false);
-            alert("서버 통신 중 오류가 발생했습니다. ❌");
-        }
-    }
-
-    function renderRewardList() {
-        const tbody = document.getElementById('reward-tbody');
-
-        if (!purchaseDataCache || purchaseDataCache.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="empty-report">쿠폰 구매 내역이 없습니다. 🛒</td></tr>';
-            return;
-        }
-
-        let html = '';
-        purchaseDataCache.forEach(p => {
-            let actionBtn = p.status === 'pending'
-                ? `<button class="btn-small" style="background-color: var(--primary);" onclick="markRewardAsUsed(${p.id})">사용 승인 ✅</button>`
-                : `<button class="btn-small used" disabled>사용 완료 🎁</button>`;
-
-            html += `<tr>
-                <td style="font-weight:900; color:var(--text-main);">${escapeHtml(p.profile)}</td>
-                <td><div style="font-weight:800;">${escapeHtml(p.itemName)}</div><div style="font-size:11px; color:var(--text-muted);">${escapeHtml(p.date)}</div></td>
-                <td style="color:var(--secondary); font-weight:900;">${p.cost}P</td>
-                <td>${actionBtn}</td>
-            </tr>`;
+        db.ref('users').on('value', snap=>{
+            if (currentProfile==='admin') renderAdminPw(snap.val()||{});
         });
-
-        tbody.innerHTML = html;
     }
-
-    async function markRewardAsUsed(purchaseId) {
-        const ok = confirmAction(
-            "[사용 승인 확인]\n\n해당 쿠폰 보상을 실제로 제공하셨습니까?\n확인 시 '사용 완료' 처리됩니다."
-        );
-        if (!ok) return;
-
-        let purchases = await dbGet('purchases') || [];
-        let itemIndex = purchases.findIndex(p => p.id === purchaseId);
-        if (itemIndex !== -1) {
-            purchases[itemIndex].status = 'used';
-            await dbSet('purchases', purchases);
-        }
-    }
-
-    window.onload = async () => {
-        showView('login-view', { push: false, resetHistory: true });
-
-        if ('speechSynthesis' in window) {
-            loadTTSVoices();
-            window.speechSynthesis.onvoiceschanged = loadTTSVoices;
-        }
-
-        if (db) {
-            db.ref('reports').on('value', snap => {
-                reportDataCache = Object.values(snap.val() || []).sort((a, b) => b.id - a.id);
-                if (currentProfile === 'admin') renderReportsList();
-            });
-
-            db.ref('purchases').on('value', snap => {
-                purchaseDataCache = Object.values(snap.val() || []).sort((a, b) => b.id - a.id);
-                if (currentProfile === 'admin') renderRewardList();
-            });
-
-            db.ref('users').on('value', snap => {
-                if (currentProfile === 'admin') renderAdminPasswords(snap.val());
-            });
-        }
-    };
+};
 </script>
-
 </body>
 </html>
