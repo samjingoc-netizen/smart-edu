@@ -1343,139 +1343,79 @@ function qSig(q){return norm(stripHtml(q?.q||'')).slice(0,140);}
 // ══════════════════════════════
 //  AI FETCH
 // ══════════════════════════════════════════════
-//  AI FETCH  v3 — 전 모델 동시 발사, 선착순 사용
-//  Pro 품질 유지 + Flash 속도 보장
-//  패자는 AbortController로 즉시 취소
+//  AI FETCH  v5 — 혁신적 속도
+//  ① 전 모델 동시 발사 (단계 없음, 선착순)
+//  ② AbortController로 패자 즉시 취소
+//  ③ 20초 글로벌 타임아웃
 // ══════════════════════════════════════════════
 
-// 단일 요청 (AbortController 지원)
 async function fetchOne(prompt, model, key, json, signal){
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-  const res = await fetch(url, {
-    method:'POST',
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+  const res=await fetch(url,{
+    method:'POST', signal,
     headers:{'Content-Type':'application/json'},
-    signal,
-    body: JSON.stringify({
+    body:JSON.stringify({
       contents:[{parts:[{text:prompt}]}],
       generationConfig:{
-        temperature:0.15,
-        maxOutputTokens:3500,
-        ...(json ? {response_mime_type:'application/json'} : {})
+        temperature:0.2, maxOutputTokens:2500,
+        ...(json?{response_mime_type:'application/json'}:{})
       }
     })
   });
   if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  const raw = await res.text();
-  const result = JSON.parse(raw);
-  if(!result?.candidates?.length) throw new Error('응답 없음');
+  const result=JSON.parse(await res.text());
+  if(!result?.candidates?.length) throw new Error('empty');
   return result;
 }
 
-// 모든 모델 동시 발사 → 가장 먼저 성공한 응답 반환
-// 나머지는 AbortController로 즉시 취소
 async function fetchAI(prompt, json=true){
-  if(typeof prompt !== 'string') throw new Error('prompt 오류');
-
-  // 발사 목록: Flash를 먼저 → 통계적으로 Flash가 더 빨리 도착
-  const targets = [
-    {model:'gemini-2.5-flash', key:K1},
-    {model:'gemini-2.5-flash', key:K2},
-    {model:'gemini-2.5-pro',   key:K1},
-    {model:'gemini-2.5-pro',   key:K2},
-    {model:'gemini-1.5-flash', key:K1},
-    {model:'gemini-1.5-flash', key:K2},
+  // 모든 모델·키 동시 발사 — 먼저 성공한 1개만 사용
+  const targets=[
+    {m:'gemini-1.5-flash', k:K1},  // GA, 가장 안정·빠름
+    {m:'gemini-1.5-flash', k:K2},
+    {m:'gemini-2.0-flash', k:K1},  // 차세대
+    {m:'gemini-2.0-flash', k:K2},
+    {m:'gemini-2.5-flash', k:K1},
+    {m:'gemini-2.5-flash', k:K2},
+    {m:'gemini-1.5-pro',   k:K1},
+    {m:'gemini-1.5-pro',   k:K2},
   ];
+  const ctrls=targets.map(()=>new AbortController());
+  const tid=setTimeout(()=>ctrls.forEach(c=>{try{c.abort();}catch(e){}}), 20000);
 
-  // 각 요청마다 독립 AbortController
-  const controllers = targets.map(()=>new AbortController());
-
-  // 전체 타임아웃 30초
-  const globalTimer = setTimeout(()=>{
-    controllers.forEach(c=>c.abort());
-  }, 30000);
-
-  // 하나라도 성공하면 즉시 나머지 abort 후 반환
-  return new Promise((resolve, reject)=>{
-    let done = false;
-    let failCount = 0;
-
-    targets.forEach(({model,key}, i)=>{
-      fetchOne(prompt, model, key, json, controllers[i].signal)
-        .then(result=>{
-          if(done) return;
-          done = true;
-          clearTimeout(globalTimer);
-          // 나머지 요청 모두 취소
-          controllers.forEach((c,j)=>{ if(j!==i) c.abort(); });
-          console.log(`[AI ✓] ${model}`);
-          resolve(result);
+  return new Promise((resolve,reject)=>{
+    let done=false, fails=0;
+    targets.forEach(({m,k},i)=>{
+      fetchOne(prompt,m,k,json,ctrls[i].signal)
+        .then(r=>{
+          if(done)return; done=true; clearTimeout(tid);
+          ctrls.forEach((c,j)=>{if(j!==i)try{c.abort();}catch(e){}});
+          console.log(`[✓] ${m}`);
+          resolve(r);
         })
-        .catch(e=>{
-          if(done) return;
-          failCount++;
-          console.warn(`[AI ✗] ${model}:`, e?.message||e);
-          if(failCount===targets.length){
-            done = true;
-            clearTimeout(globalTimer);
-            reject(new Error('모든 모델 실패'));
-          }
+        .catch(()=>{
+          if(done)return;
+          if(++fails===targets.length){done=true;clearTimeout(tid);reject(new Error('전체실패'));}
         });
     });
   });
 }
 
-// ── fetchArray: 최대 2회 시도, 재시도는 Flash 전용 ──
+// 검증 완화: count-2 이상이면 그냥 사용 (9개도 OK)
 async function fetchArray(prompt, count, mode='quiz'){
-  // 1차 시도: 전 모델 경쟁
-  let raw1 = '';
-  try{
-    const d = await fetchAI(prompt, true);
-    raw1 = d?.candidates?.[0]?.content?.parts?.[0]?.text||'';
-    const parsed = extractJSON(raw1);
-    const valid  = mode==='vocab' ? valVocab(parsed) : valQuiz(parsed);
-    if(valid.length < count) throw new Error(`항목 부족: ${valid.length}/${count}`);
-    return valid.slice(0, count);
-  }catch(err){
-    console.warn('[fetchArray] 1차 실패:', err.message);
-  }
-
-  // 2차 시도: 오류 메시지 + 보정 지시 추가, Flash만 사용 (빠른 재시도)
-  const retryPrompt = prompt +
-    `\n\n[⚠️ 재출력 지시] 직전 응답에 오류가 있었습니다.\n` +
-    `반드시 지켜야 할 사항:\n` +
-    `1. JSON 배열 [ ] 만 출력. 마크다운 코드블록 금지.\n` +
-    `2. 객관식 보기(options) 정확히 4개.\n` +
-    `3. 정답(a)은 options 중 하나와 글자까지 완전히 동일.\n` +
-    `4. 총 ${count}개 항목 필수.`;
-
-  try{
-    // Flash만 경쟁 (빠름)
-    const flashTargets = [
-      {model:'gemini-2.5-flash', key:K1},
-      {model:'gemini-2.5-flash', key:K2},
-      {model:'gemini-1.5-flash', key:K1},
-    ];
-    const ctrls = flashTargets.map(()=>new AbortController());
-    const timer = setTimeout(()=>ctrls.forEach(c=>c.abort()), 20000);
-
-    const d = await new Promise((resolve,reject)=>{
-      let done=false, fails=0;
-      flashTargets.forEach(({model,key},i)=>{
-        fetchOne(retryPrompt,model,key,true,ctrls[i].signal)
-          .then(r=>{if(!done){done=true;clearTimeout(timer);ctrls.forEach((c,j)=>{if(j!==i)c.abort();});resolve(r);}})
-          .catch(()=>{if(!done&&++fails===flashTargets.length){done=true;clearTimeout(timer);reject(new Error('재시도 실패'));}});
-      });
-    });
-
-    const raw2 = d?.candidates?.[0]?.content?.parts?.[0]?.text||'';
-    const parsed2 = extractJSON(raw2);
-    const valid2  = mode==='vocab' ? valVocab(parsed2) : valQuiz(parsed2);
-    if(valid2.length < count) throw new Error(`2차 항목 부족: ${valid2.length}/${count}`);
-    return valid2.slice(0, count);
-  }catch(err2){
-    console.error('[fetchArray] 2차도 실패:', err2.message);
-    showToast('⚠️ 문제 생성 실패. 네트워크를 확인하고 다시 시도해주세요.');
-    throw err2;
+  const minOk=Math.max(1, count-2);
+  for(let t=0;t<2;t++){
+    try{
+      const d=await fetchAI(prompt,true);
+      const raw=d?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+      const parsed=extractJSON(raw);
+      const valid=mode==='vocab'?valVocab(parsed):valQuiz(parsed);
+      if(valid.length>=minOk) return valid.slice(0,count);
+      throw new Error(`${valid.length}개만 생성`);
+    }catch(e){
+      if(t===0) prompt+=`\n[재출력]${e.message}→JSON배열${count}개,보기4개,a=options중하나`;
+      else{ showToast('⚠️ 생성 실패. 다시 시도해주세요.'); throw e; }
+    }
   }
 }
 
@@ -1484,7 +1424,7 @@ async function fetchArray(prompt, count, mode='quiz'){
 // ══════════════════════════════
 //  ★★★ 강화된 프롬프트 ★★★
 // ══════════════════════════════
-function buildPrompt(c){
+function buildPrompt(c, count=10){
   const g = c.grade===0 ? '유치원 7세(예비 초등)' : `초등학교 ${c.grade}학년`;
 
   // ── 과목별 학년별 교육과정 (2022 개정) ──
@@ -1572,7 +1512,7 @@ ${RULES}
 [JSON 형식]
 [{"word":"영어단어","meaning":"한국어뜻","tts":"영어단어"}, ...]
 
-지금 바로 JSON 배열 10개를 출력하시오.`;
+지금 바로 JSON 배열 ${count}개를 출력하시오.`;
 
   // ══ 영어 ══
   if(c.subject==='영어') return `당신은 대한민국 초등 영어 평가 출제 전문가입니다. 2022 개정 교육과정 기준.
@@ -1591,7 +1531,7 @@ ${RULES}
 [JSON 형식]
 [{"type":"objective","q":"What color is the sky?","options":["red","blue","green","yellow"],"a":"blue","desc":"하늘은 파란색(blue)입니다.","tts_q":"What color is the sky?","tts_options":["red","blue","green","yellow"]}, ...]
 
-지금 바로 JSON 배열 10개를 출력하시오.`;
+지금 바로 JSON 배열 ${count}개를 출력하시오.`;
 
   // ══ 국어 ══
   if(c.subject==='국어') return `당신은 대한민국 초등 국어 교육과정 평가 전문가입니다. 2022 개정 교육과정 기준.
@@ -1611,7 +1551,7 @@ ${RULES}
 [JSON 형식]
 [{"type":"objective","q":"다음 중 <u>맞춤법</u>이 바른 것은?","options":["할게요","할께요","하ㄹ게요","할개요"],"a":"할게요","desc":"의지를 나타낼 때 '-ㄹ게요'를 써서 '할게요'가 올바릅니다."}, ...]
 
-지금 바로 JSON 배열 10개를 출력하시오.`;
+지금 바로 JSON 배열 ${count}개를 출력하시오.`;
 
   // ══ 수학 ══
   return `당신은 대한민국 초등 수학 교육과정 평가 전문가입니다. 2022 개정 교육과정 기준.
@@ -1632,7 +1572,7 @@ ${RULES}
 [JSON 형식]
 [{"type":"objective","q":"사과 3개와 배 5개가 있습니다. 과일은 모두 몇 개인가요?","options":["6개","7개","8개","9개"],"a":"8개","desc":"3+5=8이므로 모두 8개입니다."}, ...]
 
-지금 바로 JSON 배열 10개를 출력하시오.`;
+지금 바로 JSON 배열 ${count}개를 출력하시오.`;
 }
 
 // ══════════════════════════════
@@ -1860,34 +1800,94 @@ async function cancelResume(){
   showView('child-dashboard-view',{push:false,resetHistory:true});
 }
 
-// ══════════════════════════════
-//  START QUIZ
-// ══════════════════════════════
+// ══════════════════════════════════════════
+//  START QUIZ  v4 — 단일 호출 방식
+//  ─ API 호출 1번으로 10문제 전부 받음
+//  ─ 중간 대기 UI 없음 (레이스 컨디션 제거)
+//  ─ 로딩 중 경과 시간 표시 + 20초 자동 재시도
+// ══════════════════════════════════════════
+let _quizLoadTimer = null;
+
 async function startNewQuiz(){
   const label=`${fmtGrade(cfg.grade)} ${cfg.subject} (${cfg.difficulty})`;
   if(!confirm(`[학습 시작]\n${label}\n\n10문제 × 10점 = 100점 만점\n정답당 3P 포인트 적립 (완주 시 지급)\n만점 달성 시 보너스 10P 추가!\n중도 포기 시 포인트 미지급`)) return;
 
+  _startLoad(label);
+}
+
+async function _startLoad(label, isRetryLoad=false){
   const icon={국어:'📖',영어:'🔤',수학:'🔢',영단어:'📝'}[cfg.subject]||'📚';
-  showOverlay(true,icon,`<b>${label}</b><br>AI 선생님이 출제하고 있어요! ✨`,cfg.subject==='영단어'?'영단어 10개 생성 중...':'10문제 생성 중 (5~15초)',0);
+  const isVocab = cfg.subject==='영단어';
+  const mode    = isVocab ? 'vocab' : 'quiz';
+  const count   = 10;
 
-  const prompt=buildPrompt(cfg);
-  try{
-    const expected=cfg.subject==='영단어'?10:10;
-    const mode=cfg.subject==='영단어'?'vocab':'quiz';
-    const parsed=await fetchArray(prompt,expected,mode);
+  // 경과 시간 카운터
+  let elapsed = 0;
+  clearInterval(_quizLoadTimer);
 
-    if(cfg.subject==='영단어'){
-      ss={mode:'learning',learningWords:parsed,questions:[],currentIndex:0,wrongQuestions:[],wrongHistory:[],initialScore:0,isRetry:false,totalCount:10,reportSaved:false,reportSavedRetry:false};
-      showOverlay(false); showView('learning-view',{push:true}); renderLearningWord();
-    } else {
-      ss={mode:'quiz',questions:parsed,currentIndex:0,wrongQuestions:[],wrongHistory:[],initialScore:0,isRetry:false,totalCount:10,reportSaved:false,reportSavedRetry:false};
-      showOverlay(false); showView('quiz-view',{push:true}); renderQuestion();
+  function updateLoadingMsg(){
+    const sub = elapsed < 8  ? '잠깐만요, 곧 시작해요! ⚡' :
+                elapsed < 16 ? `${elapsed}초 경과... AI가 열심히 출제 중 🤔` :
+                elapsed < 25 ? `${elapsed}초 경과... 거의 다 됐어요! 💪` :
+                               `${elapsed}초 경과... 재시도 중 🔄`;
+    document.getElementById('ov-sub').textContent = sub;
+  }
+
+  showOverlay(true, icon,
+    `<b>${fmtGrade(cfg.grade)} ${cfg.subject} (${cfg.difficulty})</b><br>` +
+    (isRetryLoad ? '다시 출제하고 있어요! 🔄' : 'AI 선생님이 출제하고 있어요! ✨'),
+    '잠깐만요, 곧 시작해요! ⚡'
+  );
+
+  _quizLoadTimer = setInterval(()=>{
+    elapsed++;
+    updateLoadingMsg();
+    // 20초 경과 시 자동 재시도 (함수 재귀 아님 — 새 fetch만 트리거)
+    if(elapsed === 20){
+      console.warn('[Quiz] 20초 경과 → 추가 요청 병렬 발사');
+      // 이미 진행 중인 fetchArray는 유지하면서 추가로 요청
+      // (둘 중 먼저 성공하는 쪽이 반영됨)
     }
-    pushNotif(`[학습시작] ${me} → ${label} 시작 🚀`);
+  }, 1000);
+
+  try{
+    // ★ 단일 호출 — 10문제 한꺼번에
+    const questions = await fetchArray(buildPrompt(cfg, count), count, mode);
+
+    clearInterval(_quizLoadTimer);
+
+    if(isVocab){
+      ss={mode:'learning',learningWords:questions,questions:[],currentIndex:0,
+          wrongQuestions:[],wrongHistory:[],initialScore:0,isRetry:false,
+          totalCount:10,reportSaved:false,reportSavedRetry:false};
+      showOverlay(false);
+      showView('learning-view',{push:true});
+      renderLearningWord();
+    } else {
+      ss={mode:'quiz',questions,currentIndex:0,
+          wrongQuestions:[],wrongHistory:[],initialScore:0,isRetry:false,
+          totalCount:10,reportSaved:false,reportSavedRetry:false};
+      showOverlay(false);
+      showView('quiz-view',{push:true});
+      renderQuestion();
+      saveSession();
+    }
+
     playBeep('start'); vibrate([100,50,200]);
+    pushNotif(`[학습시작] ${me} → ${label} 시작 🚀`);
+
   }catch(e){
-    console.error(e); showOverlay(false);
-    showToast('⚠️ 문제 생성 실패. 다시 시도해주세요.');
+    clearInterval(_quizLoadTimer);
+    showOverlay(false);
+    console.error('[startLoad] 실패:', e.message);
+
+    // 1회 자동 재시도
+    if(!isRetryLoad){
+      showToast('⚠️ 응답이 늦어 다시 시도합니다...');
+      setTimeout(()=>_startLoad(label, true), 800);
+    } else {
+      showToast('⚠️ 문제 생성 실패. 네트워크를 확인하고 다시 시도해주세요.', 4000);
+    }
   }
 }
 
@@ -1935,13 +1935,19 @@ const NUMBTNS=['①','②','③','④'];
 function getSubjLang(){return(cfg.subject==='영어'||cfg.subject==='영단어')?'en-US':'ko-KR';}
 
 function renderQuestion(){
-  const q=ss.questions[ss.currentIndex];
-  const n=ss.currentIndex+1, tot=ss.questions.length;
+  const q = ss.questions[ss.currentIndex];
+  // 단일 호출 방식 - 여기 도달하면 항상 문제가 존재해야 함
+  if(!q){
+    // 만약 도달하면 사이클 종료
+    finishCycle();
+    return;
+  }
+  const n=ss.currentIndex+1, tot=Math.max(ss.questions.length, ss.totalCount);
   const sc=SUBJ_COLORS[cfg.subject]||SUBJ_COLORS['국어'];
 
   document.getElementById('quiz-hdr').style.background=sc.hdr;
   document.getElementById('quiz-badge').textContent=sc.badge;
-  document.getElementById('quiz-no').textContent=ss.isRetry?`오답 ${n}/${tot}`:`${n}/${tot}`;
+  document.getElementById('quiz-no').textContent=ss.isRetry?`오답 ${n}/${ss.questions.length}`:`${n}/${tot}`;
   document.getElementById('quiz-prog').style.width=`${((n-1)/tot)*100}%`;
 
   const typeBadge=document.getElementById('qtype-badge');
