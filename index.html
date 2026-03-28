@@ -1399,7 +1399,7 @@ async function fetchOne(prompt, model, key, json, signal){
     body:JSON.stringify({
       contents:[{parts:[{text:prompt}]}],
       generationConfig:{
-        temperature:0,          // ★ 0 = 가장 결정론적, 정답 오류 최소화
+        temperature:0.8,          // ★ 높을수록 다양한 문제 생성
         maxOutputTokens:2000,
         ...(json?{response_mime_type:'application/json'}:{})
       }
@@ -1501,6 +1501,8 @@ async function fetchArray(prompt, count, mode='quiz'){
 // ══════════════════════════════
 function buildPrompt(c, count=10){
   const g = c.grade===0 ? '유치원 7세(예비 초등)' : `초등학교 ${c.grade}학년`;
+  // ★ 매 호출마다 다른 문제가 생성되도록 고유값 삽입
+  const SEED = `[고유값:${Date.now()}-${Math.floor(Math.random()*999999)}] 이전과 완전히 다른 새로운 문제를 출제하시오.`;
 
   const SCOPE = {
     국어:{
@@ -1595,7 +1597,8 @@ function buildPrompt(c, count=10){
 - "밑줄 친" 표현 시 반드시 <u>텍스트</u> 태그 사용
 - JSON 배열만 출력. 마크다운(코드블록) 절대 금지. [ 로 시작, ] 로 끝.`;
 
-  if(c.subject==='영단어') return `당신은 대한민국 초등 영어 어휘 교육 전문가입니다.
+  if(c.subject==='영단어') return `${SEED}
+당신은 대한민국 초등 영어 어휘 교육 전문가입니다.
 
 [학습 대상] ${g}
 [학습 범위] ${scope}
@@ -1610,7 +1613,8 @@ ${QUALITY}
 [{"word":"apple","meaning":"사과","tts":"apple"}, ...]
 지금 바로 JSON 배열 ${count}개를 출력하시오.`;
 
-  if(c.subject==='영어') return `당신은 대한민국 초등 영어 평가 출제 전문가입니다. 2022 개정 교육과정 기준.
+  if(c.subject==='영어') return `${SEED}
+당신은 대한민국 초등 영어 평가 출제 전문가입니다. 2022 개정 교육과정 기준.
 
 [학습 대상] ${g}  [학습 범위] ${scope}  [난이도] ${diff}
 [출제 배분] 어휘 3 / 문법 4 / 독해 3 (총 10문제)
@@ -1622,7 +1626,8 @@ ${QUALITY}
 [{"type":"objective","q":"What color is the sky?","options":["red","blue","green","yellow"],"a":"blue","desc":"하늘은 파란색(blue)입니다.","tts_q":"What color is the sky?","tts_options":["red","blue","green","yellow"]}, ...]
 지금 바로 JSON 배열 ${count}개를 출력하시오.`;
 
-  if(c.subject==='국어') return `당신은 대한민국 초등 국어 교육과정 평가 전문가입니다. 2022 개정 교육과정 기준.
+  if(c.subject==='국어') return `${SEED}
+당신은 대한민국 초등 국어 교육과정 평가 전문가입니다. 2022 개정 교육과정 기준.
 
 [학습 대상] ${g}  [학습 범위] ${scope}  [난이도] ${diff}
 [출제 배분] 맞춤법·어문규정 3 / 어휘(낱말의 뜻·관계·반의어·유의어) 3 / 독해(내용·주제·중심문장) 2 / 문법(문장성분·종류·높임법) 2
@@ -1641,7 +1646,8 @@ ${QUALITY}
 [{"type":"objective","q":"다음 중 <u>맞춤법</u>이 바른 것은?","options":["할게요","할께요","하ㄹ게요","할개요"],"a":"할게요","desc":"의지를 나타내는 어미 '-ㄹ게요'를 써서 '할게요'가 올바릅니다."}, ...]
 지금 바로 JSON 배열 ${count}개를 출력하시오.`;
 
-  return `당신은 대한민국 초등 수학 교육과정 평가 전문가입니다. 2022 개정 교육과정 기준.
+  return `${SEED}
+당신은 대한민국 초등 수학 교육과정 평가 전문가입니다. 2022 개정 교육과정 기준.
 
 [학습 대상] ${g}  [학습 범위] ${scope}  [난이도] ${diff}
 [출제 배분] 수와 연산 4 / 도형·측정 2 / 규칙·패턴 2 / 문장제(실생활 응용) 2
