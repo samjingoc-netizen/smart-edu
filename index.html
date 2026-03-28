@@ -1371,15 +1371,17 @@ async function fetchOne(prompt, model, key, json, signal){
 }
 
 // 여러 모델 동시 발사 → 먼저 성공한 것 반환
-// ★ 1.5-flash가 가장 안정적·빠름 → 최우선
+// ★ 2026년 3월 기준 실제 사용 모델 (gemini-3.x 시리즈)
 async function raceModels(prompt, json, timeoutMs){
   const targets=[
-    {m:'gemini-1.5-flash', k:K1},   // 가장 안정·빠름
-    {m:'gemini-1.5-flash', k:K2},   // 키 분산
-    {m:'gemini-1.5-pro',   k:K1},   // 품질 백업
-    {m:'gemini-1.5-pro',   k:K2},
-    {m:'gemini-2.0-flash', k:K1},   // 차세대
-    {m:'gemini-2.0-flash', k:K2},
+    {m:'gemini-3.1-flash-lite-preview', k:K1},  // 가장 빠름
+    {m:'gemini-3.1-flash-lite-preview', k:K2},
+    {m:'gemini-3-flash-preview',        k:K1},  // 속도+품질 균형
+    {m:'gemini-3-flash-preview',        k:K2},
+    {m:'gemini-3.1-pro-preview',        k:K1},  // 고품질 백업
+    {m:'gemini-3.1-pro-preview',        k:K2},
+    {m:'gemini-2.5-flash',              k:K1},  // 구세대 최종 폴백
+    {m:'gemini-2.5-flash',              k:K2},
   ];
   const ctrls=targets.map(()=>new AbortController());
   const tid=setTimeout(()=>ctrls.forEach(c=>{try{c.abort();}catch(e){}}), timeoutMs);
@@ -1408,7 +1410,7 @@ async function raceModels(prompt, json, timeoutMs){
 }
 
 async function fetchAI(prompt, json=true){
-  return raceModels(prompt, json, 18000);  // 18초 타임아웃
+  return raceModels(prompt, json, 25000);  // 25초 타임아웃
 }
 
 // ── fetchArray: 검증 완화(8개↑ OK) + 재시도 1회만 ──
@@ -1416,10 +1418,9 @@ async function fetchArray(prompt, count, mode='quiz'){
   const minOk = Math.max(1, count - 2);  // 8개 이상이면 사용
 
   // 1차 시도
-  let raw = '';
   try{
-    const d = await raceModels(prompt, true, 18000);
-    raw = d?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const d = await raceModels(prompt, true, 25000);
+    const raw = d?.candidates?.[0]?.content?.parts?.[0]?.text||'';
     const valid = mode==='vocab' ? valVocab(extractJSON(raw)) : valQuiz(extractJSON(raw));
     if(valid.length >= minOk) return valid.slice(0, count);
     throw new Error(`항목부족:${valid.length}개`);
@@ -1427,14 +1428,12 @@ async function fetchArray(prompt, count, mode='quiz'){
     console.warn('[1차실패]', e.message);
   }
 
-  // 2차 시도: 1.5-flash 단독 (가장 빠름)
+  // 2차 시도: lite-flash + 3-flash 경쟁
   try{
-    const ctrl = new AbortController();
-    setTimeout(()=>ctrl.abort(), 15000);
-    const d2 = await Promise.race([
-      fetchOne(prompt+`\n반드시JSON배열${count}개만출력.보기4개.a=options중하나.`, 'gemini-1.5-flash', K1, true, ctrl.signal),
-      fetchOne(prompt+`\n반드시JSON배열${count}개만출력.보기4개.a=options중하나.`, 'gemini-1.5-flash', K2, true, ctrl.signal),
-    ]);
+    const d2 = await raceModels(
+      prompt+`\n[재출력]JSON배열${count}개만출력.보기4개.a=options중하나와동일.`,
+      true, 20000
+    );
     const raw2 = d2?.candidates?.[0]?.content?.parts?.[0]?.text||'';
     const valid2 = mode==='vocab' ? valVocab(extractJSON(raw2)) : valQuiz(extractJSON(raw2));
     if(valid2.length >= minOk) return valid2.slice(0, count);
