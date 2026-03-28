@@ -1013,7 +1013,7 @@ let cfg={grade:1, subject:'국어', difficulty:'중'};
 let ss={
   mode:'quiz',learningWords:[],questions:[],currentIndex:0,
   wrongQuestions:[],wrongHistory:[],initialScore:0,isRetry:false,
-  totalCount:20,reportSaved:false,reportSavedRetry:false
+  totalCount:10,reportSaved:false,reportSavedRetry:false
 };
 
 const SHOP_ITEMS=[
@@ -1202,10 +1202,24 @@ function closeModal(id){document.getElementById(id).classList.remove('active');}
 async function dbGet(p){if(db){const s=await db.ref(p).once('value');return s.val();}return JSON.parse(localStorage.getItem('edu_'+p.replace(/\//g,'_'))||'null');}
 async function dbSet(p,d){if(db)return db.ref(p).set(d);localStorage.setItem('edu_'+p.replace(/\//g,'_'),JSON.stringify(d));}
 async function pushNotif(m){if(!db)return;await db.ref('push_notifications').push({message:m,timestamp:firebase.database.ServerValue.TIMESTAMP});}
+let _pushListening=false;
 function setupPush(){
-  if(!db||Notification.permission!=='granted')return;
-  db.ref('push_notifications').orderByChild('timestamp').startAt(Date.now()).on('child_added',snap=>{
-    const d=snap.val(); if(d?.message) new Notification('스마트 학습 🔔',{body:d.message,icon:'icon.png?v=18'});
+  if(!db||Notification.permission!=='granted'||_pushListening) return;
+  _pushListening=true;
+  // 현재 시각 이후 새로 추가되는 알림만 수신
+  const since=Date.now();
+  db.ref('push_notifications').orderByChild('timestamp').startAt(since).on('child_added',snap=>{
+    const d=snap.val();
+    if(!d?.message) return;
+    try{
+      new Notification('스마트 학습 🔔',{
+        body:d.message,
+        icon:'icon.png?v=18',
+        badge:'icon.png?v=18',
+        vibrate:[200,100,200],
+        tag:'smart-edu-'+Date.now()  // 태그로 중복 알림 방지
+      });
+    }catch(e){ console.warn('알림 전송 실패:',e); }
   });
 }
 
@@ -1429,43 +1443,43 @@ JSON 배열을 출력하십시오.`;
 대상:${gradeText} / 난이도:${c.difficulty} (${diffMap[c.difficulty]})
 고유값:${Date.now()}
 
-임무: 영어(EFL) 객관식 20문항 JSON 배열 출제.
-출제 배분(20개): 어휘 6개 / 문법 7개 / 독해 7개
+임무: 영어(EFL) 객관식 10문항 JSON 배열 출제.
+출제 배분(10개): 어휘 3개 / 문법 4개 / 독해 3개
 품질: ${gradeText} 수준 단어·문법만 사용, 오답은 그럴듯한 함정
 
 [JSON 예시]
 [{"type":"objective","q":"What is the <u>opposite</u> of hot?","options":["cold","warm","big","fast"],"a":"cold","desc":"hot의 반의어는 cold입니다.","tts_q":"What is the opposite of hot?","tts_options":["cold","warm","big","fast"]}]
 
 ${STRICT}
-JSON 배열 20개를 출력하십시오.`;
+JSON 배열 10개를 출력하십시오.`;
 
   if(c.subject==='국어') return `대한민국 초등 국어교육·평가 전문가입니다. 2026 개정 교육과정 기준.
 대상:${gradeText} / 난이도:${c.difficulty} (${diffMap[c.difficulty]})
 고유값:${Date.now()}
 
-임무: 국어 객관식 20문항 JSON 배열 출제.
-출제 배분(20개): 맞춤법·띄어쓰기 5개 / 어휘(낱말관계) 5개 / 독해(내용·주제) 5개 / 문법(문장성분) 5개
+임무: 국어 객관식 10문항 JSON 배열 출제.
+출제 배분(10개): 맞춤법·띄어쓰기 3개 / 어휘(낱말관계) 3개 / 독해(내용·주제) 2개 / 문법(문장성분) 2개
 품질: 글만으로 완전 이해 가능, 짧은 지문은 q 안에 직접 포함, 오답은 헷갈리는 함정
 
 [JSON 예시]
 [{"type":"objective","q":"다음 중 <u>맞춤법</u>이 바른 것은?","options":["할게요","할께요","하ㄹ게요","할개요"],"a":"할게요","desc":"'-ㄹ게요'는 의지를 나타내는 어미로 '할게요'가 올바른 표기입니다."}]
 
 ${STRICT}
-JSON 배열 20개를 출력하십시오.`;
+JSON 배열 10개를 출력하십시오.`;
 
   return `대한민국 초등 수학교육·평가 전문가입니다. 2026 개정 교육과정 기준.
 대상:${gradeText} / 난이도:${c.difficulty} (${diffMap[c.difficulty]})
 고유값:${Date.now()}
 
-임무: 수학 객관식 20문항 JSON 배열 출제.
-출제 배분(20개): 수와 연산 8개 / 도형·측정 4개 / 규칙·패턴 4개 / 문장제 4개
+임무: 수학 객관식 10문항 JSON 배열 출제.
+출제 배분(10개): 수와 연산 4개 / 도형·측정 2개 / 규칙·패턴 2개 / 문장제 2개
 품질: 해당 학년 범위만(선행 금지), 계산문제는 숫자 직접 표기, 문장제 3문장 이내, 오답은 흔한 계산 실수
 
 [JSON 예시]
 [{"type":"objective","q":"사과 3개와 배 5개가 있습니다. 과일은 모두 몇 개인가요?","options":["7개","8개","9개","6개"],"a":"8개","desc":"3+5=8이므로 모두 8개입니다."}]
 
 ${STRICT}
-JSON 배열 20개를 출력하십시오.`;
+JSON 배열 10개를 출력하십시오.`;
 }
 
 // ══════════════════════════════
@@ -1493,7 +1507,7 @@ async function addPts(n){
 }
 async function updateStatBadges(pts,streak){
   if(pts==null){ const u=await dbGet('users/'+me)||{}; pts=u.points||0; if(streak==null) streak=calcStreak(u.streak||[]); }
-  document.getElementById('point-val').textContent=pts>=1000?Math.floor(pts/1000)+'k':pts;
+  document.getElementById('point-val').textContent=pts;
   document.getElementById('shop-pts').textContent=pts.toLocaleString()+'P';
   if(streak!=null) document.getElementById('streak-val').textContent=streak+'일';
   // 총 학습 횟수
@@ -1518,16 +1532,25 @@ function saveSession(){if(!me||me==='admin')return;dbSet('sessions/'+me,{cfg,ss}
 // ══════════════════════════════
 //  DASHBOARD UI
 // ══════════════════════════════
+let _studentAge=8;
 function renderGrades(age){
+  if(age!=null) _studentAge=age;
+  const a=_studentAge;
   const c=document.getElementById('grade-row'); c.innerHTML='';
-  const minIdx=Math.max(0,(age||8)-8);
-  [{v:0,t:'7세 👶'},{v:1,t:'1학년'},{v:2,t:'2학년'},{v:3,t:'3학년'},{v:4,t:'4학년'},{v:5,t:'5학년'},{v:6,t:'6학년 🎓'}].forEach((g,i)=>{
+  // 자기 나이 기준 학년 = a-7 (나이8=1학년, 나이9=2학년...)
+  // 활성 범위: (자기학년 - 1) 이상 → 즉 grade >= (a-7-1) = (a-8)
+  // 그 아래(grade < a-8)만 비활성
+  const minGrade=Math.max(0, a-8);
+  if(cfg.grade<minGrade){ cfg.grade=minGrade; }
+  [{v:0,t:'7세 👶'},{v:1,t:'1학년'},{v:2,t:'2학년'},{v:3,t:'3학년'},{v:4,t:'4학년'},{v:5,t:'5학년'},{v:6,t:'6학년 🎓'}].forEach(g=>{
     const b=document.createElement('button');
-    b.className='grade-btn'+(g.v===cfg.grade?' active':'');
+    const disabled=g.v<minGrade;
+    b.className='grade-btn'+(g.v===cfg.grade&&!disabled?' active':'');
     b.textContent=g.t; b.dataset.v=g.v;
-    if(i<minIdx){b.disabled=true;}else{b.onclick=()=>setGrade(g.v);}
+    if(disabled){b.disabled=true;}else{b.onclick=()=>setGrade(g.v);}
     c.appendChild(b);
   });
+  updateStartBtn();
 }
 function setGrade(v){cfg.grade=v;renderGrades();updateStartBtn();}
 function selectSubj(s){
@@ -1689,14 +1712,14 @@ async function cancelResume(){
 // ══════════════════════════════
 async function startNewQuiz(){
   const label=`${fmtGrade(cfg.grade)} ${cfg.subject} (${cfg.difficulty})`;
-  if(!confirm(`[학습 시작]\n${label}\n\n정답 1개당 5P 적립 (완주 시 지급)\n중도 포기 시 포인트 미지급`)) return;
+  if(!confirm(`[학습 시작]\n${label}\n\n10문제 × 10점 = 100점 만점\n정답당 3P 포인트 적립 (완주 시 지급)\n만점 달성 시 보너스 10P 추가!\n중도 포기 시 포인트 미지급`)) return;
 
   const icon={국어:'📖',영어:'🔤',수학:'🔢',영단어:'📝'}[cfg.subject]||'📚';
-  showOverlay(true,icon,`<b>${label}</b><br>AI 선생님이 출제하고 있어요! ✨`,cfg.subject==='영단어'?'영단어 10개 생성 중...':'20문제 생성 중 (10~20초)',0);
+  showOverlay(true,icon,`<b>${label}</b><br>AI 선생님이 출제하고 있어요! ✨`,cfg.subject==='영단어'?'영단어 10개 생성 중...':'10문제 생성 중 (5~15초)',0);
 
   const prompt=buildPrompt(cfg);
   try{
-    const expected=cfg.subject==='영단어'?10:20;
+    const expected=cfg.subject==='영단어'?10:10;
     const mode=cfg.subject==='영단어'?'vocab':'quiz';
     const parsed=await fetchArray(prompt,expected,mode);
 
@@ -1706,7 +1729,7 @@ async function startNewQuiz(){
     } else {
       showOverlay(true,icon,'문제 품질 검증 중... 🔍','잘못된 문제를 걸러냅니다',2);
       const polished=await postProcess(parsed,prompt);
-      ss={mode:'quiz',questions:polished,currentIndex:0,wrongQuestions:[],wrongHistory:[],initialScore:0,isRetry:false,totalCount:20,reportSaved:false,reportSavedRetry:false};
+      ss={mode:'quiz',questions:polished,currentIndex:0,wrongQuestions:[],wrongHistory:[],initialScore:0,isRetry:false,totalCount:10,reportSaved:false,reportSavedRetry:false};
       showOverlay(false); showView('quiz-view',{push:true}); renderQuestion();
     }
     pushNotif(`[학습시작] ${me} → ${label} 시작 🚀`);
@@ -1830,7 +1853,7 @@ async function handleObj(selected,btnEl,e){
     fbEl.className='feedback fb-correct'; fbEl.textContent='✅ 정답입니다! 아주 잘했어요 🎉';
     floatPt(e,'+5P 💰');
     playBeep('correct'); vibrate(50);
-    if(!ss.isRetry) ss.initialScore+=5;
+    if(!ss.isRetry) ss.initialScore+=10;
   } else {
     btnEl.classList.add('state-wrong');
     // 정답 버튼 표시
@@ -1860,7 +1883,7 @@ async function processSubjective(e){
     fbEl.className='feedback fb-correct'; fbEl.textContent='✅ 정답입니다! 아주 잘했어요 🎉';
     floatPt(e||{clientX:window.innerWidth/2,clientY:window.innerHeight/2},'+5P 💰');
     playBeep('correct'); vibrate(50);
-    if(!ss.isRetry) ss.initialScore+=5;
+    if(!ss.isRetry) ss.initialScore+=10;
   } else {
     fbEl.className='feedback fb-wrong';
     fbEl.innerHTML=`❌ 오답! 정답은 <b>${sanitize(stripHtml(q.a))}</b> 였어요.`;
@@ -1879,23 +1902,32 @@ document.getElementById('ans-input').addEventListener('keypress',e=>{if(e.key===
 // ══════════════════════════════
 async function finishCycle(){
   showView('result-view',{push:true});
-  const score=ss.initialScore, max=ss.totalCount*5;
-  const correctN=ss.isRetry?ss.questions.length-ss.wrongQuestions.length:Math.round(score/5);
+  // ★ 점수: 10문제×10점=100점 만점 표시
+  const displayScore=ss.initialScore;          // 0~100
+  const maxScore=ss.totalCount*10;             // 100
+  const correctN=ss.isRetry
+    ? ss.questions.length-ss.wrongQuestions.length
+    : Math.round(displayScore/10);
   const wrongN=ss.wrongQuestions.length;
-  const rate=Math.round((correctN/(ss.totalCount))*100);
+  const rate=Math.round((correctN/ss.totalCount)*100);
 
-  if(score===max&&!ss.isRetry){confetti();vibrate([200,100,200,100,400]);}
+  // ★ 포인트: 정답당 3P + 만점시 +10P (점수와 별개)
+  const earnedPts=correctN*3;
+  const bonusPts=displayScore===maxScore?10:0;
+  const totalPts=earnedPts+bonusPts;
+
+  if(displayScore===maxScore&&!ss.isRetry){confetti();vibrate([200,100,200,100,400]);}
 
   // 점수 링 애니메이션
   const ring=document.getElementById('score-ring');
   const sc=SUBJ_COLORS[cfg.subject];
   ring.style.stroke=sc?.ring||'#6C63FF';
   const circumference=408;
-  const ratio=ss.isRetry?1:(score/max);
+  const ratio=ss.isRetry?1:(displayScore/maxScore);
   setTimeout(()=>{ ring.style.strokeDashoffset=circumference-(circumference*ratio); },100);
 
-  document.getElementById('score-num').textContent=ss.isRetry?'✓':score;
-  document.getElementById('score-max').textContent=ss.isRetry?'완료':'/ '+max+'점';
+  document.getElementById('score-num').textContent=ss.isRetry?'✓':displayScore;
+  document.getElementById('score-max').textContent=ss.isRetry?'완료':'/ '+maxScore+'점';
   document.getElementById('rst-correct').textContent=correctN;
   document.getElementById('rst-wrong').textContent=wrongN;
   document.getElementById('rst-rate').textContent=rate+'%';
@@ -1912,26 +1944,27 @@ async function finishCycle(){
   ptsBox.style.display='none';
 
   if(!ss.isRetry){
-    const bonus=score===max?20:score>=(max*.9)?10:0;
-    const total=score+bonus;
     if(!ss.reportSaved){
-      document.getElementById('points-earned').textContent=`+${total}P 획득!`;
-      document.getElementById('points-lbl').textContent=bonus>0?`기본 ${score}P + 우수 보너스 ${bonus}P`:`${ss.totalCount}문제 완주 보상`;
+      document.getElementById('points-earned').textContent=`+${totalPts}P 획득!`;
+      document.getElementById('points-lbl').textContent=bonusPts>0
+        ? `정답 ${correctN}개×3P + 만점 보너스 ${bonusPts}P`
+        : `정답 ${correctN}개×3P`;
       ptsBox.style.display='block';
-      await addPts(total);
+      await addPts(totalPts);
       await saveReport();
-      pushNotif(`[점수] ${me} 완주! ${score}점 → ${total}P 🌟`);
+      pushNotif(`[결과] ${me} ${displayScore}점 완주! +${totalPts}P 🌟`);
       ss.reportSaved=true; saveSession();
-    } else ptsBox.style.display='block';
+    } else { ptsBox.style.display='block'; }
 
     if(wrongN>0){
       emojiEl.textContent='😅'; titleEl.textContent='1차 학습 완료!'; subEl.textContent=`${wrongN}개 오답이 있어요`;
       msgEl.textContent=`총 ${ss.totalCount}문제 중 ${wrongN}개를 틀렸어요.\n오답 개념을 확인하고 다시 도전해볼까요? 💪`;
       actionBtn.textContent='📝 오답 확인하기';
     } else {
-      emojiEl.textContent=score===max?'🏆':'🌟'; titleEl.textContent=score===max?'완벽해요! 💯':'학습 완료! 🎉';
+      emojiEl.textContent=displayScore===maxScore?'🏆':'🌟';
+      titleEl.textContent=displayScore===maxScore?'완벽해요! 💯':'학습 완료! 🎉';
       subEl.textContent='정말 대단해요! 최고예요 👏';
-      msgEl.textContent=score===max?'모든 문제를 다 맞혔어요! 🏆 완벽한 점수입니다!':'모든 문제를 끝냈어요! 수고하셨어요 🌟';
+      msgEl.textContent=displayScore===maxScore?'모든 문제를 다 맞혔어요! 🏆 완벽한 점수입니다!':'모든 문제를 끝냈어요! 수고하셨어요 🌟';
       actionBtn.textContent='🏠 홈으로 돌아가기';
     }
   } else {
@@ -1942,7 +1975,7 @@ async function finishCycle(){
     }
     if(wrongN>0){
       emojiEl.textContent='😤'; titleEl.textContent='다시 풀기 완료 💪'; subEl.textContent=`아직 ${wrongN}개 남았어요`;
-      msgEl.textContent=`포기하지 말고 다시 도전해봐요! 🔥`;
+      msgEl.textContent='포기하지 말고 다시 도전해봐요! 🔥';
       actionBtn.textContent='📝 오답 다시 확인';
     } else {
       emojiEl.textContent='🎊'; titleEl.textContent='모두 해결! 🎊'; subEl.textContent='어려운 문제도 해냈어요';
@@ -2004,7 +2037,7 @@ function renderRepTable(){
   tbody.innerHTML=data.map(r=>`<tr>
     <td style="font-weight:800;">${esc(r.profile)}</td>
     <td style="font-size:11px;color:var(--text2);line-height:1.5;">${esc(r.date)}<br>${fmtGrade(r.grade)} ${esc(r.difficulty||'중')}급</td>
-    <td>${esc(r.subject)}<br><b style="color:${r.score===(r.totalCount*5)?'var(--green-d)':'var(--red)'};">${r.score}점</b></td>
+    <td>${esc(r.subject)}<br><b style="color:${r.score===(r.totalCount*10)?'var(--green-d)':'var(--red)'};">${r.score}점</b></td>
     <td><button class="tbtn" onclick="openDetail(${r.id})">🔍</button></td></tr>`).join('');
 }
 function openDetail(id){
@@ -2068,8 +2101,18 @@ async function reqNotif(){
   closeModal('notif-modal');
   if(!("Notification"in window)){showToast('🚫 알림 미지원 브라우저');return;}
   const p=await Notification.requestPermission();
-  if(p==='granted'){showToast('✅ 알림 권한 허용 완료!');setupPush();}
-  else showToast('⚠️ 알림이 차단되었습니다. 기기 설정에서 허용해주세요.');
+  if(p==='granted'){
+    showToast('✅ 알림 권한 허용 완료! 이제 학습 알림을 받을 수 있어요.');
+    setupPush();
+    // 테스트 알림 발송
+    setTimeout(()=>{
+      try{ new Notification('스마트 학습 🔔',{body:'알림이 정상적으로 설정되었습니다! 🎉',icon:'icon.png?v=18'}); }catch(e){}
+    },500);
+  } else if(p==='denied'){
+    showToast('⚠️ 알림이 차단되었습니다.\n브라우저 설정에서 허용으로 변경해주세요.',4000);
+  } else {
+    showToast('알림 권한이 설정되지 않았습니다.');
+  }
 }
 
 // ══════════════════════════════
@@ -2086,6 +2129,11 @@ window.onload=async()=>{
       _voices=window.speechSynthesis.getVoices();
       _voiceReady=true;
     };
+  }
+
+  // ★ 앱 시작 시 이미 알림 권한 있으면 바로 리스너 시작
+  if("Notification"in window && Notification.permission==='granted'){
+    setupPush();
   }
 
   if(db){
