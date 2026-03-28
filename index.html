@@ -1003,7 +1003,7 @@ try{ firebase.initializeApp(firebaseConfig); db=firebase.database(); }catch(e){}
 const K1="AIzaSyA1H3rfJarOuDx"+"A1NflRN96_ugCsaehU0M";
 const K2="AIzaSyBred_9lqK4Jx1"+"emrzyHWcUVnmLrqnttUQ";
 const API_KEYS=[K1,K2];
-const AI_MODELS=["gemini-2.5-pro","gemini-2.5-flash","gemini-1.5-pro","gemini-1.5-flash"];
+
 
 // ══════════════════════════════
 //  STATE
@@ -1343,28 +1343,67 @@ function qSig(q){return norm(stripHtml(q?.q||'')).slice(0,140);}
 // ══════════════════════════════
 //  AI FETCH
 // ══════════════════════════════
-async function fetchAI(prompt,attempt=0,json=true){
-  const total=AI_MODELS.length*API_KEYS.length;
-  if(attempt>=total){showToast('⚠️ AI 서버 오류. 잠시 후 다시 시도해주세요.');throw new Error('통신 제한');}
-  const model=AI_MODELS[attempt%AI_MODELS.length];
-  const key=API_KEYS[Math.floor(attempt/AI_MODELS.length)];
+// ══════════════════════════════
+//  AI FETCH — 병렬 경쟁 방식
+//  Pro + Flash 동시 요청 → 먼저 성공한 응답 사용
+//  Pro 품질 유지하면서 Flash 속도 보장
+// ══════════════════════════════
+
+// 단일 모델·키 조합으로 1회 요청
+async function fetchOne(prompt, model, key, json=true){
   const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-  const cfg2={temperature:0.1,maxOutputTokens:6000};
-  if(json) cfg2.response_mime_type='application/json';
+  const genCfg={temperature:0.1, maxOutputTokens:4096};
+  if(json) genCfg.response_mime_type='application/json';
+  const res=await fetch(url,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:genCfg})
+  });
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const raw=await res.text();
+  const result=JSON.parse(raw);
+  if(!result?.candidates?.length) throw new Error('candidates 없음');
+  return result;
+}
+
+// 여러 모델·키 조합을 동시에 쏘고 가장 먼저 성공한 것 반환
+async function fetchAI(prompt, json=true){
+  // ★ 경쟁 조합: Pro(K1), Flash(K1), Pro(K2), Flash(K2)
+  const combos=[
+    {model:'gemini-2.5-pro',   key:API_KEYS[0]},
+    {model:'gemini-2.5-flash', key:API_KEYS[0]},
+    {model:'gemini-2.5-pro',   key:API_KEYS[1]},
+    {model:'gemini-2.5-flash', key:API_KEYS[1]},
+    {model:'gemini-1.5-pro',   key:API_KEYS[0]},
+    {model:'gemini-1.5-flash', key:API_KEYS[0]},
+  ];
+
+  // 각 요청을 Promise로 감싸서 실패 시 reject (race에서 제외됨)
+  const races=combos.map(({model,key})=>
+    fetchOne(prompt,model,key,json).catch(e=>{
+      // 실패한 요청은 절대 resolve 안 함 → race에서 무시
+      return new Promise(()=>{});
+    })
+  );
+
+  // 타임아웃 25초 — 모든 모델이 응답 없으면 에러
+  const timeout=new Promise((_,rej)=>
+    setTimeout(()=>rej(new Error('타임아웃: 25초 초과')), 25000)
+  );
+
   try{
-    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:cfg2})});
-    const raw=await res.text();
-    let result; try{result=JSON.parse(raw);}catch(e){return fetchAI(prompt,attempt+1,json);}
-    if(!res.ok||!result?.candidates?.length) return fetchAI(prompt,attempt+1,json);
-    return result;
-  }catch(e){return fetchAI(prompt,attempt+1,json);}
+    return await Promise.race([...races, timeout]);
+  }catch(e){
+    showToast('⚠️ AI 서버 응답 없음. 다시 시도해주세요.');
+    throw e;
+  }
 }
 
 async function fetchArray(prompt,count,mode='quiz',maxR=2){
-  let lastErr=null,lastRaw='';
+  let lastErr=null;
   for(let i=0;i<maxR;i++){
-    const data=await fetchAI(prompt,0,true);
-    lastRaw=data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const data=await fetchAI(prompt,true);
+    const lastRaw=data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
     try{
       const parsed=extractJSON(lastRaw);
       const valid=mode==='vocab'?valVocab(parsed):valQuiz(parsed);
@@ -2105,7 +2144,7 @@ async function aiSingle(id){
   const sum={profile:r.profile,grade:r.grade,subject:r.subject,diff:r.difficulty||'중',score:r.score,total:r.totalCount||20,wrongs:(r.wrongDetails||[]).map(w=>({q:stripHtml(w.q),ans:stripHtml(w.userAns||''),correct:stripHtml(w.a),desc:stripHtml(w.desc)}))};
   const prompt=`교육 분석가로서 ${r.profile} 학생의 학습 데이터를 분석하십시오.\n데이터:${JSON.stringify(sum)}\n1.성취도 평가\n2.오답 해설 종합 분석 및 취약 개념 도출\n3.칭찬·개선점·부모님 지도팁 (500자 이내)`;
   try{
-    const d=await fetchAI(prompt,0,false);
+    const d=await fetchAI(prompt,false);
     showOverlay(false);
     document.getElementById('detail-title').textContent='📊 AI 심층 분석';
     document.getElementById('detail-body').innerHTML=`<div style="white-space:pre-wrap;line-height:1.7;font-size:14px;">${sanitize(d.candidates[0].content.parts[0].text)}</div>`;
@@ -2121,7 +2160,7 @@ async function aiGrowthReport(){
   const cmp={profile:adminFilter,sessions:reps.length,initial:{date:oldest.date,subject:oldest.subject,score:oldest.score},current:{date:newest.date,subject:newest.subject,score:newest.score,recent_avg:recentAvg}};
   const prompt=`대한민국 교육 분석 전문가로서 ${adminFilter} 학생의 누적 성장 데이터를 분석하십시오.\n데이터:${JSON.stringify(cmp)}\n1.초기 대비 발전 사항 구체적 칭찬\n2.정체·취약 부분\n3.가정 내 지도 방향 (600자 이내, 가독성 있게)`;
   try{
-    const d=await fetchAI(prompt,0,false);
+    const d=await fetchAI(prompt,false);
     showOverlay(false);
     document.getElementById('detail-title').textContent='📈 AI 종합 성장 리포트';
     document.getElementById('detail-body').innerHTML=`<div style="white-space:pre-wrap;line-height:1.7;font-size:14px;">${sanitize(d.candidates[0].content.parts[0].text)}</div>`;
