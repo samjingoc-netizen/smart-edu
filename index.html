@@ -1292,37 +1292,78 @@ function extractJSON(raw){
 }
 function valVocab(arr){
   if(!Array.isArray(arr)) throw new Error('배열 아님');
-  const seen=new Set();
-  return arr.map((item,i)=>{
+  const seen=new Set(), result=[];
+  for(const item of arr){
     const word=String(item?.word??'').trim();
     const meaning=String(item?.meaning??'').trim();
-    const tts_val=String(item?.tts??word).trim();
-    if(!word) throw new Error(`${i+1}번 word 없음`);
-    if(!meaning) throw new Error(`${i+1}번 meaning 없음`);
-    const k=norm(word); if(seen.has(k)) throw new Error(`${i+1}번 중복`); seen.add(k);
-    return{word,meaning,tts:tts_val};
-  });
+    if(!word||!meaning) continue;
+    const k=norm(word); if(seen.has(k)) continue; seen.add(k);
+    result.push({word, meaning, tts:String(item?.tts??word).trim()});
+  }
+  if(!result.length) throw new Error('유효 단어 없음');
+  return result;
 }
+
 function valQuiz(arr){
   if(!Array.isArray(arr)) throw new Error('배열 아님');
-  return arr.map((item,i)=>{
+  const result=[];
+  for(let i=0;i<arr.length;i++){
+    const item=arr[i];
     const type=item?.type==='subjective'?'subjective':'objective';
     const q=String(item?.q??'').trim();
     const aRaw=String(item?.a??'').trim();
-    const desc=String(item?.desc??'해설이 제공되지 않았습니다.').trim();
-    if(!q) throw new Error(`${i+1}번 q 없음`);
-    if(!aRaw) throw new Error(`${i+1}번 a 없음`);
-    if(type==='objective'){
-      const opts=Array.isArray(item?.options)?item.options.map(v=>String(v).trim()).filter(Boolean):[];
-      if(opts.length!==4) throw new Error(`${i+1}번 보기 ${opts.length}개`);
-      if(new Set(opts.map(o=>norm(o))).size!==4) throw new Error(`${i+1}번 보기 중복`);
-      const match=opts.find(o=>same(o,aRaw));
-      if(!match) throw new Error(`${i+1}번 정답 보기 불일치: "${aRaw}"`);
-      const ttsOpts=(Array.isArray(item?.tts_options)&&item.tts_options.length===4)?item.tts_options.map(v=>String(v).trim()):[...opts];
-      return{type:'objective',q,options:opts,a:match,desc,tts_q:String(item?.tts_q??q).trim(),tts_options:ttsOpts};
+    const desc=String(item?.desc??'').trim()||'정답을 확인하세요.';
+    if(!q||!aRaw){ console.warn(`[skip] ${i+1}번 q/a 없음`); continue; }
+
+    if(type==='subjective'){
+      result.push({type:'subjective',q,a:aRaw,desc}); continue;
     }
-    return{type:'subjective',q,a:aRaw,desc};
-  });
+
+    // 보기 정리
+    let opts=Array.isArray(item?.options)
+      ? item.options.map(v=>String(v??'').trim()).filter(v=>v.length>0)
+      : [];
+    if(opts.length<2){ console.warn(`[skip] ${i+1}번 보기 부족`); continue; }
+    if(opts.length>4) opts=opts.slice(0,4);
+
+    // 보기 4개 보장: 부족하면 aRaw 포함 후 채우기
+    if(opts.length<4){
+      if(!opts.some(o=>same(o,aRaw))) opts.push(aRaw);
+      const pad=['①','②','③'];
+      while(opts.length<4) opts.push(pad[opts.length-1]||'...');
+    }
+
+    // 정답 매칭 (3단계)
+    let match=opts.find(o=>same(o,aRaw));
+    if(!match){
+      // 공백·단위 무시 매칭
+      const strip2=s=>norm(s).replace(/[\s()（）]/g,'').replace(/[원개㎝㎏㎖]/g,'');
+      match=opts.find(o=>strip2(o)===strip2(aRaw));
+    }
+    if(!match){
+      // 포함 관계
+      const al=norm(aRaw);
+      match=opts.find(o=>{const ol=norm(o);return ol.includes(al)||al.includes(ol);});
+    }
+    if(!match){
+      // 강제 삽입: 마지막 보기를 정답으로 교체
+      opts[opts.length-1]=aRaw; match=aRaw;
+      console.warn(`[fix] ${i+1}번 정답 강제삽입: "${aRaw}"`);
+    }
+
+    // 중복 보기 skip
+    if(new Set(opts.map(o=>norm(o))).size<4){
+      console.warn(`[skip] ${i+1}번 보기중복`); continue;
+    }
+
+    const ttsOpts=(Array.isArray(item?.tts_options)&&item.tts_options.length===4)
+      ?item.tts_options.map(v=>String(v).trim()):[...opts];
+
+    result.push({type:'objective',q,options:opts,a:match,desc,
+      tts_q:String(item?.tts_q??q).trim(),tts_options:ttsOpts});
+  }
+  if(!result.length) throw new Error('유효 문제 없음');
+  return result;
 }
 function qCheck(q){
   const p=stripHtml(q?.q||''),raw=String(q?.q||''),opts=Array.isArray(q?.options)?q.options:[];
@@ -1358,8 +1399,8 @@ async function fetchOne(prompt, model, key, json, signal){
     body:JSON.stringify({
       contents:[{parts:[{text:prompt}]}],
       generationConfig:{
-        temperature:0.15,
-        maxOutputTokens:1800,   // 10문제 충분, 불필요 대기 제거
+        temperature:0,          // ★ 0 = 가장 결정론적, 정답 오류 최소화
+        maxOutputTokens:2000,
         ...(json?{response_mime_type:'application/json'}:{})
       }
     })
@@ -1413,33 +1454,42 @@ async function fetchAI(prompt, json=true){
   return raceModels(prompt, json, 25000);  // 25초 타임아웃
 }
 
-// ── fetchArray: 검증 완화(8개↑ OK) + 재시도 1회만 ──
+// 문제 품질 필터 - 불량 문제 제거
+function filterQuiz(qs){
+  return qs.filter(q=>{
+    const issue=qCheck(q);
+    if(issue){ console.warn(`[filter] 제거: ${issue} / "${stripHtml(q.q).slice(0,30)}"`); return false; }
+    return true;
+  });
+}
+
+// fetchArray: 품질필터 + 재시도
 async function fetchArray(prompt, count, mode='quiz'){
-  const minOk = Math.max(1, count - 2);  // 8개 이상이면 사용
+  const minOk=Math.max(1, count-2);
+
+  const tryFetch=async(p, timeoutMs)=>{
+    const d=await raceModels(p, true, timeoutMs);
+    const raw=d?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    let items=mode==='vocab' ? valVocab(extractJSON(raw)) : valQuiz(extractJSON(raw));
+    if(mode==='quiz') items=filterQuiz(items);
+    if(items.length<minOk) throw new Error(`품질필터 후 ${items.length}개`);
+    return items.slice(0, count);
+  };
 
   // 1차 시도
-  try{
-    const d = await raceModels(prompt, true, 25000);
-    const raw = d?.candidates?.[0]?.content?.parts?.[0]?.text||'';
-    const valid = mode==='vocab' ? valVocab(extractJSON(raw)) : valQuiz(extractJSON(raw));
-    if(valid.length >= minOk) return valid.slice(0, count);
-    throw new Error(`항목부족:${valid.length}개`);
-  }catch(e){
-    console.warn('[1차실패]', e.message);
-  }
+  try{ return await tryFetch(prompt, 25000); }
+  catch(e){ console.warn('[1차]', e.message); }
 
-  // 2차 시도: lite-flash + 3-flash 경쟁
-  try{
-    const d2 = await raceModels(
-      prompt+`\n[재출력]JSON배열${count}개만출력.보기4개.a=options중하나와동일.`,
-      true, 20000
-    );
-    const raw2 = d2?.candidates?.[0]?.content?.parts?.[0]?.text||'';
-    const valid2 = mode==='vocab' ? valVocab(extractJSON(raw2)) : valQuiz(extractJSON(raw2));
-    if(valid2.length >= minOk) return valid2.slice(0, count);
-    throw new Error(`2차 항목부족:${valid2.length}개`);
-  }catch(e){
-    console.error('[2차실패]', e.message);
+  // 2차: 재출력 지시 추가
+  const p2=prompt+`\n\n[재출력 필수 지시]\n`+
+    `직전 응답에 오류가 있었습니다. 아래를 반드시 지켜 다시 출력하세요:\n`+
+    `1. JSON 배열 [ ] 만 출력 (다른 텍스트 금지)\n`+
+    `2. options 배열 안에 정답이 반드시 포함 (a 값과 options 중 하나가 완전히 동일)\n`+
+    `3. options 개수 정확히 4개\n`+
+    `4. 총 ${count}개 항목 출력`;
+  try{ return await tryFetch(p2, 20000); }
+  catch(e){
+    console.error('[2차]', e.message);
     throw new Error('생성실패');
   }
 }
@@ -1452,153 +1502,173 @@ async function fetchArray(prompt, count, mode='quiz'){
 function buildPrompt(c, count=10){
   const g = c.grade===0 ? '유치원 7세(예비 초등)' : `초등학교 ${c.grade}학년`;
 
-  // ── 과목별 학년별 교육과정 (2022 개정) ──
   const SCOPE = {
-    국어: {
-      0: '받침 없는 낱말 읽기, 자음·모음 이름 익히기, 간단한 문장 따라 읽기, 인사말 표현',
-      1: '받침 있는 낱말 읽기·쓰기, 문장 부호(마침표·물음표·느낌표), 짧은 이야기 읽고 내용 파악, 반대말·비슷한 말',
-      2: '겹받침 낱말, 높임말과 낮춤말, 글을 읽고 중심 문장 찾기, 원인과 결과 파악, 시 읽기',
-      3: '표준어와 방언, 낱말의 짜임(합성어·파생어), 문단의 중심 내용 파악, 설명문과 주장하는 글 구분, 이야기 구조',
-      4: '관용 표현·속담, 사실과 의견 구분, 주장과 근거 파악, 띄어쓰기 심화, 글의 흐름과 전개 방식',
-      5: '한자어·고유어·외래어 구분, 글의 짜임(서론-본론-결론), 요약하기, 작가의 의도 파악, 토론 형식',
-      6: '품사(명사·동사·형용사·부사 등), 문장 성분(주어·서술어·목적어), 논설문 구조, 비유·상징 표현, 매체 읽기'
+    국어:{
+      0:'받침 없는 낱말 읽기, 자음·모음 이름 익히기, 간단한 문장 따라 읽기, 인사말 표현',
+      1:'받침 있는 낱말 읽기·쓰기, 문장 부호(마침표·물음표·느낌표), 짧은 이야기 읽고 내용 파악, 반대말·비슷한 말',
+      2:'겹받침 낱말, 높임말과 낮춤말, 글을 읽고 중심 문장 찾기, 원인과 결과 파악, 시 읽기',
+      3:'표준어와 방언, 낱말의 짜임(합성어·파생어), 문단의 중심 내용, 설명문과 주장글 구분, 이야기 구조',
+      4:'관용 표현·속담, 사실과 의견 구분, 주장과 근거, 띄어쓰기 심화, 글의 흐름',
+      5:'한자어·고유어·외래어, 글의 짜임(서론-본론-결론), 요약하기, 작가의 의도, 토론',
+      6:'품사(명사·동사·형용사·부사), 문장 성분(주어·서술어·목적어), 논설문 구조, 비유·상징'
     },
-    영어: {
-      0: '알파벳 대소문자, 인사말(Hello/Goodbye/Thank you), 색깔·숫자 1~10, 동물·사물 이름 10개 이내',
-      1: '자기소개(My name is / I am), 숫자 1~20, 신체 부위(head/eyes/hands), 좋아하는 것(I like), 단순 명령문',
-      2: '가족 명칭(mother/father/sister), 음식 이름, be동사(am/is/are), 단수·복수, 의문문(Is this a...? / Are you...?)',
-      3: '일반동사 현재형 3인칭 단수(-s), 요일·월 이름, 학교 물건, 의문사(What/Where/Who), 짧은 대화문',
-      4: '현재진행형(is/are -ing), 형용사 비교급·최상급(-er/-est), 빈도부사(always/usually/sometimes), 4~5문장 짧은 지문 독해',
-      5: '과거형(규칙동사 -ed, 불규칙 동사), 미래형(will / be going to), 조동사(can/must/should), 6~8문장 지문 독해',
-      6: '현재완료(have+p.p.), 관계대명사(who/which/that), 접속사(because/if/when/although), 8~10문장 지문 독해 및 추론'
+    영어:{
+      0:'알파벳 대소문자, 인사말(Hello/Goodbye/Thank you), 색깔·숫자 1~10, 동물·사물 이름 10개 이내',
+      1:'자기소개(My name is / I am), 숫자 1~20, 신체 부위, 좋아하는 것(I like), 단순 명령문',
+      2:'가족 명칭, 음식 이름, be동사(am/is/are), 단수·복수, 의문문(Is this a...?)',
+      3:'일반동사 현재형 3인칭(-s), 요일·월, 학교 물건, 의문사(What/Where/Who), 짧은 대화문',
+      4:'현재진행형(is/are -ing), 형용사 비교급·최상급, 빈도부사, 4~5문장 지문 독해',
+      5:'과거형(규칙·불규칙), 미래형(will/be going to), 조동사(can/must/should), 6~8문장 독해',
+      6:'현재완료(have+p.p.), 관계대명사(who/which), 접속사(because/if/when), 8~10문장 독해'
     },
-    수학: {
-      0: '10 이하 수 세기·읽기·쓰기, 크다/작다 비교, 기본 도형(원·삼각형·사각형), 1~5 더하기·빼기',
-      1: '100까지의 수, 받아올림 없는 두 자리 수 덧셈·뺄셈, 시각 읽기(몇 시), 길이 비교, 수 배열 규칙',
-      2: '세 자리 수, 받아올림·받아내림 있는 덧셈·뺄셈, 곱셈 개념 및 곱셈구구(2~9단), 시각(몇 시 몇 분), cm·m',
-      3: '네 자리 수, 나눗셈(나머지 있는 나눗셈 포함), 분수 개념(전체와 부분), 소수 개념, 평면도형(사각형·삼각형 종류), 들이·무게',
-      4: '큰 수(만·억·조), 세 자리×두 자리 곱셈, 두 자리÷두 자리 나눗셈, 분수 덧셈·뺄셈(동분모), 소수 두 자리, 각도·삼각형 분류, 꺾은선그래프',
-      5: '약수·배수·공약수·공배수, 분수 곱셈·나눗셈, 소수 곱셈·나눗셈, 도형의 합동·대칭, 직육면체·정육면체, 평균과 가능성',
-      6: '분수÷분수, 소수÷소수, 비와 비율·백분율, 원주율과 원의 넓이, 직육면체 겉넓이·부피, 비례식·비례배분, 경우의 수'
+    수학:{
+      0:'10 이하 수 세기·읽기·쓰기, 크다/작다 비교, 기본 도형, 1~5 더하기·빼기',
+      1:'100까지의 수, 두 자리 덧셈·뺄셈(받아올림 없음), 시각(몇 시), 길이 비교, 수 배열 규칙',
+      2:'세 자리 수, 받아올림·받아내림 덧셈·뺄셈, 곱셈구구(2~9단), 시각(몇 시 몇 분), cm·m',
+      3:'네 자리 수, 나눗셈(나머지 포함), 분수·소수 개념, 평면도형(사각형·삼각형 종류), 들이·무게',
+      4:'큰 수(만·억·조), 세 자리×두 자리 곱셈, 두 자리÷두 자리, 분수 덧셈·뺄셈(동분모), 각도, 꺾은선그래프',
+      5:'약수·배수·공약수·공배수, 분수·소수 곱셈·나눗셈, 합동·대칭, 직육면체·정육면체, 평균',
+      6:'분수÷분수, 소수÷소수, 비와 비율·백분율, 원주율·원의 넓이, 직육면체 겉넓이·부피, 비례식'
     },
-    영단어: {
-      0: '일상 사물(book·bag·cup·pen), 동물(cat·dog·bird·fish), 색깔(red·blue·yellow), 숫자(one~ten), 과일(apple·banana)',
-      1: '학교 물건(desk·chair·pencil), 가족(mom·dad·sister·brother), 신체(head·hand·foot), 음식(milk·bread·egg), 감정(happy·sad·angry)',
-      2: '날씨(sunny·rainy·cloudy·windy), 계절(spring·summer·fall·winter), 직업(teacher·doctor·farmer), 교통수단(bus·train·plane), 집 안 물건(bed·sofa·table)',
-      3: '자연(mountain·river·forest·ocean), 스포츠(soccer·swimming·baseball), 형용사(beautiful·delicious·dangerous), 빈도부사(always·sometimes·never)',
-      4: '감정 형용사(nervous·excited·disappointed·proud), 동작 동사(describe·explain·discover·collect), 접두사 un-/dis- 포함 단어',
-      5: '추상 명사(freedom·success·knowledge·responsibility), 동의어·반의어 쌍, 다의어, 관용구(take part in·look forward to)',
-      6: '학문 어휘(experiment·hypothesis·evidence), 동사 구동사(give up·put off·break down), 고급 형용사(enormous·magnificent·gradual)'
+    영단어:{
+      0:'일상 사물(book·bag·cup), 동물(cat·dog·bird), 색깔(red·blue), 숫자(one~ten)',
+      1:'학교 물건(desk·pencil), 가족(mom·dad), 신체(head·hand), 음식(milk·bread), 감정(happy·sad)',
+      2:'날씨(sunny·rainy), 계절(spring·summer), 직업(teacher·doctor), 교통수단(bus·train)',
+      3:'자연(mountain·river), 스포츠(soccer·swimming), 형용사(beautiful·dangerous)',
+      4:'감정 형용사(nervous·excited·disappointed), 동작 동사(describe·explain·discover)',
+      5:'추상 명사(freedom·success·knowledge), 동의어·반의어, 관용구(take part in)',
+      6:'학문 어휘(experiment·hypothesis), 구동사(give up·put off), 고급 형용사(enormous·gradual)'
     }
   };
 
-  // ── 난이도 × 학년 조합 설명 ──
-  const DIFF = {
-    최저: `단순 사실 확인형 문제만 출제. 하나의 개념만 묻고, 오답은 명확히 틀린 것으로 구성. 짧은 문제(1~2줄), 지문 없음. 초등 학습 시작 단계.`,
-    하:   `교과서 기본 개념을 직접 묻는 문제. 이해가 필요하나 꼬임 없이 정답이 명확. 오답 중 1~2개는 헷갈릴 수 있지만 충분히 구분 가능.`,
-    중:   `개념을 이해·적용해야 풀리는 문제. 2단계 이상의 사고 필요. 오답은 실수하기 쉬운 그럴듯한 선택지. 짧은 지문(3~4문장)은 q 안에 직접 포함.`,
-    상:   `두 개념 이상 연결·비교하는 심화 문제. 추론·분석·적용 능력 요구. 오답이 정답처럼 보이는 함정 보기 포함. 지문 있으면 q 안에 4~5문장으로 포함.`,
-    최상: `최상위권 변별 문제. 깊은 논리 사고·예외 규칙·복합 개념 통합 필요. 모든 보기가 그럴듯해야 하며 정확한 개념 이해 없이는 풀 수 없음.`
+  const DIFF={
+    최저:'가장 기초. 단순 암기·사실 확인. 오답은 명확히 틀린 것. 지문 없음.',
+    하:'교과서 기본 개념. 꼬임 없이 정답 명확. 오답 1~2개는 헷갈리지만 구분 가능.',
+    중:'개념 이해·적용 필요. 2단계 사고. 그럴듯한 오답. 짧은 지문 가능(q 안에 포함).',
+    상:'심화·연계 개념. 추론·분석 필요. 함정 보기 포함. 지문 4~5문장 가능.',
+    최상:'최상위 변별. 깊은 논리·복합 개념. 모든 보기가 그럴듯. 정확한 개념 이해 필수.'
   };
 
-  const scope = (SCOPE[c.subject]||{})[c.grade] || '';
-  const diff  = DIFF[c.difficulty] || DIFF['중'];
+  const scope = (SCOPE[c.subject]||{})[c.grade]||'';
+  const diff  = DIFF[c.difficulty]||DIFF['중'];
 
-  // ── 공통 출력 규칙 ──
-  const RULES = `
-[필수 품질 규칙]
-① 그림·표·사진이 필요한 문제 절대 금지
-② "바르게 배열하여 문장을 만들 때" 유형 금지
-③ "첫/두/세/네 번째에 올 말" 순서 배열 유형 금지
-④ 보기(options)는 반드시 정확히 4개, 서로 중복 없이 달라야 함
-⑤ 정답(a)은 options 배열 중 하나와 글자까지 완전히 동일해야 함
-⑥ "밑줄 친" 표현 사용 시 반드시 <u>텍스트</u> HTML 태그 사용
-⑦ 해설(desc)은 왜 정답인지 핵심 이유 1문장, 60자 이내
+  const QUALITY=`
+[★ 정답 정확성 — 최우선 규칙]
+1. 모든 문제는 대한민국 초등 교과서(2022 개정)에 근거한 명확한 단일 정답만 출제.
+2. 해석에 따라 정답이 달라지거나 논쟁 여지가 있는 문제 절대 금지.
+3. 반의어·유의어: 교과서에 명시된 쌍만 사용.
+   - 기쁘다↔슬프다, 높다↔낮다, 크다↔작다, 빠르다↔느리다 등은 교과서 인정 반의어.
+   - "기쁘다-슬프다가 반의어가 아니다" 같은 문제 절대 금지.
+4. 높임말: 표준국어대사전 기준. 먹다→드시다(또는 잡수시다 중 하나만 보기에 포함).
+   - 정답이 될 수 있는 단어를 보기에 2개 이상 넣지 말 것.
+5. 맞춤법: 국립국어원 표준어 규정 기준만 출제.
 
-[JSON 출력 규칙]
-- 반드시 JSON 배열만 출력 (앞뒤 다른 텍스트 일절 금지)
-- \`\`\`json 마크다운 코드블록 절대 사용 금지
-- 응답은 [ 로 시작하여 ] 로 끝나야 함`;
+[★★ 보기 구성 핵심 규칙 — 반드시 준수 ★★]
+문제에서 묻는 조건을 만족하는 보기는 반드시 정답 1개뿐이어야 합니다.
+나머지 오답 3개는 그 조건을 만족하지 않아야 합니다.
 
-  // ══ 영단어 ══
+올바른 보기 구성 예시:
+- "비슷한 말끼리 짝지어진 것은?" → 정답만 유의어 쌍, 오답 3개는 반의어 쌍이거나 관계없는 쌍
+  ✓ 올바름: options:["예쁘다-아름답다","크다-작다","빠르다-느리다","많다-적다"] a:"예쁘다-아름답다"
+  ✗ 잘못됨: options:["예쁘다-아름답다","기쁘다-즐겁다","맑다-깨끗하다","넓다-광활하다"] → 4개 모두 유의어 쌍
+
+- "반대말 관계가 아닌 것은?" → 오답 3개는 실제 반대말 쌍, 정답만 반대말이 아닌 쌍
+  ✓ 올바름: options:["크다-작다","빠르다-느리다","기쁘다-슬프다","예쁘다-아름답다"] a:"예쁘다-아름답다"
+  ✗ 잘못됨: options:["크다-작다","빠르다-느리다","기쁘다-슬프다","높다-낮다"] → 4개 모두 반대말 쌍
+
+- "높임말로 바르게 고친 것은?" → 정답만 올바른 높임말, 오답 3개는 틀린 높임말
+  ✓ 올바름: options:["자다→주무시다","자다→자시다","자다→잠자시다","자다→쉬시다"] a:"자다→주무시다"
+
+- "맞춤법이 바른 것은?" → 정답만 올바른 표기, 오답 3개는 실제 틀린 표기
+  ✓ 올바름: options:["할게요","할께요","하ㄹ게요","할개요"] a:"할게요"
+
+[출제 금지 유형]
+- 그림·표·사진이 필요한 문제
+- 순서 배열 유형 (바르게 배열하여, 첫/두/세/네 번째에 올 말)
+- 정답이 2개 이상 될 수 있는 문제
+- 학자마다 견해가 다른 문법 문제
+
+[JSON 구조 규칙]
+- options: 반드시 정확히 4개, 서로 중복 없음
+- a: options 배열 중 하나와 글자까지 완전히 동일
+- desc: 왜 정답인지 1문장 (60자 이내)
+- "밑줄 친" 표현 시 반드시 <u>텍스트</u> 태그 사용
+- JSON 배열만 출력. 마크다운(\`\`\`) 절대 금지. [ 로 시작, ] 로 끝.`;
+
+[출제 금지 유형]
+- 그림·표·사진이 필요한 문제
+- 순서 배열 유형 (바르게 배열하여, 첫/두/세/네 번째에 올 말)
+- 정답이 2개 이상 될 수 있는 문제
+- 학자마다 견해가 다른 문법 문제
+
+[JSON 구조 규칙]
+- options: 반드시 정확히 4개, 서로 중복 없음
+- a: options 배열 중 하나와 글자까지 완전히 동일
+- desc: 왜 정답인지 1문장 (60자 이내)
+- "밑줄 친" 표현 시 반드시 <u>텍스트</u> 태그 사용
+- JSON 배열만 출력. 마크다운(\`\`\`) 절대 금지. [ 로 시작, ] 로 끝.`;
+
   if(c.subject==='영단어') return `당신은 대한민국 초등 영어 어휘 교육 전문가입니다.
 
 [학습 대상] ${g}
-[이 학년 학습 범위] ${scope}
-[난이도 기준] ${diff}
+[학습 범위] ${scope}
+[난이도] ${diff}
 
-[임무] 위 학년·난이도 기준에 정확히 맞는 영단어 10개를 JSON 배열로 생성하십시오.
-- 해당 학년이 학교에서 실제로 배우거나 배울 예정인 단어 선정
-- 난이도 최저·하: 1~2음절 단어 위주 / 상·최상: 3음절 이상 포함
-- meaning은 초등학생이 바로 이해할 수 있는 쉬운 한국어
-- 10개 단어 모두 달라야 함 (중복 금지)
-${RULES}
-
+[임무] 위 학년·난이도에 맞는 영단어 ${count}개를 JSON 배열로 생성하십시오.
+- 해당 학년 교과서·생활 영어에서 실제로 쓰이는 단어
+- 난이도 최저·하: 1~2음절 위주 / 상·최상: 3음절 이상 포함
+- meaning은 초등학생이 바로 이해하는 쉬운 한국어. 단어 중복 금지.
+${QUALITY}
 [JSON 형식]
-[{"word":"영어단어","meaning":"한국어뜻","tts":"영어단어"}, ...]
-
+[{"word":"apple","meaning":"사과","tts":"apple"}, ...]
 지금 바로 JSON 배열 ${count}개를 출력하시오.`;
 
-  // ══ 영어 ══
   if(c.subject==='영어') return `당신은 대한민국 초등 영어 평가 출제 전문가입니다. 2022 개정 교육과정 기준.
 
-[학습 대상] ${g}
-[이 학년 학습 범위] ${scope}
-[난이도 기준] ${diff}
-[출제 배분] 어휘 3문제 / 문법 4문제 / 짧은 지문·대화문 독해 3문제 (총 10문제)
-
-[학년 수준 준수]
-- 위 학습 범위에 명시된 단어·문법 구조만 사용 (범위 초과 금지)
-- 독해 지문은 ${c.grade<=2?'2~3':'4~5'}문장 이내로 q 필드 안에 직접 포함
-- 오답 3개는 해당 학년 학생이 실제로 혼동하는 그럴듯한 선택지
-${RULES}
-
+[학습 대상] ${g}  [학습 범위] ${scope}  [난이도] ${diff}
+[출제 배분] 어휘 3 / 문법 4 / 독해 3 (총 10문제)
+- 위 학습 범위 단어·문법만 사용 (초과 금지)
+- 독해 지문은 ${c.grade<=2?'2~3':'4~5'}문장 이내로 q 안에 직접 포함
+- 오답 3개는 학생이 실제로 혼동하는 그럴듯한 선택지
+${QUALITY}
 [JSON 형식]
 [{"type":"objective","q":"What color is the sky?","options":["red","blue","green","yellow"],"a":"blue","desc":"하늘은 파란색(blue)입니다.","tts_q":"What color is the sky?","tts_options":["red","blue","green","yellow"]}, ...]
-
 지금 바로 JSON 배열 ${count}개를 출력하시오.`;
 
-  // ══ 국어 ══
   if(c.subject==='국어') return `당신은 대한민국 초등 국어 교육과정 평가 전문가입니다. 2022 개정 교육과정 기준.
 
-[학습 대상] ${g}
-[이 학년 학습 범위] ${scope}
-[난이도 기준] ${diff}
-[출제 배분] 맞춤법·어문규정 3문제 / 어휘(낱말의 뜻·관계) 3문제 / 독해(내용·주제·중심문장) 2문제 / 문법(문장 성분·종류·높임법) 2문제 (총 10문제)
+[학습 대상] ${g}  [학습 범위] ${scope}  [난이도] ${diff}
+[출제 배분] 맞춤법·어문규정 3 / 어휘(낱말의 뜻·관계·반의어·유의어) 3 / 독해(내용·주제·중심문장) 2 / 문법(문장성분·종류·높임법) 2
+- 위 학습 범위 어휘·문법만 사용
+- 모든 문제는 텍스트만으로 완전히 풀 수 있어야 함
+- 독해 지문은 ${g} 수준 3~5문장으로 q 안에 직접 포함
+- 오답은 실제 학생이 자주 틀리는 유형으로 구성
 
-[학년 수준 준수]
-- 위 학습 범위 내 어휘와 문법 개념만 사용 (범위 초과 금지)
-- 모든 문제는 텍스트만으로 완전히 풀 수 있어야 함 (외부 자료 불필요)
-- 독해 지문은 ${g} 수준에 맞는 3~5문장으로 q 필드 안에 직접 포함
-- 오답은 실제 학생들이 자주 틀리는 유형으로 구성
-${RULES}
-
+[★ 국어 오류 방지 예시]
+올바른 예: {"q":"다음 중 맞춤법이 바른 것은?","options":["할게요","할께요","하ㄹ게요","할개요"],"a":"할게요","desc":"의지를 나타내는 어미는 '-ㄹ게요'이므로 '할게요'가 맞습니다."}
+금지 예1: "기쁘다-슬프다가 반의어 관계가 아닌 것" → 기쁘다↔슬프다는 교과서 인정 반의어이므로 이를 오답으로 처리하는 문제 출제 금지
+금지 예2: 높임말 보기에 "드시다"와 "잡수시다" 동시 포함 → 정답 2개 발생, 금지
+금지 예3: 반의어 문제에서 실제 반의어 쌍을 오답으로 처리하는 문제 금지
+${QUALITY}
 [JSON 형식]
-[{"type":"objective","q":"다음 중 <u>맞춤법</u>이 바른 것은?","options":["할게요","할께요","하ㄹ게요","할개요"],"a":"할게요","desc":"의지를 나타낼 때 '-ㄹ게요'를 써서 '할게요'가 올바릅니다."}, ...]
-
+[{"type":"objective","q":"다음 중 <u>맞춤법</u>이 바른 것은?","options":["할게요","할께요","하ㄹ게요","할개요"],"a":"할게요","desc":"의지를 나타내는 어미 '-ㄹ게요'를 써서 '할게요'가 올바릅니다."}, ...]
 지금 바로 JSON 배열 ${count}개를 출력하시오.`;
 
-  // ══ 수학 ══
   return `당신은 대한민국 초등 수학 교육과정 평가 전문가입니다. 2022 개정 교육과정 기준.
 
-[학습 대상] ${g}
-[이 학년 학습 범위] ${scope}
-[난이도 기준] ${diff}
-[출제 배분] 수와 연산 4문제 / 도형·측정 2문제 / 규칙·패턴 2문제 / 문장제(실생활 응용) 2문제 (총 10문제)
-
-[학년 수준 준수]
-- 위 학습 범위(${scope})를 벗어나는 선행 개념 절대 사용 금지
-- 계산 문제는 숫자를 q에 직접 표기 (예: "324 + 517 = ?")
-- 문장제는 2~3문장 이내로 간결하게 q에 직접 작성
-- 오답은 해당 학년 학생이 흔히 저지르는 계산 실수 유형으로 구성
-- 단위(cm·kg·원·개·L 등) 필요 시 q와 a 모두에 반드시 표기
-${RULES}
-
+[학습 대상] ${g}  [학습 범위] ${scope}  [난이도] ${diff}
+[출제 배분] 수와 연산 4 / 도형·측정 2 / 규칙·패턴 2 / 문장제(실생활 응용) 2
+- 위 학습 범위만 사용, 선행 개념 절대 금지
+- 계산 문제: 숫자를 q에 직접 표기 (예: "324 + 517 = ?")
+- 문장제: 2~3문장 이내, q에 직접 작성
+- 오답: 해당 학년 학생이 자주 하는 계산 실수 유형
+- 단위(cm·kg·원·개·L) 필요 시 q와 a 모두에 표기
+${QUALITY}
 [JSON 형식]
 [{"type":"objective","q":"사과 3개와 배 5개가 있습니다. 과일은 모두 몇 개인가요?","options":["6개","7개","8개","9개"],"a":"8개","desc":"3+5=8이므로 모두 8개입니다."}, ...]
-
 지금 바로 JSON 배열 ${count}개를 출력하시오.`;
 }
+
 
 // ══════════════════════════════
 //  STREAK / POINTS
