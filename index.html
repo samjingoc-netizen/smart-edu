@@ -41,6 +41,7 @@
    RESET & BASE
 ═══════════════════════════════════ */
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;outline:none;user-select:none;-webkit-user-select:none;}
+button, a { cursor:pointer; pointer-events:auto; }
 html,body{height:100%;overflow:hidden;}
 body{
   font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
@@ -120,10 +121,9 @@ input,textarea{user-select:text;-webkit-user-select:text;}
   font-size:16px; font-weight:800; font-family:inherit;
   letter-spacing:-.3px; transition:transform .1s,box-shadow .1s;
   position:relative; overflow:hidden;
+  pointer-events:auto;
 }
-.btn::after{content:'';position:absolute;inset:0;background:transparent;transition:background .15s;}
 .btn:active{transform:scale(.97);}
-.btn:active::after{background:rgba(0,0,0,.08);}
 
 .btn-primary{background:linear-gradient(135deg,var(--primary),#9333EA);color:#fff;box-shadow:0 4px 15px rgba(108,99,255,.35);}
 .btn-gold{background:linear-gradient(135deg,var(--gold),#EF4444);color:#fff;box-shadow:0 4px 15px rgba(245,158,11,.35);}
